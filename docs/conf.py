@@ -18,7 +18,7 @@
 import os.path as op
 import sys
 
-import BMicro
+import bmicro
 # include parent directory
 pdir = op.dirname(op.dirname(op.abspath(__file__)))
 # include extensions
@@ -188,7 +188,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'bmicro', 'BMicro Documentation',
-     author, 'bmicro', 'post-measurement analysis of Brillouin microscopy data',
+     author, 'bmicro', 'GUI for Brillouin microscopy data analysis',
      'Scientific'),
 ]
 
@@ -197,6 +197,5 @@ texinfo_documents = [
 intersphinx_mapping = {
     "python": ('https://docs.python.org/', None),
     "numpy": ('http://docs.scipy.org/doc/numpy', None),
-    "skimage": ('http://scikit-image.org/docs/stable/', None),
     "scipy": ('https://docs.scipy.org/doc/scipy/reference/', None),
     }
