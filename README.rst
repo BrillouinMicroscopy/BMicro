@@ -19,7 +19,7 @@ Installation
 
 ::
 
-    pip install bmicro[all]
+    pip install bmicro
 
 For more options, please check out the `documentation
 <https://bmicro.readthedocs.io/en/latest/sec_getting_started.html#installation>`__.
