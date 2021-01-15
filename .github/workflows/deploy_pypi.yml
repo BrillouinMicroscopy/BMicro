@@ -7,7 +7,6 @@ on:
 
 jobs:
   deploy:
-    if: github.event.base_ref == 'refs/heads/main'
     runs-on: macos-latest
     strategy:
       matrix:
