@@ -1,5 +1,5 @@
 |BMicro|
-=======
+========
 
 |PyPI Version| |Build Status| |Coverage Status| |Docs Status|
 
