@@ -22,4 +22,3 @@ def test_main_window_can_activate_all_tabs(qtbot):
 
 
 
-
