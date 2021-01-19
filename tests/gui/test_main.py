@@ -18,7 +18,3 @@ def test_main_window_can_activate_all_tabs(qtbot):
         assert current_tab
         qtbot.mouseClick(current_tab, QtCore.Qt.LeftButton)
         assert window.tabWidget.tabText(idx) == tab_text
-
-
-
-
