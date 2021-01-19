@@ -14,13 +14,21 @@ jobs:
       matrix:
         python-version: ['3.7', '3.8']
         os: [macos-latest, ubuntu-latest, windows-latest]
-
+    env:
+      # Display must be available globally for linux to know where xvfb is
+      DISPLAY: :0
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Setup xvfb (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0
+        # start xvfb in the background
+        sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
     - name: Install dependencies
       run: |
         # prerequisites
