@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>BMicro</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -36,7 +36,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_data">
        <attribute name="title">
@@ -53,9 +53,9 @@
         <string>Calibration</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="tab_peakSelection">
+      <widget class="QWidget" name="tab_peak_selection">
        <attribute name="title">
-        <string>PeakSelection</string>
+        <string>Peak Selection</string>
        </attribute>
       </widget>
       <widget class="QWidget" name="tab_evaluation">
