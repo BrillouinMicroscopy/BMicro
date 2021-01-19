@@ -39,10 +39,8 @@ jobs:
         # show installed packages
         pip freeze
     - name: Test with pytest
-      uses: GabrielBB/xvfb-action@v1
-      with:
-           run: |
-             coverage run --source=bmicro setup.py test
+      run: |
+        coverage run --source=bmicro setup.py test
     - name: Lint with flake8
       run: |
         flake8 .
