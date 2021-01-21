@@ -37,7 +37,7 @@ jobs:
         # install bmlab from same branch
         pip install git+https://github.com/BrillouinMicroscopy/bmlab.git@${GITHUB_REF##*/}
         # install dependencies
-        pip install -e .[all]
+        pip install -e .
         # show installed packages
         pip freeze
     - name: Test with pytest
