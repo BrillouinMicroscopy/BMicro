@@ -38,6 +38,7 @@ jobs:
       run: |
         flake8 .
     - name: Submit code coverage
+      continue-on-error: true
       run: |
         coverage report -m
         codecov
