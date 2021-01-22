@@ -39,7 +39,8 @@ setup(
     install_requires=["h5py>=2.10.0",
                       "numpy>=1.17.0",
                       "scipy>=0.14.0",
-                      "pyqt5"
+                      "pyqt5",
+                      "bmlab"
                       ],
     # not to be confused with definitions in pyproject.toml [build-system]
     setup_requires=["pytest-runner"],

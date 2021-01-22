@@ -20,3 +20,11 @@ def test_main_window_can_activate_all_tabs(qtbot):
         assert window.tabWidget.tabText(idx) == tab_text
 
     window.close()
+
+
+def test_data_tab_shows_smoke_test_message(qtbot):
+
+    window = BMicro()
+    data_widget = window.widget_data_view
+    assert data_widget.data_test_label.text() == 'test message'
+    window.close()
