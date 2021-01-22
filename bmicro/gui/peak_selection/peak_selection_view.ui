@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>data_view</class>
+ <widget class="QWidget" name="data_view">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>640</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QLabel" name="data_test_label">
+   <property name="geometry">
+    <rect>
+     <x>232</x>
+     <y>200</y>
+     <width>209</width>
+     <height>65</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Peak selection widget
+Replace me with data from bmlab</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

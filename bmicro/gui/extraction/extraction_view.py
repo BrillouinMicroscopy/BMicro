@@ -8,7 +8,7 @@ class ExtractionView(QtWidgets.QWidget):
     """
 
     def __init__(self, *args, **kwargs):
+        super(ExtractionView, self).__init__(*args, **kwargs)
 
-        QtWidgets.QWidget.__init__(self)
         ui_file = pkg_resources.resource_filename('bmicro.gui.extraction', 'extraction_view.ui')
         uic.loadUi(ui_file, self)
