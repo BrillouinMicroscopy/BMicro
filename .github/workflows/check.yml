@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.7']
-        os: [macos-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
     env:
       # Display must be available globally for linux to know where xvfb is
       DISPLAY: :0
@@ -23,21 +23,33 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: nelonoel/branch-name@v1.0.1
     - name: Setup xvfb (Linux)
       if: runner.os == 'Linux'
       run: |
         sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0
         # start xvfb in the background
         sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
-    - name: Install dependencies
+    - name: Install dependencies for Mac and Linux
+      if: runner.os != 'Windows'
       run: |
         # prerequisites
         python -m pip install --upgrade pip wheel
         python -m pip install codecov coverage flake8 pytest
         # install bmlab from same branch
-        echo GITHUB_REF = ${GITHUB_REF}
-        pip install git+https://github.com/BrillouinMicroscopy/bmlab.git@${GITHUB_REF}
+        pip install git+https://github.com/BrillouinMicroscopy/bmlab.git@${GITHUB_REF##*/}
+        # install dependencies
+        pip install -e .
+        # show installed packages
+        pip freeze
+    - name: Install dependencies for Windows
+      if: runner.os == 'Windows'
+      run: |
+        # prerequisites
+        python -m pip install --upgrade pip wheel
+        python -m pip install codecov coverage flake8 pytest
+        # install bmlab from same branch
+        SET branch=%ref:/refs/heads/=%
+        pip install git+https://github.com/BrillouinMicroscopy/bmlab.git@%branch%
         # install dependencies
         pip install -e .
         # show installed packages
