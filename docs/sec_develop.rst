@@ -85,7 +85,7 @@ installed and run
 
 ::
 
-    coverage run --source="BMicro" setup.py test
+    coverage run --source="bmicro" setup.py test
     coverage report
 
 
