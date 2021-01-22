@@ -51,6 +51,9 @@ jobs:
         SET branch=%GITHUB_REF:/refs/heads/=%
         echo %branch%
         echo %GITHUB_REF%
+        echo $branch
+        echo $GITHUB_REF
+
         pip install git+https://github.com/BrillouinMicroscopy/bmlab.git@%branch%
         # install dependencies
         pip install -e .
