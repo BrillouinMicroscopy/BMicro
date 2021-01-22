@@ -36,12 +36,25 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_data">
        <attribute name="title">
         <string>Data</string>
        </attribute>
+       <widget class="QLabel" name="label_test">
+        <property name="geometry">
+         <rect>
+          <x>16</x>
+          <y>16</y>
+          <width>209</width>
+          <height>33</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Replace me with data from bmlab</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_extraction">
        <attribute name="title">
