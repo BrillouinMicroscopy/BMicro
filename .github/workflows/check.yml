@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.7']
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [windows-latest]
     env:
       # Display must be available globally for linux to know where xvfb is
       DISPLAY: :0
@@ -48,7 +48,7 @@ jobs:
         python -m pip install --upgrade pip wheel
         python -m pip install codecov coverage flake8 pytest
         # install bmlab from same branch
-        SET branch=%ref:/refs/heads/=%
+        SET branch=%GITHUB_REF:/refs/heads/=%
         pip install git+https://github.com/BrillouinMicroscopy/bmlab.git@%branch%
         # install dependencies
         pip install -e .
