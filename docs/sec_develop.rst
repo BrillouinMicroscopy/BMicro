@@ -5,34 +5,51 @@ Development
 ===========
 
 This section gives on overview about everything you need to know if you
-wish to contribute to BMicro.
+wish to contribute to
+`bmlab <https://github.com/BrillouinMicroscopy/bmlab/>`_ or
+`BMicro <https://github.com/BrillouinMicroscopy/BMicro>`_.
 
 
 Development workflow
 ====================
-The main branch for developing BMicro is ``main``.
-If you want to make small changes like one-liners,
-documentation, or default values in the configuration,
-you may work on the ``main`` branch. If you want to change
-more, please (fork BMicro and) create a separate branch,
-e.g. ``my_new_feature_dev``, and create a pull-request
-once you are done making your changes.
-Please make sure to edit the
-`Changelog <https://github.com/BrillouinMicroscopy/BMicro/blob/main/CHANGELOG>`__.
+We use `GitHub projects <https://github.com/BrillouinMicroscopy/BMicro/projects>`_
+to manage the development workflow of bmlab and BMicro. The main development project board is
+`Brillouin Evaluation in Python <https://github.com/BrillouinMicroscopy/BMicro/projects/1>`_.
 
-**Very important:** Please try to always pull with rebase
+The development is split into "User Stories", each of which is a
+collection of issues (identified via titles in the issues). The current work in progress
+(WIP) branch is named according to the currently active user story
+(e.g. `1-smoke-test`). Issues that are not part of the current user story
+should still be addressed in the current WIP branch.
 
-::
+Once you wish to address an issue, drag it from the "Open" or "Ready"
+column of the project board to the "In progress" column. Once you finished
+working on an issue, drag it to the "Done" column, but don't close it yet
+(It should be discussed first in the dev meeting).
 
-    git pull --rebase
+**Notes**:
 
-instead of
+- Please write test functions and keep code coverage above 90%.
 
-::
+- Please make sure to always edit the
+  changelog for
+  `BMicro <https://github.com/BrillouinMicroscopy/BMicro/blob/main/CHANGELOG>`__
+  or
+  `bmlab <https://github.com/BrillouinMicroscopy/bmlab/blob/main/CHANGELOG>`__.
 
-    git pull
+- Please try to always pull with rebase
 
-to prevent confusions in the commit history.
+  ::
+
+      git pull --rebase
+
+  instead of
+
+  ::
+
+      git pull
+
+  to prevent confusions in the commit history.
 
 
 Documentation
@@ -50,7 +67,7 @@ and execute:
     sphinx-build . _build
 
 This will create a a file ``_build/index.html`` which you can open in
-your favorite browser.
+your favorite browser. This also applies to bmlab.
 
 
 
@@ -62,6 +79,14 @@ functions for your code. You can run all tests via
 ::
 
     python setup.py test
+
+To check for code coverage, make sure the `coverage` Python package is
+installed and run
+
+::
+
+    coverage run --source="bmicro" setup.py test
+    coverage report
 
 
 Making a new release

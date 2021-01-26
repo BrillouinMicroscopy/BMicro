@@ -1,7 +1,12 @@
-name: Checks
+name: Checks with bmlab from PyPI
 
 on:
   push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
   schedule:
   - cron: "0 0 1 * *"
 
@@ -28,26 +33,11 @@ jobs:
         sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0
         # start xvfb in the background
         sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
-    - name: Install dependencies for Mac and Linux
-      if: runner.os != 'Windows'
+    - name: Install dependencies
       run: |
         # prerequisites
         python -m pip install --upgrade pip wheel
         python -m pip install codecov coverage flake8 pytest
-        # install bmlab from same branch
-        pip install git+https://github.com/BrillouinMicroscopy/bmlab.git@${GITHUB_REF##*/}
-        # install dependencies
-        pip install -e .
-        # show installed packages
-        pip freeze
-    - name: Install dependencies for Windows
-      if: runner.os == 'Windows'
-      run: |
-        # prerequisites
-        python -m pip install --upgrade pip wheel
-        python -m pip install codecov coverage flake8 pytest
-        # install bmlab from same branch
-        pip install ("git+https://github.com/BrillouinMicroscopy/bmlab.git@" + $env:GITHUB_REF.replace('refs/heads/', ''))
         # install dependencies
         pip install -e .
         # show installed packages

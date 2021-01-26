@@ -39,12 +39,14 @@ setup(
     install_requires=["h5py>=2.10.0",
                       "numpy>=1.17.0",
                       "scipy>=0.14.0",
+                      "pyqt5",
+                      "bmlab"
                       ],
     # not to be confused with definitions in pyproject.toml [build-system]
     setup_requires=["pytest-runner"],
     python_requires=">=3.6",
-    tests_require=["pytest"],
-    keywords=["Brillouin microscopy"],
+    tests_require=["pytest", "pytest-qt"],
+    keywords=["Brillouin Microscopy"],
     classifiers=['Operating System :: OS Independent',
                  'Programming Language :: Python :: 3',
                  'Topic :: Scientific/Engineering :: Visualization',
