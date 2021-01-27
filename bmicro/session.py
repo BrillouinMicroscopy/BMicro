@@ -20,7 +20,10 @@ class Session(object):
         return Session.__instance
 
     def set_file(self, file_name):
-        if file_name:
+        try:
             self.file = BrillouinFile(file_name)
-        else:
+        except Exception:
             self.file = None
+
+    def clear(self):
+        self.file = None

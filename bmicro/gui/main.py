@@ -68,11 +68,12 @@ class BMicro(QtWidgets.QMainWindow):
             self.session.set_file(file_name)
         except Exception:
             msg = QMessageBox()
-            msg.setIcon(QMessageBox.Information)
-            msg.setText("This is a message box")
-            msg.setInformativeText("This is additional information")
-            msg.setWindowTitle("MessageBox demo")
-            msg.show()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText('Unable to load file:')
+            msg.setInformativeText(file_name)
+            msg.setWindowTitle('Invalid File Error')
+            msg.exec_()
+            self.session.clear()
 
         self.update_ui()
 
