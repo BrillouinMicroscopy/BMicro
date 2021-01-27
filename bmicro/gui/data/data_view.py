@@ -21,6 +21,9 @@ class DataView(QtWidgets.QWidget):
         self.update_ui()
 
     def update_ui(self):
+        """
+        When a new file is selected, update the UI accordingly.
+        """
         self.label_selected_file.setText('')
         self.comboBox_repetition.clear()
         self.label_date.setText('')

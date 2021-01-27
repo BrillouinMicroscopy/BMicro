@@ -59,9 +59,11 @@ class BMicro(QtWidgets.QMainWindow):
         self.session = Session.get_instance()
 
     def connect_menu(self):
+        """ Registers the menu actions """
         self.action_open.triggered.connect(self.open_file)
 
     def open_file(self):
+        """ Show open file dialog and load file. """
         file_name, _ = QFileDialog.getOpenFileName(self, 'Open File...',
                                                    filter='*.h5')
         try:
