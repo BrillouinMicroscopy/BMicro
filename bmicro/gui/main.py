@@ -1,12 +1,14 @@
 import pkg_resources
 
 from PyQt5 import QtWidgets, uic, QtCore
+from PyQt5.QtWidgets import QAction, QFileDialog, QMessageBox
 
 from . import data
 from . import extraction
 from . import calibration
 from . import peak_selection
 from . import evaluation
+from ..session import Session
 
 
 class BMicro(QtWidgets.QMainWindow):
@@ -51,3 +53,29 @@ class BMicro(QtWidgets.QMainWindow):
         self.layout_evaluation = QtWidgets.QVBoxLayout()
         self.tab_evaluation.setLayout(self.layout_evaluation)
         self.layout_evaluation.addWidget(self.widget_evaluation_view)
+
+        self.connect_menu()
+
+        self.session = Session.get_instance()
+
+    def connect_menu(self):
+        self.action_open.triggered.connect(self.open_file)
+
+    def open_file(self):
+        file_name, _ = QFileDialog.getOpenFileName(self, 'Open File...',
+                                                  filter='*.h5')
+        try:
+            self.session.set_file(file_name)
+        except Exception:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("This is a message box")
+            msg.setInformativeText("This is additional information")
+            msg.setWindowTitle("MessageBox demo")
+            msg.show()
+
+        self.update_ui()
+
+    def update_ui(self):
+        self.widget_data_view.update_ui()
+

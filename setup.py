@@ -45,7 +45,7 @@ setup(
     # not to be confused with definitions in pyproject.toml [build-system]
     setup_requires=["pytest-runner"],
     python_requires=">=3.6",
-    tests_require=["pytest", "pytest-qt"],
+    tests_require=["pytest", "pytest-qt", "pytest-mock"],
     keywords=["Brillouin Microscopy"],
     classifiers=['Operating System :: OS Independent',
                  'Programming Language :: Python :: 3',
