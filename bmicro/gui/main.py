@@ -1,7 +1,7 @@
 import pkg_resources
 
 from PyQt5 import QtWidgets, uic, QtCore
-from PyQt5.QtWidgets import QAction, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 from . import data
 from . import extraction
@@ -63,7 +63,7 @@ class BMicro(QtWidgets.QMainWindow):
 
     def open_file(self):
         file_name, _ = QFileDialog.getOpenFileName(self, 'Open File...',
-                                                  filter='*.h5')
+                                                   filter='*.h5')
         try:
             self.session.set_file(file_name)
         except Exception:
@@ -78,4 +78,3 @@ class BMicro(QtWidgets.QMainWindow):
 
     def update_ui(self):
         self.widget_data_view.update_ui()
-

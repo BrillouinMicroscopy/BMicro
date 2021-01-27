@@ -1,5 +1,4 @@
 import pkg_resources
-import datetime
 
 from PyQt5 import QtWidgets, uic
 
@@ -39,7 +38,8 @@ class DataView(QtWidgets.QWidget):
         self.comboBox_repetition.addItems(rep_keys)
 
         if rep_keys and self.comboBox_repetition.currentText():
-            repetition = self.session.file.get_repetition(self.comboBox_repetition.currentText())
+            repetition = self.session.file.get_repetition(
+                self.comboBox_repetition.currentText())
             res = repetition.payload.resolution
             if res:
                 self.label_resolution_x.setText(str(res[0]))
@@ -48,4 +48,5 @@ class DataView(QtWidgets.QWidget):
             date = repetition.date.strftime('%Y-%m-%d %H:%M')
             self.label_date.setText(date)
             self.textedit_comment.setText(self.session.file.comment)
-            self.label_calibration.setText(str(not repetition.calibration.is_empty()))
+            self.label_calibration.setText(
+                str(not repetition.calibration.is_empty()))

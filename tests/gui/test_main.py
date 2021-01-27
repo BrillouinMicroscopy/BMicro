@@ -1,6 +1,6 @@
 import pathlib
 
-from PyQt5.QtWidgets import QWidget, QAction
+from PyQt5.QtWidgets import QWidget
 from PyQt5 import QtCore
 
 from bmicro.gui.main import BMicro
@@ -39,12 +39,13 @@ def test_open_file_shows_metadata(qtbot, mocker):
                  mock_getOpenFileName)
 
     window.open_file()
-    assert window.widget_data_view.label_selected_file.text() == str(file_name)
-    assert window.widget_data_view.label_date.text() == '2020-11-03 15:20'
-    assert window.widget_data_view.label_resolution_x.text() == '10'
-    assert window.widget_data_view.label_resolution_y.text() == '1'
-    assert window.widget_data_view.label_resolution_z.text() == '1'
-    assert window.widget_data_view.label_calibration.text() == 'True'
-    assert window.widget_data_view.textedit_comment.toPlainText() == 'Brillouin data'
+    w = window.widget_data_view
+    assert w.label_selected_file.text() == str(file_name)
+    assert w.label_date.text() == '2020-11-03 15:20'
+    assert w.label_resolution_x.text() == '10'
+    assert w.label_resolution_y.text() == '1'
+    assert w.label_resolution_z.text() == '1'
+    assert w.label_calibration.text() == 'True'
+    assert w.textedit_comment.toPlainText() == 'Brillouin data'
 
     window.close()
