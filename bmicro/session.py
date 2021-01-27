@@ -22,8 +22,9 @@ class Session(object):
     def set_file(self, file_name):
         try:
             self.file = BrillouinFile(file_name)
-        except Exception:
+        except Exception as e:
             self.file = None
+            raise e
 
     def clear(self):
         self.file = None

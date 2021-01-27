@@ -80,6 +80,8 @@ def test_open_invalid_file_clears_session(qtbot, mocker):
     # shown.
     mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
                  mock_getOpenFileName_invalid)
+    # Suppress modal alert window for test
+    mocker.patch('PyQt5.QtWidgets.QMessageBox.exec_', lambda self, *args, **kwargs: True)
     window.open_file()
 
     #

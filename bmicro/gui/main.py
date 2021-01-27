@@ -70,7 +70,7 @@ class BMicro(QtWidgets.QMainWindow):
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
             msg.setText('Unable to load file:')
-            msg.setInformativeText(file_name)
+            msg.setInformativeText(str(file_name))
             msg.setWindowTitle('Invalid File Error')
             msg.exec_()
             self.session.clear()
