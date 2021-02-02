@@ -23,6 +23,8 @@ jobs:
       DISPLAY: :0
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -52,3 +54,8 @@ jobs:
       run: |
         coverage report -m
         codecov
+    - name: Create app and check if it runs (macOS)
+      if: runner.os == 'macOS'
+      working-directory: ./build-recipes
+      run: |
+        bash ./macos_build_app.sh BMicro $(python -m bmicro --version)
