@@ -1,5 +1,6 @@
 0.1.3
  - ui: add app icon (#9)
+ - build: add Windows build pipeline (#1)
 0.1.2
  - CI automation
 0.1.1
