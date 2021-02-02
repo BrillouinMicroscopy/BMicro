@@ -32,7 +32,14 @@ install:
   # Install the latest version of bmlab if we are not on main
   - ps: |
       if ($env:APPVEYOR_REPO_BRANCH -ne "main") {
-        pip install ("git+https://github.com/BrillouinMicroscopy/bmlab.git@" + $env:APPVEYOR_REPO_BRANCH) 2> $null || exit 0
+        Try
+        {
+           pip install ("git+https://github.com/BrillouinMicroscopy/bmlab.git@" + $env:APPVEYOR_REPO_BRANCH) 2> $null || exit 0
+        }
+        Catch
+        {
+           "Expected git issue"
+        }
       }
   # Show the installed packages
   - pip freeze
