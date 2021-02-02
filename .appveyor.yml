@@ -54,16 +54,17 @@ after_test:
   - python setup.py bdist_wheel
   - python setup.py sdist
   - ps: "ls dist"
+  - cd build-recipes
   # Run pyinstaller
-  - pyinstaller -y --log-level=WARN build-recipes\win_bmicro.spec
+  - pyinstaller -y --log-level=WARN win_bmicro.spec
   # Run the binary (the most simple test)
   - dist\\BMicro\\BMicro.exe --version
   # Create InnoSetup installers
   # Generate iss file
-  - python build-recipes\\win_make_iss.py
+  - python win_make_iss.py
   # Set InnoSetup path here, because Cython complained about it.
   - set PATH=%PATH%;"C:\\Program Files (x86)\\Inno Setup 5"
-  - iscc /Q build-recipes\\win_bmicro.iss
+  - iscc /Q win_bmicro.iss
 
 artifacts:
   # InnoSetup files

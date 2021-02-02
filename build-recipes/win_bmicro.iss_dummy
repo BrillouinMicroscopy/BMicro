@@ -9,6 +9,7 @@
 #define MyAppURL "https://bmicro.readthedocs.io"
 #define MyAppPlatform "win32"
 #define MyAppExeName "BMicro.exe"
+#define MyAppDir = SourcePath + "dist\pyjibe\"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -41,8 +42,8 @@ Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\projects\bmicro\dist\BMicro\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\projects\bmicro\dist\BMicro\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MyAppDir}{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MyAppDir}*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyzmAppName}"; Filename: "{app}\{#MyAppExeName}"
