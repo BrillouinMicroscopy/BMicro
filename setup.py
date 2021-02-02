@@ -36,14 +36,13 @@ setup(
     license="GPL v3",
     description=description,
     long_description=open('README.rst').read() if exists('README.rst') else '',
-    install_requires=["h5py>=2.10.0",
+    install_requires=["bmlab",
+                      "h5py>=2.10.0",
                       "numpy>=1.17.0",
                       "scipy>=0.14.0",
                       "pyqt5",
-                      "bmlab"
                       ],
-    # not to be confused with definitions in pyproject.toml [build-system]
-    setup_requires=["pytest-runner"],
+    setup_requires=["pytest-runner"],  # required for pytest
     python_requires=">=3.6",
     tests_require=["pytest", "pytest-qt", "pytest-mock"],
     keywords=["Brillouin Microscopy"],
