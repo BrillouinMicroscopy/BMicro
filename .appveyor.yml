@@ -56,7 +56,7 @@ after_test:
   - ps: "ls dist"
   - cd build-recipes
   # Run pyinstaller
-  - pyinstaller -y --log-level=WARN win_bmicro.spec
+  - pyinstaller -y --log-level=WARN win_BMicro.spec
   # Run the binary (the most simple test)
   - dist\\BMicro\\BMicro.exe --version
   # Create InnoSetup installers
