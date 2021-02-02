@@ -42,8 +42,9 @@ setup(
                       "scipy>=0.14.0",
                       "pyqt5",
                       ],
+    setup_requires=["pytest-runner"],  # required for pytest
     python_requires=">=3.6",
-    tests_require=["pytest", "pytest-qt", "pytest-mock", "pytest-runner"],
+    tests_require=["pytest", "pytest-qt", "pytest-mock"],
     keywords=["Brillouin Microscopy"],
     classifiers=['Operating System :: OS Independent',
                  'Programming Language :: Python :: 3',
