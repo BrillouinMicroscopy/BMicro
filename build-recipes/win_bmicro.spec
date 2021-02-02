@@ -34,7 +34,7 @@ exe = EXE(pyz,
           strip=False,
           upx=False,
           icon=icofile,
-          console=True)
+          console=False)
 
 coll = COLLECT(exe,
                a.binaries,

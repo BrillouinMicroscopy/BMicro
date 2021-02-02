@@ -1,14 +1,17 @@
 import pkg_resources
+import sys
 
 from PyQt5 import QtWidgets, uic, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
+
+from ..session import Session
+from .._version import version as __version__
 
 from . import data
 from . import extraction
 from . import calibration
 from . import peak_selection
 from . import evaluation
-from ..session import Session
 
 
 class BMicro(QtWidgets.QMainWindow):
@@ -22,7 +25,6 @@ class BMicro(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         """ Initializes BMicro."""
-
         super(BMicro, self).__init__(*args, **kwargs)
         ui_file = pkg_resources.resource_filename('bmicro.gui', 'main.ui')
         uic.loadUi(ui_file, self)
@@ -57,6 +59,12 @@ class BMicro(QtWidgets.QMainWindow):
         self.connect_menu()
 
         self.session = Session.get_instance()
+
+        # if "--version" was specified, print the version and exit
+        if "--version" in sys.argv:
+            print(__version__)
+            QtWidgets.QApplication.processEvents()
+            sys.exit(0)
 
     def connect_menu(self):
         """ Registers the menu actions """
