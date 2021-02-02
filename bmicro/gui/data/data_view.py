@@ -37,6 +37,7 @@ class DataView(QtWidgets.QWidget):
             return
 
         self.label_selected_file.setText(str(self.session.file.path))
+        self.label_selected_file.adjustSize()
         rep_keys = self.session.file.repetition_keys()
         self.comboBox_repetition.addItems(rep_keys)
 
