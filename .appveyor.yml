@@ -31,9 +31,8 @@ install:
   - appveyor-retry pip install -e .
   # Install the latest version of bmlab if we are not on main
   - ps: |
-      $env:GIT_REDIRECT_STDERR = '2>&1'
       if ($env:APPVEYOR_REPO_BRANCH -ne "main") {
-        pip install ("git+https://github.com/BrillouinMicroscopy/bmlab.git@" + $env:APPVEYOR_REPO_BRANCH)
+        pip install ("git+https://github.com/BrillouinMicroscopy/bmlab.git@" + $env:APPVEYOR_REPO_BRANCH) 2> $null
       }
   # Show the installed packages
   - pip freeze
