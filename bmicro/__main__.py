@@ -4,7 +4,7 @@ import sys
 
 from PyQt5 import QtGui, QtWidgets
 
-from .gui.main import BMicro
+from bmicro.gui.main import BMicro
 
 
 def main():

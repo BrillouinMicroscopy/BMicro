@@ -41,6 +41,8 @@ setup(
                       "numpy>=1.17.0",
                       "scipy>=0.14.0",
                       "pyqt5",
+                      "pyqtgraph",
+                      "matplotlib"
                       ],
     setup_requires=["pytest-runner"],  # required for pytest
     python_requires=">=3.6",

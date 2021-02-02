@@ -24,6 +24,8 @@ class Session(object):
             Session.__instance = self
 
         self.file = None
+        self.rotation = 0
+        self.reflection = {'vertically': False, 'horizontally': False}
 
     @staticmethod
     def get_instance():
@@ -61,3 +63,12 @@ class Session(object):
         Close connection to loaded file.
         """
         self.file = None
+
+    def set_rotation(self, angle):
+        self.rotation = angle
+
+    def set_reflection(self, **kwargs):
+        axes = ['vertically', 'horizontally']
+        for a in axes:
+            if a in kwargs:
+                self.reflection[a] = kwargs[a]
