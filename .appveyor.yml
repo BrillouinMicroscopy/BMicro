@@ -29,6 +29,11 @@ install:
   - python -m pip install -r build-recipes\\win_build_requirements.txt
   # Install bmicro and its dependencies
   - appveyor-retry pip install -e .
+  # Install the latest version of bmlab if we are not on main
+  - ps: |
+      if ($env:APPVEYOR_REPO_BRANCH -eq "main") {
+        pip install ("git+https://github.com/BrillouinMicroscopy/bmlab.git@" + $env:APPVEYOR_REPO_BRANCH)
+      }
   # Show the installed packages
   - pip freeze
 
