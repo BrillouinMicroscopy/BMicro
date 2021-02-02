@@ -34,7 +34,7 @@ install:
       if ($env:APPVEYOR_REPO_BRANCH -ne "main") {
         Try
         {
-           pip install ("git+https://github.com/BrillouinMicroscopy/bmlab.git@" + $env:APPVEYOR_REPO_BRANCH) 2> $null || exit 0
+           pip install ("git+https://github.com/BrillouinMicroscopy/bmlab.git@" + $env:APPVEYOR_REPO_BRANCH) 2> $null
         }
         Catch
         {
