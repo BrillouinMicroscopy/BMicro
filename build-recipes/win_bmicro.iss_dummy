@@ -9,7 +9,7 @@
 #define MyAppURL "https://bmicro.readthedocs.io"
 #define MyAppPlatform "win32"
 #define MyAppExeName "BMicro.exe"
-#define MyAppDir = SourcePath + "dist\pyjibe\"
+#define MyAppDir = SourcePath + "dist\BMicro\"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
