@@ -22,7 +22,7 @@ class Setup(object):
         vipa
         calibration
         """
-
+        self.key = key
         self.name = name
         self.pixel_size = pixel_size
         self.lambda0 = lambda0
