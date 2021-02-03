@@ -94,3 +94,20 @@ def test_open_file_shows_preview(qtbot, mocker):
     assert len(window.widget_data_view.mplcanvas.fig.get_axes()) > 0
 
     window.close()
+
+
+def test_selecting_setup_updates_session(qtbot, mocker):
+    window = BMicro()
+    file_name = data_file_path('Water.h5')
+
+    def mock_getOpenFileName(self, *args, **kwargs):
+        return file_name, None
+
+    mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
+                 mock_getOpenFileName)
+
+    window.open_file()
+    qtbot.keyClicks(window.widget_data_view.combobox_setup, '532 nm @ Biotec R314')
+
+    assert window.session.setup.name == '532 nm @ Biotec R314'
+    window.close()

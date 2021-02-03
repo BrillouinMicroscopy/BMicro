@@ -5,6 +5,7 @@ import matplotlib
 
 from bmicro.gui.mpl import MplCanvas
 from bmicro.session import Session
+from bmicro.model import AVAILABLE_SETUPS
 
 matplotlib.use('Qt5Agg')
 
@@ -38,6 +39,10 @@ class DataView(QtWidgets.QWidget):
 
         self.comboBox_repetition.currentIndexChanged.connect(
             self.on_select_repetition)
+
+        self.combobox_setup.addItems([s.name for s in AVAILABLE_SETUPS])
+        self.combobox_setup.currentIndexChanged.connect(
+            self.on_select_setup)
 
         self.update_ui()
 
@@ -130,3 +135,13 @@ class DataView(QtWidgets.QWidget):
             pass
 
         self.update_preview()
+
+    def on_select_setup(self):
+        name = self.combobox_setup.currentText()
+        setup = None
+        for s in AVAILABLE_SETUPS:
+            if s.name == name:
+                setup = s
+                break
+        self.session.setup = setup
+

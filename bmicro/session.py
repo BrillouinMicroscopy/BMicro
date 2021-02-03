@@ -1,5 +1,7 @@
 from bmlab.file import BrillouinFile
 
+from bmicro.model import AVAILABLE_SETUPS
+
 
 class Session(object):
     """
@@ -27,6 +29,7 @@ class Session(object):
         self.rotation = 0
         self.reflection = {'vertically': False, 'horizontally': False}
         self.selected_repetition = None
+        self.setup = None
 
     @staticmethod
     def get_instance():
@@ -73,3 +76,6 @@ class Session(object):
         for a in axes:
             if a in kwargs:
                 self.reflection[a] = kwargs[a]
+
+    def set_setup(self, setup):
+        self.setup = setup

@@ -3,12 +3,14 @@ import numpy as np
 
 class Setup(object):
 
-    def __init__(self, name, pixel_size, lambda0, focal_length,
+    def __init__(self, key, name, pixel_size, lambda0, focal_length,
                  vipa, calibration):
         """
 
         Parameters
         ----------
+        key: str
+            ID for the setup
         name: str
             Name of setup
         pixel_size: float
@@ -53,7 +55,8 @@ class VIPA(object):
 
 class Calibration(object):
 
-    def __init__(self, num_brillouin_samples, shift_methanol=None, shift_water=None):
+    def __init__(self, num_brillouin_samples, shift_methanol=None,
+                 shift_water=None):
         """
 
         Parameters
@@ -72,7 +75,8 @@ class Calibration(object):
 
 
 AVAILABLE_SETUPS = [
-    Setup(name='780 nm @ Biotec R340',
+    Setup(key='S0',
+          name='780 nm @ Biotec R340',
           pixel_size=6.5e-6,
           lambda0=780.24e-9,
           focal_length=0.2,
@@ -83,7 +87,8 @@ AVAILABLE_SETUPS = [
           calibration=Calibration(num_brillouin_samples=2,
                                   shift_methanol=3.78e9,
                                   shift_water=5.066e9)),
-    Setup(name='780 nm @ Biotec R340 old',
+    Setup(key='S1',
+          name='780 nm @ Biotec R340 old',
           pixel_size=6.5e-6,
           lambda0=780.24e-9,
           focal_length=0.2,
@@ -93,7 +98,8 @@ AVAILABLE_SETUPS = [
                     order=0),
           calibration=Calibration(num_brillouin_samples=1,
                                   shift_methanol=3.78e9)),
-    Setup(name='532 nm @ Biotec R314',
+    Setup(key='S2',
+          name='532 nm @ Biotec R314',
           pixel_size=6.5e-6,
           lambda0=532e-9,
           focal_length=0.2,
