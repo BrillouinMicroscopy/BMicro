@@ -126,7 +126,7 @@ class DataView(QtWidgets.QWidget):
         try:
             rep = self.session.file.get_repetition(rep_key)
             self.session.selected_repetition = rep
-        except:
+        except Exception:
             pass
 
         self.update_preview()
