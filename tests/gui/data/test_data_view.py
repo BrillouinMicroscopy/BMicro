@@ -1,6 +1,7 @@
 import pathlib
 
 from PyQt5 import QtCore
+import pytest
 
 from bmicro.gui.main import BMicro
 
@@ -9,8 +10,8 @@ def data_file_path(file_name):
     return pathlib.Path(__file__).parent.parent.parent / 'data' / file_name
 
 
-def test_clicking_rotate_updates_session(qtbot, mocker):
-
+@pytest.fixture
+def window(mocker):
     window = BMicro()
     file_name = data_file_path('Water.h5')
 
@@ -19,8 +20,13 @@ def test_clicking_rotate_updates_session(qtbot, mocker):
 
     mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
                  mock_getOpenFileName)
-
     window.open_file()
+    yield window
+    window.close()
+
+
+def test_clicking_rotate_updates_session(qtbot, window):
+
     assert window.session.rotation == 0
     qtbot.mouseClick(
         window.widget_data_view.radio_rotation_90_cw, QtCore.Qt.LeftButton)
@@ -40,21 +46,9 @@ def test_clicking_rotate_updates_session(qtbot, mocker):
     #     window.widget_data_view.radio_rotation_none, QtCore.Qt.LeftButton)
     # assert window.session.rotation == 0
 
-    window.close()
 
+def test_clicking_reflect_updates_session(qtbot, window):
 
-def test_clicking_reflect_updates_session(qtbot, mocker):
-
-    window = BMicro()
-    file_name = data_file_path('Water.h5')
-
-    def mock_getOpenFileName(self, *args, **kwargs):
-        return file_name, None
-
-    mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
-                 mock_getOpenFileName)
-
-    window.open_file()
     assert window.session.reflection == {
         'vertically': False, 'horizontally': False}
 
@@ -76,39 +70,13 @@ def test_clicking_reflect_updates_session(qtbot, mocker):
     assert window.session.reflection == {
         'vertically': True, 'horizontally': False}
 
-    window.close()
 
-
-def test_open_file_shows_preview(qtbot, mocker):
-    window = BMicro()
-    file_name = data_file_path('Water.h5')
-
-    def mock_getOpenFileName(self, *args, **kwargs):
-        return file_name, None
-
-    mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
-                 mock_getOpenFileName)
-
-    window.open_file()
-
+def test_open_file_shows_preview(qtbot, window):
     assert len(window.widget_data_view.mplcanvas.fig.get_axes()) > 0
 
-    window.close()
 
-
-def test_selecting_setup_updates_session(qtbot, mocker):
-    window = BMicro()
-    file_name = data_file_path('Water.h5')
-
-    def mock_getOpenFileName(self, *args, **kwargs):
-        return file_name, None
-
-    mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
-                 mock_getOpenFileName)
-
-    window.open_file()
+def test_selecting_setup_updates_session(qtbot, window):
     qtbot.keyClicks(window.widget_data_view.combobox_setup,
                     '532 nm @ Biotec R314')
 
     assert window.session.setup.name == '532 nm @ Biotec R314'
-    window.close()
