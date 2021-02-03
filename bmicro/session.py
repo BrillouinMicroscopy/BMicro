@@ -1,7 +1,5 @@
 from bmlab.file import BrillouinFile
 
-from bmicro.model import AVAILABLE_SETUPS
-
 
 class Session(object):
     """

@@ -107,7 +107,8 @@ def test_selecting_setup_updates_session(qtbot, mocker):
                  mock_getOpenFileName)
 
     window.open_file()
-    qtbot.keyClicks(window.widget_data_view.combobox_setup, '532 nm @ Biotec R314')
+    qtbot.keyClicks(window.widget_data_view.combobox_setup,
+                    '532 nm @ Biotec R314')
 
     assert window.session.setup.name == '532 nm @ Biotec R314'
     window.close()

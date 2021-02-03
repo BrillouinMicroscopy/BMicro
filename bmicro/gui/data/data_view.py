@@ -144,4 +144,3 @@ class DataView(QtWidgets.QWidget):
                 setup = s
                 break
         self.session.setup = setup
-
