@@ -1,7 +1,6 @@
 import pkg_resources
 
 from PyQt5 import uic, QtWidgets
-import numpy as np
 import matplotlib
 
 from bmicro.gui.mpl import MplCanvas
@@ -36,6 +35,9 @@ class DataView(QtWidgets.QWidget):
             self.on_reflection_clicked)
         self.checkbox_reflect_horizontally.toggled.connect(
             self.on_reflection_clicked)
+
+        self.comboBox_repetition.currentIndexChanged.connect(
+            self.on_select_repetition)
 
         self.update_ui()
 
@@ -102,9 +104,29 @@ class DataView(QtWidgets.QWidget):
         self.update_preview()
 
     def update_preview(self):
-        img = np.random.rand(200, 200)
-        img[50:150, 50:150] = 1
-        self.preview.clear()
-        self.preview.imshow(img)
-        self.preview.axis('off')
-        self.mplcanvas.draw()
+        rep = self.session.selected_repetition
+
+        if rep and rep.payload.image_keys():
+            first_key = rep.payload.image_keys()[0]
+            images = rep.payload.get_image(first_key)
+            img = images[0, ...]
+
+            self.preview.clear()
+            self.preview.imshow(img)
+            self.preview.axis('off')
+            self.mplcanvas.draw()
+        else:
+            self.preview.clear()
+            self.mplcanvas.draw()
+
+    def on_select_repetition(self):
+        if not self.session.file:
+            return
+        rep_key = self.comboBox_repetition.currentText()
+        try:
+            rep = self.session.file.get_repetition(rep_key)
+            self.session.selected_repetition = rep
+        except:
+            pass
+
+        self.update_preview()

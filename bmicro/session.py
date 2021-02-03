@@ -26,6 +26,7 @@ class Session(object):
         self.file = None
         self.rotation = 0
         self.reflection = {'vertically': False, 'horizontally': False}
+        self.selected_repetition = None
 
     @staticmethod
     def get_instance():
@@ -63,6 +64,7 @@ class Session(object):
         Close connection to loaded file.
         """
         self.file = None
+        self.selected_repetition = None
 
     def set_rotation(self, angle):
         self.rotation = angle
