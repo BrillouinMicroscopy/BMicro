@@ -27,9 +27,9 @@ class DataView(QtWidgets.QWidget):
 
         self.session = Session.get_instance()
 
-        self.radio_rotation_none.toggled.connect(self.on_rotation_clicked)
-        self.radio_rotation_90_cw.toggled.connect(self.on_rotation_clicked)
-        self.radio_rotation_90_ccw.toggled.connect(self.on_rotation_clicked)
+        self.radio_rotation_none.clicked.connect(self.on_rotation_clicked)
+        self.radio_rotation_90_cw.clicked.connect(self.on_rotation_clicked)
+        self.radio_rotation_90_ccw.clicked.connect(self.on_rotation_clicked)
 
         self.checkbox_reflect_vertically.toggled.connect(
             self.on_reflection_clicked)
