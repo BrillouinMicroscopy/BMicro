@@ -22,11 +22,14 @@ def test_clicking_rotate_updates_session(qtbot, mocker):
 
     window.open_file()
     assert window.session.rotation == 0
-    qtbot.mouseClick(window.widget_data_view.radio_rotation_90_cw, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(
+        window.widget_data_view.radio_rotation_90_cw, QtCore.Qt.LeftButton)
     assert window.session.rotation == -90
-    qtbot.mouseClick(window.widget_data_view.radio_rotation_90_ccw, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(
+        window.widget_data_view.radio_rotation_90_ccw, QtCore.Qt.LeftButton)
     assert window.session.rotation == 90
-    qtbot.mouseClick(window.widget_data_view.radio_rotation_none, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(
+        window.widget_data_view.radio_rotation_none, QtCore.Qt.LeftButton)
     assert window.session.rotation == 0
 
     window.close()
@@ -44,16 +47,23 @@ def test_clicking_reflect_updates_session(qtbot, mocker):
                  mock_getOpenFileName)
 
     window.open_file()
-    assert window.session.reflection == {'vertically': False, 'horizontally': False}
+    assert window.session.reflection == {
+        'vertically': False, 'horizontally': False}
 
-    qtbot.mouseClick(window.widget_data_view.checkbox_reflect_horizontally, QtCore.Qt.LeftButton)
-    assert window.session.reflection == {'vertically': False, 'horizontally': True}
+    qtbot.mouseClick(
+        window.widget_data_view.checkbox_reflect_horizontally, QtCore.Qt.LeftButton)
+    assert window.session.reflection == {
+        'vertically': False, 'horizontally': True}
 
-    qtbot.mouseClick(window.widget_data_view.checkbox_reflect_vertically, QtCore.Qt.LeftButton)
-    assert window.session.reflection == {'vertically': True, 'horizontally': True}
+    qtbot.mouseClick(
+        window.widget_data_view.checkbox_reflect_vertically, QtCore.Qt.LeftButton)
+    assert window.session.reflection == {
+        'vertically': True, 'horizontally': True}
 
-    qtbot.mouseClick(window.widget_data_view.checkbox_reflect_horizontally, QtCore.Qt.LeftButton)
-    assert window.session.reflection == {'vertically': True, 'horizontally': False}
+    qtbot.mouseClick(
+        window.widget_data_view.checkbox_reflect_horizontally, QtCore.Qt.LeftButton)
+    assert window.session.reflection == {
+        'vertically': True, 'horizontally': False}
 
     window.close()
 
