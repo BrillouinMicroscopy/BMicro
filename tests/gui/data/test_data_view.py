@@ -51,17 +51,20 @@ def test_clicking_reflect_updates_session(qtbot, mocker):
         'vertically': False, 'horizontally': False}
 
     qtbot.mouseClick(
-        window.widget_data_view.checkbox_reflect_horizontally, QtCore.Qt.LeftButton)
+        window.widget_data_view.checkbox_reflect_horizontally,
+        QtCore.Qt.LeftButton)
     assert window.session.reflection == {
         'vertically': False, 'horizontally': True}
 
     qtbot.mouseClick(
-        window.widget_data_view.checkbox_reflect_vertically, QtCore.Qt.LeftButton)
+        window.widget_data_view.checkbox_reflect_vertically,
+        QtCore.Qt.LeftButton)
     assert window.session.reflection == {
         'vertically': True, 'horizontally': True}
 
     qtbot.mouseClick(
-        window.widget_data_view.checkbox_reflect_horizontally, QtCore.Qt.LeftButton)
+        window.widget_data_view.checkbox_reflect_horizontally,
+        QtCore.Qt.LeftButton)
     assert window.session.reflection == {
         'vertically': True, 'horizontally': False}
 
