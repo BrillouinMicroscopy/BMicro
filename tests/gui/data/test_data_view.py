@@ -56,3 +56,20 @@ def test_clicking_reflect_updates_session(qtbot, mocker):
     assert window.session.reflection == {'vertically': True, 'horizontally': False}
 
     window.close()
+
+
+def test_open_file_shows_preview(qtbot, mocker):
+    window = BMicro()
+    file_name = data_file_path('Water.h5')
+
+    def mock_getOpenFileName(self, *args, **kwargs):
+        return file_name, None
+
+    mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
+                 mock_getOpenFileName)
+
+    window.open_file()
+
+    assert len(window.widget_data_view.mplcanvas.fig.get_axes()) > 0
+
+    window.close()
