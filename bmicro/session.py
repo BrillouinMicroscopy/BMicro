@@ -63,8 +63,7 @@ class Session(object):
         """
         Close connection to loaded file.
         """
-        self.file = None
-        self.selected_repetition = None
+        Session.__instance = None
 
     def set_rotation(self, angle):
         self.rotation = angle
