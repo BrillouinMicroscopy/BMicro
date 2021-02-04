@@ -19,6 +19,11 @@ def main():
 
     main = BMicro()
     main.show()
+
+    if len(sys.argv) > 1:
+        file_to_load = sys.argv[1]
+        main.open_file(file_to_load)
+
     sys.exit(app.exec_())
 
 

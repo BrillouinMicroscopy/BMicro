@@ -70,9 +70,10 @@ class BMicro(QtWidgets.QMainWindow):
         """ Registers the menu actions """
         self.action_open.triggered.connect(self.open_file)
 
-    def open_file(self):
+    def open_file(self, file_name=None):
         """ Show open file dialog and load file. """
-        file_name, _ = QFileDialog.getOpenFileName(self, 'Open File...',
+        if not file_name:
+            file_name, _ = QFileDialog.getOpenFileName(self, 'Open File...',
                                                    filter='*.h5')
         try:
             self.session.set_file(file_name)
