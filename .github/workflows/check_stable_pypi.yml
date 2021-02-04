@@ -55,7 +55,11 @@ jobs:
         coverage report -m
         codecov
     - name: Create app and check if it runs (macOS)
-      if: runner.os == 'macOS'
+      # For now, we disable this step for Python 3.9, because there is no
+      # scipy wheel matching build-recipes/requirements.txt (this is the
+      # easy way out). It is important that this step works with the Python
+      # version that is set in deploy_github.yml.
+      if: runner.os == 'macOS' && ${{ matrix.python-version }} != 3.9
       working-directory: ./build-recipes
       run: |
         bash ./macos_build_app.sh BMicro $(python -m bmicro --version)
