@@ -74,7 +74,7 @@ class BMicro(QtWidgets.QMainWindow):
         """ Show open file dialog and load file. """
         if not file_name:
             file_name, _ = QFileDialog.getOpenFileName(self, 'Open File...',
-                                                   filter='*.h5')
+                                                       filter='*.h5')
         try:
             self.session.set_file(file_name)
         except Exception:
