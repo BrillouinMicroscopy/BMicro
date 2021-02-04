@@ -129,7 +129,7 @@ class DataView(QtWidgets.QWidget):
                                   self.session.reflection['horizontally'])
 
             self.preview.clear()
-            self.preview.imshow(img)
+            self.preview.imshow(img, origin='lower')
             self.preview.axis('off')
             self.mplcanvas.draw()
         else:
