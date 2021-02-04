@@ -3,6 +3,8 @@ import pkg_resources
 from PyQt5 import uic, QtWidgets
 import matplotlib
 
+from bmlab.image_operations import set_orientation
+
 from bmicro.gui.mpl import MplCanvas
 from bmicro.session import Session
 from bmicro.model import AVAILABLE_SETUPS
@@ -116,8 +118,18 @@ class DataView(QtWidgets.QWidget):
             images = rep.payload.get_image(first_key)
             img = images[0, ...]
 
+            num_rots = 0
+            if self.session.rotation == 90:
+                num_rots = 1
+            elif self.session.rotation == -90:
+                num_rots = 3
+
+            img = set_orientation(img, num_rots,
+                                  self.session.reflection['vertically'],
+                                  self.session.reflection['horizontally'])
+
             self.preview.clear()
-            self.preview.imshow(img)
+            self.preview.imshow(img.T)
             self.preview.axis('off')
             self.mplcanvas.draw()
         else:
