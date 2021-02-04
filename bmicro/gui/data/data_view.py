@@ -120,16 +120,16 @@ class DataView(QtWidgets.QWidget):
 
             num_rots = 0
             if self.session.rotation == 90:
-                num_rots = 1
-            elif self.session.rotation == -90:
                 num_rots = 3
+            elif self.session.rotation == -90:
+                num_rots = 1
 
             img = set_orientation(img, num_rots,
                                   self.session.reflection['vertically'],
                                   self.session.reflection['horizontally'])
 
             self.preview.clear()
-            self.preview.imshow(img.T)
+            self.preview.imshow(img)
             self.preview.axis('off')
             self.mplcanvas.draw()
         else:
