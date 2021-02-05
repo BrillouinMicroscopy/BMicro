@@ -1,7 +1,13 @@
+import pathlib
+
 from PyQt5.QtWidgets import QWidget
 from PyQt5 import QtCore
 
 from bmicro.gui.main import BMicro
+
+
+def data_file_path(file_name):
+    return pathlib.Path(__file__).parent.parent / 'data' / file_name
 
 
 def test_main_window_can_activate_all_tabs(qtbot):
@@ -22,9 +28,24 @@ def test_main_window_can_activate_all_tabs(qtbot):
     window.close()
 
 
-def test_data_tab_shows_smoke_test_message(qtbot):
-
+def test_open_file_shows_metadata(qtbot, mocker):
     window = BMicro()
-    data_widget = window.widget_data_view
-    assert data_widget.data_test_label.text() == 'test message'
+    file_name = data_file_path('Water.h5')
+
+    def mock_getOpenFileName(self, *args, **kwargs):
+        return file_name, None
+
+    mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
+                 mock_getOpenFileName)
+
+    window.open_file()
+    w = window.widget_data_view
+    assert w.label_selected_file.text() == str(file_name)
+    assert w.label_date.text() == '2020-11-03 15:20'
+    assert w.label_resolution_x.text() == '10'
+    assert w.label_resolution_y.text() == '1'
+    assert w.label_resolution_z.text() == '1'
+    assert w.label_calibration.text() == 'True'
+    assert w.textedit_comment.toPlainText() == 'Brillouin data'
+
     window.close()

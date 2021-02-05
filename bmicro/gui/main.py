@@ -1,6 +1,11 @@
 import pkg_resources
+import sys
 
 from PyQt5 import QtWidgets, uic, QtCore
+from PyQt5.QtWidgets import QFileDialog, QMessageBox
+
+from ..session import Session
+from .._version import version as __version__
 
 from . import data
 from . import extraction
@@ -20,7 +25,6 @@ class BMicro(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         """ Initializes BMicro."""
-
         super(BMicro, self).__init__(*args, **kwargs)
         ui_file = pkg_resources.resource_filename('bmicro.gui', 'main.ui')
         uic.loadUi(ui_file, self)
@@ -51,3 +55,38 @@ class BMicro(QtWidgets.QMainWindow):
         self.layout_evaluation = QtWidgets.QVBoxLayout()
         self.tab_evaluation.setLayout(self.layout_evaluation)
         self.layout_evaluation.addWidget(self.widget_evaluation_view)
+
+        self.connect_menu()
+
+        self.session = Session.get_instance()
+
+        # if "--version" was specified, print the version and exit
+        if "--version" in sys.argv:
+            print(__version__)
+            QtWidgets.QApplication.processEvents()
+            sys.exit(0)
+
+    def connect_menu(self):
+        """ Registers the menu actions """
+        self.action_open.triggered.connect(self.open_file)
+
+    def open_file(self, file_name=None):
+        """ Show open file dialog and load file. """
+        if not file_name:
+            file_name, _ = QFileDialog.getOpenFileName(self, 'Open File...',
+                                                       filter='*.h5')
+        try:
+            self.session.set_file(file_name)
+        except Exception:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText('Unable to load file:')
+            msg.setInformativeText(str(file_name))
+            msg.setWindowTitle('Invalid File Error')
+            msg.exec_()
+            self.session.clear()
+
+        self.update_ui()
+
+    def update_ui(self):
+        self.widget_data_view.update_ui()
