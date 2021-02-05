@@ -168,66 +168,84 @@
           <string>Image Orientation</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QGroupBox" name="groupBox_5">
-            <property name="title">
-             <string>Rotation</string>
+          <item alignment="Qt::AlignTop">
+           <widget class="QWidget" name="widget_3" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>250</width>
+              <height>300</height>
+             </size>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_5">
+            <layout class="QVBoxLayout" name="verticalLayout_7">
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_2">
-               <item>
-                <widget class="QRadioButton" name="radio_rotation_none">
-                 <property name="text">
-                  <string>None</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="radio_rotation_90_cw">
-                 <property name="text">
-                  <string>90° clockwise</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="radio_rotation_90_ccw">
-                 <property name="text">
-                  <string>90° counterclockwise</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+              <widget class="QGroupBox" name="groupBox_5">
+               <property name="title">
+                <string>Rotation</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_2">
+                  <item alignment="Qt::AlignTop">
+                   <widget class="QWidget" name="widget" native="true">
+                    <layout class="QVBoxLayout" name="verticalLayout_6">
+                     <item>
+                      <widget class="QRadioButton" name="radio_rotation_none">
+                       <property name="text">
+                        <string>None</string>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QRadioButton" name="radio_rotation_90_cw">
+                       <property name="text">
+                        <string>90° clockwise</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QRadioButton" name="radio_rotation_90_ccw">
+                       <property name="text">
+                        <string>90° counterclockwise</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
              </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_4">
-            <property name="title">
-             <string>Reflection</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_3">
-               <item>
-                <widget class="QCheckBox" name="checkbox_reflect_vertically">
-                 <property name="text">
-                  <string>vertically</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="checkbox_reflect_horizontally">
-                 <property name="text">
-                  <string>horizontally</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+              <widget class="QGroupBox" name="groupBox_4">
+               <property name="title">
+                <string>Reflection</string>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_3">
+                  <item>
+                   <widget class="QCheckBox" name="checkbox_reflect_vertically">
+                    <property name="text">
+                     <string>vertically</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QCheckBox" name="checkbox_reflect_horizontally">
+                    <property name="text">
+                     <string>horizontally</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -236,8 +254,8 @@
            <widget class="QWidget" name="image_preview_widget" native="true">
             <property name="minimumSize">
              <size>
-              <width>200</width>
-              <height>200</height>
+              <width>300</width>
+              <height>300</height>
              </size>
             </property>
            </widget>
