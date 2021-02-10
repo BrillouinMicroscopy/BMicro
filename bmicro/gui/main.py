@@ -30,6 +30,8 @@ class BMicro(QtWidgets.QMainWindow):
         uic.loadUi(ui_file, self)
         QtCore.QCoreApplication.setApplicationName('BMicro')
 
+        self.tabWidget.currentChanged.connect(self.update_ui)
+
         self.widget_data_view = data.DataView(self)
         self.layout_data = QtWidgets.QVBoxLayout()
         self.tab_data.setLayout(self.layout_data)
@@ -93,3 +95,4 @@ class BMicro(QtWidgets.QMainWindow):
 
     def update_ui(self):
         self.widget_data_view.update_ui()
+        self.widget_extraction_view.update_ui()
