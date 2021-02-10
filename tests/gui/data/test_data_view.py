@@ -86,7 +86,6 @@ def test_selecting_setup_updates_session(qtbot, window):
 
 
 def test_close_file_clears_datatab(qtbot, window):
-
     assert window.widget_data_view.label_selected_file.text() != ''
     assert Session.get_instance().file
     window.close_file()
