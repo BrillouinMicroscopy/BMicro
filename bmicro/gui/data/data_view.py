@@ -58,6 +58,7 @@ class DataView(QtWidgets.QWidget):
         self.label_resolution_z.setText('')
         self.label_calibration.setText('')
         self.textedit_comment.setText('')
+        self.update_preview()
 
         session = Session.get_instance()
         if not session.file:
@@ -138,7 +139,8 @@ class DataView(QtWidgets.QWidget):
             self.preview.axis('off')
             self.mplcanvas.draw()
         else:
-            self.preview.clear()
+            self.mplcanvas.get_figure().clf()
+            self.preview = self.mplcanvas.get_figure().add_subplot(111)
             self.mplcanvas.draw()
 
     def on_select_repetition(self):

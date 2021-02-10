@@ -83,3 +83,11 @@ def test_selecting_setup_updates_session(qtbot, window):
                     '532 nm @ Biotec R314')
 
     assert Session.get_instance().setup.name == '532 nm @ Biotec R314'
+
+
+def test_close_file_clears_datatab(qtbot, window):
+    assert window.widget_data_view.label_selected_file.text() != ''
+    assert Session.get_instance().file
+    window.close_file()
+    assert not Session.get_instance().file
+    assert window.widget_data_view.label_selected_file.text() == ''
