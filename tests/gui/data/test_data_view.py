@@ -4,6 +4,7 @@ from PyQt5 import QtCore
 import pytest
 
 from bmicro.gui.main import BMicro
+from bmicro.session import Session
 
 
 def data_file_path(file_name):
@@ -27,13 +28,14 @@ def window(mocker):
 
 def test_clicking_rotate_updates_session(qtbot, window):
 
-    assert window.session.rotation == 0
+    session = Session.get_instance()
+    assert session.rotation == 0
     qtbot.mouseClick(
         window.widget_data_view.radio_rotation_90_cw, QtCore.Qt.LeftButton)
-    assert window.session.rotation == -90
+    assert session.rotation == -90
     qtbot.mouseClick(
         window.widget_data_view.radio_rotation_90_ccw, QtCore.Qt.LeftButton)
-    assert window.session.rotation == 90
+    assert session.rotation == 90
 
     # For some reason, the following code three lines of code do not trigger
     # the event of the radio_rotation_none radio button. But
@@ -49,25 +51,26 @@ def test_clicking_rotate_updates_session(qtbot, window):
 
 def test_clicking_reflect_updates_session(qtbot, window):
 
-    assert window.session.reflection == {
+    session = Session.get_instance()
+    assert session.reflection == {
         'vertically': False, 'horizontally': False}
 
     qtbot.mouseClick(
         window.widget_data_view.checkbox_reflect_horizontally,
         QtCore.Qt.LeftButton)
-    assert window.session.reflection == {
+    assert session.reflection == {
         'vertically': False, 'horizontally': True}
 
     qtbot.mouseClick(
         window.widget_data_view.checkbox_reflect_vertically,
         QtCore.Qt.LeftButton)
-    assert window.session.reflection == {
+    assert session.reflection == {
         'vertically': True, 'horizontally': True}
 
     qtbot.mouseClick(
         window.widget_data_view.checkbox_reflect_horizontally,
         QtCore.Qt.LeftButton)
-    assert window.session.reflection == {
+    assert session.reflection == {
         'vertically': True, 'horizontally': False}
 
 
@@ -79,4 +82,4 @@ def test_selecting_setup_updates_session(qtbot, window):
     qtbot.keyClicks(window.widget_data_view.combobox_setup,
                     '532 nm @ Biotec R314')
 
-    assert window.session.setup.name == '532 nm @ Biotec R314'
+    assert Session.get_instance().setup.name == '532 nm @ Biotec R314'

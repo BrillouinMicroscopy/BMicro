@@ -28,8 +28,6 @@ class DataView(QtWidgets.QWidget):
         self.preview = self.mplcanvas.get_figure().add_subplot(111)
         self.preview.axis('off')
 
-        self.session = Session.get_instance()
-
         self.radio_rotation_none.clicked.connect(self.on_rotation_clicked)
         self.radio_rotation_90_cw.clicked.connect(self.on_rotation_clicked)
         self.radio_rotation_90_ccw.clicked.connect(self.on_rotation_clicked)
@@ -61,16 +59,17 @@ class DataView(QtWidgets.QWidget):
         self.label_calibration.setText('')
         self.textedit_comment.setText('')
 
-        if not self.session.file:
+        session = Session.get_instance()
+        if not session.file:
             return
 
-        self.label_selected_file.setText(str(self.session.file.path))
+        self.label_selected_file.setText(str(session.file.path))
         self.label_selected_file.adjustSize()
-        rep_keys = self.session.file.repetition_keys()
+        rep_keys = session.file.repetition_keys()
         self.comboBox_repetition.addItems(rep_keys)
 
         if rep_keys and self.comboBox_repetition.currentText():
-            repetition = self.session.file.get_repetition(
+            repetition = session.file.get_repetition(
                 self.comboBox_repetition.currentText())
             res = repetition.payload.resolution
             if res:
@@ -79,7 +78,7 @@ class DataView(QtWidgets.QWidget):
                 self.label_resolution_z.setText(str(res[2]))
             date = repetition.date.strftime('%Y-%m-%d %H:%M')
             self.label_date.setText(date)
-            self.textedit_comment.setText(self.session.file.comment)
+            self.textedit_comment.setText(session.file.comment)
             self.label_calibration.setText(
                 str(not repetition.calibration.is_empty()))
 
@@ -87,15 +86,19 @@ class DataView(QtWidgets.QWidget):
 
         radio_button = self.sender()
 
+        session = Session.get_instance()
+        if not session:
+            return
+
         if not radio_button.isChecked():
             return
 
         if radio_button == self.radio_rotation_none:
-            self.session.set_rotation(0)
+            session.set_rotation(0)
         elif radio_button == self.radio_rotation_90_cw:
-            self.session.set_rotation(-90)
+            session.set_rotation(-90)
         elif radio_button == self.radio_rotation_90_ccw:
-            self.session.set_rotation(90)
+            session.set_rotation(90)
 
         self.update_preview()
 
@@ -103,15 +106,17 @@ class DataView(QtWidgets.QWidget):
 
         checkbox = self.sender()
 
+        session = Session.get_instance()
         if checkbox == self.checkbox_reflect_vertically:
-            self.session.set_reflection(vertically=checkbox.isChecked())
+            session.set_reflection(vertically=checkbox.isChecked())
         elif checkbox == self.checkbox_reflect_horizontally:
-            self.session.set_reflection(horizontally=checkbox.isChecked())
+            session.set_reflection(horizontally=checkbox.isChecked())
 
         self.update_preview()
 
     def update_preview(self):
-        rep = self.session.selected_repetition
+        session = Session.get_instance()
+        rep = session.selected_repetition
 
         if rep and rep.payload.image_keys():
             first_key = rep.payload.image_keys()[0]
@@ -119,14 +124,14 @@ class DataView(QtWidgets.QWidget):
             img = images[0, ...]
 
             num_rots = 0
-            if self.session.rotation == 90:
+            if session.rotation == 90:
                 num_rots = 3
-            elif self.session.rotation == -90:
+            elif session.rotation == -90:
                 num_rots = 1
 
             img = set_orientation(img, num_rots,
-                                  self.session.reflection['vertically'],
-                                  self.session.reflection['horizontally'])
+                                  session.reflection['vertically'],
+                                  session.reflection['horizontally'])
 
             self.preview.clear()
             self.preview.imshow(img, origin='lower')
@@ -137,12 +142,13 @@ class DataView(QtWidgets.QWidget):
             self.mplcanvas.draw()
 
     def on_select_repetition(self):
-        if not self.session.file:
+        session = Session.get_instance()
+        if not session.file:
             return
         rep_key = self.comboBox_repetition.currentText()
         try:
-            rep = self.session.file.get_repetition(rep_key)
-            self.session.selected_repetition = rep
+            rep = session.file.get_repetition(rep_key)
+            session.selected_repetition = rep
         except Exception:
             pass
 
@@ -151,8 +157,9 @@ class DataView(QtWidgets.QWidget):
     def on_select_setup(self):
         name = self.combobox_setup.currentText()
         setup = None
+        session = Session.get_instance()
         for s in AVAILABLE_SETUPS:
             if s.name == name:
                 setup = s
                 break
-        self.session.setup = setup
+        session.setup = setup

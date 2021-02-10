@@ -58,8 +58,6 @@ class BMicro(QtWidgets.QMainWindow):
 
         self.connect_menu()
 
-        self.session = Session.get_instance()
-
         # if "--version" was specified, print the version and exit
         if "--version" in sys.argv:
             print(__version__)
@@ -69,6 +67,7 @@ class BMicro(QtWidgets.QMainWindow):
     def connect_menu(self):
         """ Registers the menu actions """
         self.action_open.triggered.connect(self.open_file)
+        self.action_close.triggered.connect(self.close_file)
 
     def open_file(self, file_name=None):
         """ Show open file dialog and load file. """
@@ -76,7 +75,7 @@ class BMicro(QtWidgets.QMainWindow):
             file_name, _ = QFileDialog.getOpenFileName(self, 'Open File...',
                                                        filter='*.h5')
         try:
-            self.session.set_file(file_name)
+            Session.get_instance().set_file(file_name)
         except Exception:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
@@ -86,6 +85,10 @@ class BMicro(QtWidgets.QMainWindow):
             msg.exec_()
             self.session.clear()
 
+        self.update_ui()
+
+    def close_file(self):
+        Session.get_instance().clear()
         self.update_ui()
 
     def update_ui(self):
