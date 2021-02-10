@@ -28,6 +28,3 @@ class ExtractionView(QtWidgets.QWidget):
         calib_keys = session.selected_repetition.calibration.calibration_keys()
         self.combobox_datasets.clear()
         self.combobox_datasets.addItems(calib_keys)
-
-
-
