@@ -2,7 +2,10 @@ import pkg_resources
 
 from PyQt5 import QtWidgets, uic
 
+from bmlab.image_operations import set_orientation
+
 from bmicro.session import Session
+from bmicro.gui.mpl import MplCanvas
 
 
 class ExtractionView(QtWidgets.QWidget):
@@ -17,6 +20,12 @@ class ExtractionView(QtWidgets.QWidget):
             'bmicro.gui.extraction', 'extraction_view.ui')
         uic.loadUi(ui_file, self)
 
+        self.mplcanvas = MplCanvas(self.image_widget)
+        self.image_plot = self.mplcanvas.get_figure().add_subplot(111)
+        self.image_plot.axis('off')
+
+        self.combobox_datasets.currentIndexChanged.connect(self.on_select_dataset)
+
         self.update_ui()
 
     def update_ui(self):
@@ -25,6 +34,30 @@ class ExtractionView(QtWidgets.QWidget):
             # TODO: Clear tab in this case
             return
 
-        calib_keys = session.selected_repetition.calibration.calibration_keys()
+        calib_keys = session.selected_repetition.calibration.image_keys()
         self.combobox_datasets.clear()
         self.combobox_datasets.addItems(calib_keys)
+
+    def on_select_dataset(self):
+        self.image_plot.cla()
+        image_key = self.combobox_datasets.currentText()
+        if not image_key:
+            return
+
+        session = Session.get_instance()
+
+        img = session.selected_repetition.calibration.get_image(image_key)
+        img = img[0, ...]
+
+        num_rots = 0
+        if session.rotation == 90:
+            num_rots = 3
+        elif session.rotation == -90:
+            num_rots = 1
+
+        img = set_orientation(img, num_rots,
+                              session.reflection['vertically'],
+                              session.reflection['horizontally'])
+
+        self.image_plot.imshow(img, origin='lower')
+        self.mplcanvas.draw()
