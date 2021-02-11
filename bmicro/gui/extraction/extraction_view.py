@@ -77,7 +77,7 @@ class ExtractionView(QtWidgets.QWidget):
                               session.reflection['vertically'],
                               session.reflection['horizontally'])
 
-        self.image_plot.imshow(img, origin='lower')
+        self.image_plot.imshow(img, origin='lower', vmin=100, vmax=300)
 
         points = session.extraction_model.get_points(image_key)
         for p in points:
