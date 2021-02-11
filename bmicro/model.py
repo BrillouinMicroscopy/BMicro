@@ -1,6 +1,22 @@
 import numpy as np
 
 
+class ExtractionModel(object):
+
+    def __init__(self):
+        self.points = {}
+
+    def add_point(self, calib_key, xdata, ydata):
+        if calib_key not in self.points:
+            self.points[calib_key] = []
+        self.points[calib_key].append((xdata, ydata))
+
+    def get_points(self, calib_key):
+        if calib_key in self.points:
+            return self.points[calib_key]
+        return []
+
+
 class Setup(object):
 
     def __init__(self, key, name, pixel_size, lambda0, focal_length,

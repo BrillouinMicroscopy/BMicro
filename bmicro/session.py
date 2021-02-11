@@ -1,5 +1,7 @@
 from bmlab.file import BrillouinFile
 
+from bmicro.model import ExtractionModel
+
 
 class Session(object):
     """
@@ -28,6 +30,7 @@ class Session(object):
         self.reflection = {'vertically': False, 'horizontally': False}
         self.selected_repetition = None
         self.setup = None
+        self.extraction_model = ExtractionModel()
 
     @staticmethod
     def get_instance():
