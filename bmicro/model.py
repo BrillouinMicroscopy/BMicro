@@ -16,6 +16,9 @@ class ExtractionModel(object):
             return self.points[calib_key]
         return []
 
+    def clear_points(self, calib_key):
+        self.points[calib_key] = []
+
 
 class Setup(object):
 

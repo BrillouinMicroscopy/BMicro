@@ -37,6 +37,7 @@ class ExtractionView(QtWidgets.QWidget):
             self.on_select_dataset)
 
         self.button_select_done.clicked.connect(self.toggle_mode)
+        self.button_clear.clicked.connect(self.clear_points)
 
         self.update_ui()
 
@@ -91,3 +92,9 @@ class ExtractionView(QtWidgets.QWidget):
         else:
             self.mode = MODE_DEFAULT
             self.button_select_done.setText('Select')
+
+    def clear_points(self):
+        calib_key = self.combobox_datasets.currentText()
+        session = Session.get_instance()
+        session.extraction_model.clear_points(calib_key)
+        self.refresh_image_plot()
