@@ -24,7 +24,8 @@ class ExtractionView(QtWidgets.QWidget):
         self.image_plot = self.mplcanvas.get_figure().add_subplot(111)
         self.image_plot.axis('off')
 
-        self.combobox_datasets.currentIndexChanged.connect(self.on_select_dataset)
+        self.combobox_datasets.currentIndexChanged.connect(
+            self.on_select_dataset)
 
         self.update_ui()
 
