@@ -17,6 +17,7 @@ Event = namedtuple('Event', 'xdata ydata')
 @pytest.fixture
 def window(mocker):
     window = BMicro()
+    Session.get_instance().clear()
     file_name = data_file_path('Water.h5')
 
     def mock_getOpenFileName(self, *args, **kwargs):
