@@ -32,10 +32,10 @@ def test_clicking_rotate_updates_session(qtbot, window):
     assert session.rotation == 0
     qtbot.mouseClick(
         window.widget_data_view.radio_rotation_90_cw, QtCore.Qt.LeftButton)
-    assert session.rotation == -90
+    assert session.rotation == 3
     qtbot.mouseClick(
         window.widget_data_view.radio_rotation_90_ccw, QtCore.Qt.LeftButton)
-    assert session.rotation == 90
+    assert session.rotation == 1
 
     # For some reason, the following code three lines of code do not trigger
     # the event of the radio_rotation_none radio button. But

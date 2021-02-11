@@ -97,9 +97,9 @@ class DataView(QtWidgets.QWidget):
         if radio_button == self.radio_rotation_none:
             session.set_rotation(0)
         elif radio_button == self.radio_rotation_90_cw:
-            session.set_rotation(-90)
+            session.set_rotation(3)
         elif radio_button == self.radio_rotation_90_ccw:
-            session.set_rotation(90)
+            session.set_rotation(1)
 
         self.update_preview()
 
@@ -124,13 +124,7 @@ class DataView(QtWidgets.QWidget):
             images = rep.payload.get_image(first_key)
             img = images[0, ...]
 
-            num_rots = 0
-            if session.rotation == 90:
-                num_rots = 3
-            elif session.rotation == -90:
-                num_rots = 1
-
-            img = set_orientation(img, num_rots,
+            img = set_orientation(img, session.rotation,
                                   session.reflection['vertically'],
                                   session.reflection['horizontally'])
 
