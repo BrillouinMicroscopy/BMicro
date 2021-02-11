@@ -8,7 +8,7 @@ from bmicro.session import Session
 
 
 def data_file_path(file_name):
-    return pathlib.Path(__file__).parent.parent.parent / 'data' / file_name
+    return pathlib.Path(__file__).parent.parent / 'data' / file_name
 
 
 @pytest.fixture
