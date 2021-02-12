@@ -1,6 +1,6 @@
 from bmlab.file import BrillouinFile
 
-from bmicro.model import ExtractionModel
+from bmicro.model import ExtractionModel, Orientation
 
 
 class Session(object):
@@ -26,8 +26,7 @@ class Session(object):
             Session.__instance = self
 
         self.file = None
-        self.rotation = 0
-        self.reflection = {'vertically': False, 'horizontally': False}
+        self.orientation = Orientation()
         self.selected_repetition = None
         self.setup = None
         self.extraction_model = ExtractionModel()
@@ -68,15 +67,6 @@ class Session(object):
         Close connection to loaded file.
         """
         Session.__instance = None
-
-    def set_rotation(self, angle):
-        self.rotation = angle
-
-    def set_reflection(self, **kwargs):
-        axes = ['vertically', 'horizontally']
-        for a in axes:
-            if a in kwargs:
-                self.reflection[a] = kwargs[a]
 
     def set_setup(self, setup):
         self.setup = setup

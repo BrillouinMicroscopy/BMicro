@@ -95,11 +95,11 @@ class DataView(QtWidgets.QWidget):
             return
 
         if radio_button == self.radio_rotation_none:
-            session.set_rotation(0)
+            session.orientation.set_rotation(0)
         elif radio_button == self.radio_rotation_90_cw:
-            session.set_rotation(3)
+            session.orientation.set_rotation(3)
         elif radio_button == self.radio_rotation_90_ccw:
-            session.set_rotation(1)
+            session.orientation.set_rotation(1)
 
         self.update_preview()
 
@@ -109,9 +109,10 @@ class DataView(QtWidgets.QWidget):
 
         session = Session.get_instance()
         if checkbox == self.checkbox_reflect_vertically:
-            session.set_reflection(vertically=checkbox.isChecked())
+            session.orientation.set_reflection(vertically=checkbox.isChecked())
         elif checkbox == self.checkbox_reflect_horizontally:
-            session.set_reflection(horizontally=checkbox.isChecked())
+            session.orientation.set_reflection(
+                horizontally=checkbox.isChecked())
 
         self.update_preview()
 
@@ -124,9 +125,10 @@ class DataView(QtWidgets.QWidget):
             images = rep.payload.get_image(first_key)
             img = images[0, ...]
 
-            img = set_orientation(img, session.rotation,
-                                  session.reflection['vertically'],
-                                  session.reflection['horizontally'])
+            orient = session.orientation
+            img = set_orientation(img, orient.rotation,
+                                  orient.reflection['vertically'],
+                                  orient.reflection['horizontally'])
 
             self.preview.clear()
             self.preview.imshow(img, origin='lower', vmin=100, vmax=300)

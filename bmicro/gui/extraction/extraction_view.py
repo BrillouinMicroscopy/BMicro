@@ -92,9 +92,9 @@ class ExtractionView(QtWidgets.QWidget):
         img = session.selected_repetition.calibration.get_image(image_key)
         img = img[0, ...]
 
-        img = set_orientation(img, session.rotation,
-                              session.reflection['vertically'],
-                              session.reflection['horizontally'])
+        img = set_orientation(img, session.orientation.rotation,
+                              session.orientation.reflection['vertically'],
+                              session.orientation.reflection['horizontally'])
 
         return img
 

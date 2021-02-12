@@ -1,6 +1,23 @@
 import numpy as np
 
 
+class Orientation(object):
+
+    def __init__(self, rotation=0,
+                 reflection={'vertically': False, 'horizontally': False}):
+        self.rotation = rotation
+        self.reflection = reflection
+
+    def set_rotation(self, num_rots):
+        self.rotation = num_rots
+
+    def set_reflection(self, **kwargs):
+        axes = ['vertically', 'horizontally']
+        for a in axes:
+            if a in kwargs:
+                self.reflection[a] = kwargs[a]
+
+
 class ExtractionModel(object):
 
     def __init__(self):
