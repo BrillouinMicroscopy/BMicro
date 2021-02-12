@@ -14,6 +14,17 @@ from . import peak_selection
 from . import evaluation
 
 
+def check_event_mime_data(event):
+    """ Returns the path to local file if h5 file """
+    if event.mimeData().hasUrls():
+        urls = event.mimeData().urls()
+        if urls:
+            path = urls[0].toLocalFile()
+            if path.endswith(".h5"):
+                return path
+    return False
+
+
 class BMicro(QtWidgets.QMainWindow):
     """
     Class for the main window of BMicro.
@@ -60,6 +71,8 @@ class BMicro(QtWidgets.QMainWindow):
 
         self.connect_menu()
 
+        self.setAcceptDrops(True)
+
         # if "--version" was specified, print the version and exit
         if "--version" in sys.argv:
             print(__version__)
@@ -96,3 +109,16 @@ class BMicro(QtWidgets.QMainWindow):
     def update_ui(self):
         self.widget_data_view.update_ui()
         self.widget_extraction_view.update_ui()
+
+    def dragEnterEvent(self, event):
+        """ Handles dragging a file over the GUI """
+        if check_event_mime_data(event):
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        """ Handles dropping a file, opens if h5"""
+        path = check_event_mime_data(event)
+        if path:
+            self.open_file(path)
