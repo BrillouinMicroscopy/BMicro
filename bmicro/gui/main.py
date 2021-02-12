@@ -71,6 +71,8 @@ class BMicro(QtWidgets.QMainWindow):
 
         self.connect_menu()
 
+        self.connect_drag_drop()
+
         self.setAcceptDrops(True)
 
         # if "--version" was specified, print the version and exit
@@ -78,6 +80,10 @@ class BMicro(QtWidgets.QMainWindow):
             print(__version__)
             QtWidgets.QApplication.processEvents()
             sys.exit(0)
+
+    def connect_drag_drop(self):
+        self.dragEnterEvent = self.drag_enter_event
+        self.dropEvent = self.drop_event
 
     def connect_menu(self):
         """ Registers the menu actions """
@@ -110,14 +116,14 @@ class BMicro(QtWidgets.QMainWindow):
         self.widget_data_view.update_ui()
         self.widget_extraction_view.update_ui()
 
-    def dragEnterEvent(self, event):
+    def drag_enter_event(self, event):
         """ Handles dragging a file over the GUI """
         if check_event_mime_data(event):
             event.accept()
         else:
             event.ignore()
 
-    def dropEvent(self, event):
+    def drop_event(self, event):
         """ Handles dropping a file, opens if h5"""
         path = check_event_mime_data(event)
         if path:
