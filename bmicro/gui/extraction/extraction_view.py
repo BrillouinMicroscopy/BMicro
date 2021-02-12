@@ -3,7 +3,7 @@ import pkg_resources
 from PyQt5 import QtWidgets, uic
 from matplotlib.patches import Circle
 
-from bmlab.image_operations import set_orientation
+from bmlab.image import set_orientation, find_max_in_radius
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
@@ -38,6 +38,7 @@ class ExtractionView(QtWidgets.QWidget):
 
         self.button_select_done.clicked.connect(self.toggle_mode)
         self.button_clear.clicked.connect(self.clear_points)
+        self.button_optimize.clicked.connect(self.optimize_points)
 
         self.update_ui()
 
@@ -59,11 +60,29 @@ class ExtractionView(QtWidgets.QWidget):
             return
         session = Session.get_instance()
         calib_key = self.combobox_datasets.currentText()
-        session.extraction_model.add_point(calib_key, event.xdata, event.ydata)
+        # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
+        session.extraction_model.add_point(calib_key, event.ydata, event.xdata)
         self.refresh_image_plot()
 
     def refresh_image_plot(self):
         self.image_plot.cla()
+        session = Session.get_instance()
+        image_key = self.combobox_datasets.currentText()
+        if not image_key:
+            return
+
+        img = self._get_image_data()
+        self.image_plot.imshow(img, origin='lower', vmin=100, vmax=300)
+
+        points = session.extraction_model.get_points(image_key)
+        for p in points:
+            # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
+            p_xy = p[1], p[0]
+            circle = Circle(p_xy, radius=3, color='red')
+            self.image_plot.add_patch(circle)
+        self.mplcanvas.draw()
+
+    def _get_image_data(self):
         image_key = self.combobox_datasets.currentText()
         if not image_key:
             return
@@ -77,13 +96,7 @@ class ExtractionView(QtWidgets.QWidget):
                               session.reflection['vertically'],
                               session.reflection['horizontally'])
 
-        self.image_plot.imshow(img, origin='lower', vmin=100, vmax=300)
-
-        points = session.extraction_model.get_points(image_key)
-        for p in points:
-            circle = Circle(p, radius=3, color='red')
-            self.image_plot.add_patch(circle)
-        self.mplcanvas.draw()
+        return img
 
     def toggle_mode(self):
         if self.mode == MODE_DEFAULT:
@@ -97,4 +110,20 @@ class ExtractionView(QtWidgets.QWidget):
         calib_key = self.combobox_datasets.currentText()
         session = Session.get_instance()
         session.extraction_model.clear_points(calib_key)
+        self.refresh_image_plot()
+
+    def optimize_points(self):
+        calib_key = self.combobox_datasets.currentText()
+        session = Session.get_instance()
+        points = session.extraction_model.get_points(calib_key)
+        session.extraction_model.clear_points(calib_key)
+
+        img = self._get_image_data()
+
+        for p in points:
+            new_point = find_max_in_radius(img, p, 20)
+            # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
+            session.extraction_model.add_point(
+                calib_key, new_point[0], new_point[1])
+
         self.refresh_image_plot()

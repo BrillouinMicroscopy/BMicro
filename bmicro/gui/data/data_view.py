@@ -3,7 +3,7 @@ import pkg_resources
 from PyQt5 import uic, QtWidgets
 import matplotlib
 
-from bmlab.image_operations import set_orientation
+from bmlab.image import set_orientation
 
 from bmicro.gui.mpl import MplCanvas
 from bmicro.session import Session
