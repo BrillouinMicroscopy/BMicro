@@ -3,7 +3,7 @@ import pathlib
 from PyQt5.QtWidgets import QWidget
 from PyQt5 import QtCore
 
-from bmicro.gui.main import BMicro
+from bmicro.gui.main import BMicro, check_event_mime_data
 
 
 def data_file_path(file_name):
@@ -49,3 +49,28 @@ def test_open_file_shows_metadata(qtbot, mocker):
     assert w.textedit_comment.toPlainText() == 'Brillouin data'
 
     window.close()
+
+
+def test_check_event_mime_data():
+    class DummyEvent:
+        def __init__(self, *args, **kwargs):
+            self.__mimeData = QtCore.QMimeData()
+
+        def mimeData(self):
+            return self.__mimeData
+
+    event = DummyEvent()
+
+    """ Test for empty url """
+    path = check_event_mime_data(event)
+    assert path is False
+
+    """ Test for wrong file type """
+    event.mimeData().setUrls([QtCore.QUrl("file:/directory/file.txt")])
+    path = check_event_mime_data(event)
+    assert path is False
+
+    """ Test for correct file type """
+    event.mimeData().setUrls([QtCore.QUrl("file:/directory/file.h5")])
+    path = check_event_mime_data(event)
+    assert path == '/directory/file.h5'
