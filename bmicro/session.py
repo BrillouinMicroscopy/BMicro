@@ -27,9 +27,18 @@ class Session(object):
 
         self.file = None
         self.orientation = Orientation()
-        self.selected_repetition = None
         self.setup = None
         self.extraction_model = ExtractionModel()
+
+        self._current_repetition_key = None
+
+    def current_repetition(self):
+        if self.file and self._current_repetition_key:
+            return self.file.get_repetition(self._current_repetition_key)
+        return None
+
+    def set_current_repetition(self, rep_key):
+        self._current_repetition_key = rep_key
 
     @staticmethod
     def get_instance():

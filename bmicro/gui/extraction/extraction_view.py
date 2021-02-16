@@ -44,11 +44,11 @@ class ExtractionView(QtWidgets.QWidget):
 
     def update_ui(self):
         session = Session.get_instance()
-        if not session.selected_repetition:
+        if not session.current_repetition():
             # TODO: Clear tab in this case
             return
 
-        calib_keys = session.selected_repetition.calibration.image_keys()
+        calib_keys = session.current_repetition().calibration.image_keys()
         self.combobox_datasets.clear()
         self.combobox_datasets.addItems(calib_keys)
 
@@ -89,7 +89,7 @@ class ExtractionView(QtWidgets.QWidget):
 
         session = Session.get_instance()
 
-        img = session.selected_repetition.calibration.get_image(image_key)
+        img = session.current_repetition().calibration.get_image(image_key)
         img = img[0, ...]
 
         img = set_orientation(img, session.orientation.rotation,

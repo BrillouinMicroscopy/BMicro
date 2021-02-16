@@ -118,7 +118,7 @@ class DataView(QtWidgets.QWidget):
 
     def update_preview(self):
         session = Session.get_instance()
-        rep = session.selected_repetition
+        rep = session.current_repetition()
 
         if rep and rep.payload.image_keys():
             first_key = rep.payload.image_keys()[0]
@@ -145,8 +145,7 @@ class DataView(QtWidgets.QWidget):
             return
         rep_key = self.comboBox_repetition.currentText()
         try:
-            rep = session.file.get_repetition(rep_key)
-            session.selected_repetition = rep
+            session.set_current_repetition(rep_key)
         except Exception:
             pass
 
