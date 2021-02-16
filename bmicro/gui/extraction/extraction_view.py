@@ -100,6 +100,12 @@ class ExtractionView(QtWidgets.QWidget):
         return img
 
     def toggle_mode(self):
+        """
+        Toggles between normal and selection mode.
+
+        In selection mode, the user can select points in the calibration
+        image.
+        """
         if self.mode == MODE_DEFAULT:
             self.mode = MODE_SELECT
             self.button_select_done.setText('Done')
@@ -108,12 +114,19 @@ class ExtractionView(QtWidgets.QWidget):
             self.button_select_done.setText('Select')
 
     def clear_points(self):
+        """
+        Deletes the selected point for the current calibration image
+        """
         calib_key = self.combobox_datasets.currentText()
         session = Session.get_instance()
         session.extraction_model().clear_points(calib_key)
         self.refresh_image_plot()
 
     def optimize_points(self):
+        """
+        Moves the selected points in the calibration image to the nearest
+        maximum values.
+        """
         calib_key = self.combobox_datasets.currentText()
         session = Session.get_instance()
         model = session.extraction_model()
@@ -123,7 +136,7 @@ class ExtractionView(QtWidgets.QWidget):
         img = self._get_image_data()
 
         for p in points:
-            new_point = find_max_in_radius(img, p, 20)
+            new_point = find_max_in_radius(img, p, 10)
             # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
             model.add_point(
                 calib_key, new_point[0], new_point[1])
