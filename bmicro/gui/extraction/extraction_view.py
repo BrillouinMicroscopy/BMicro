@@ -116,15 +116,16 @@ class ExtractionView(QtWidgets.QWidget):
     def optimize_points(self):
         calib_key = self.combobox_datasets.currentText()
         session = Session.get_instance()
-        points = session.extraction_model.get_points(calib_key)
-        session.extraction_model.clear_points(calib_key)
+        model = session.extraction_model()
+        points = model.get_points(calib_key)
+        model.clear_points(calib_key)
 
         img = self._get_image_data()
 
         for p in points:
             new_point = find_max_in_radius(img, p, 20)
             # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
-            session.extraction_model.add_point(
+            model.add_point(
                 calib_key, new_point[0], new_point[1])
 
         self.refresh_image_plot()

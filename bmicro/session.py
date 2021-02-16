@@ -25,14 +25,18 @@ class Session(object):
         else:
             Session.__instance = self
 
+        # Global session data:
         self.file = None
         self.orientation = Orientation()
         self.setup = None
+
+        # Session data by repetition:
         self.extraction_models = {}
 
         self._current_repetition_key = None
 
     def current_repetition(self):
+        """ Returns the repetition currently selected in data tab """
         if self.file and self._current_repetition_key:
             return self.file.get_repetition(self._current_repetition_key)
         return None

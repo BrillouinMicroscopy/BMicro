@@ -70,8 +70,7 @@ class DataView(QtWidgets.QWidget):
         self.comboBox_repetition.addItems(rep_keys)
 
         if rep_keys and self.comboBox_repetition.currentText():
-            repetition = session.file.get_repetition(
-                self.comboBox_repetition.currentText())
+            repetition = session.current_repetition()
             res = repetition.payload.resolution
             if res:
                 self.label_resolution_x.setText(str(res[0]))
@@ -86,13 +85,10 @@ class DataView(QtWidgets.QWidget):
     def on_rotation_clicked(self):
 
         radio_button = self.sender()
-
-        session = Session.get_instance()
-        if not session:
-            return
-
         if not radio_button.isChecked():
             return
+
+        session = Session.get_instance()
 
         if radio_button == self.radio_rotation_none:
             session.orientation.set_rotation(0)
@@ -104,6 +100,7 @@ class DataView(QtWidgets.QWidget):
         self.update_preview()
 
     def on_reflection_clicked(self):
+        """ Triggered when a reflection checkbox is clicked """
 
         checkbox = self.sender()
 
@@ -141,14 +138,8 @@ class DataView(QtWidgets.QWidget):
 
     def on_select_repetition(self):
         session = Session.get_instance()
-        if not session.file:
-            return
         rep_key = self.comboBox_repetition.currentText()
-        try:
-            session.set_current_repetition(rep_key)
-        except Exception:
-            pass
-
+        session.set_current_repetition(rep_key)
         self.update_preview()
 
     def on_select_setup(self):
