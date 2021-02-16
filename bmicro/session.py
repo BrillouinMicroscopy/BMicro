@@ -1,4 +1,5 @@
 import pickle
+import os
 
 from bmlab.file import BrillouinFile
 
@@ -104,3 +105,20 @@ class Session(object):
         with open(bms_file_name, 'wb') as fh:
             pickle.dump(self.orientation, fh)
             pickle.dump(self.extraction_models, fh)
+            pickle.dump(self.setup, fh)
+
+    def load(self, bms_file_name):
+
+        h5_file_name = str(bms_file_name)[:-4] + '.h5'
+
+        if not os.path.exists(bms_file_name):
+            return
+
+        self.set_file(h5_file_name)
+
+        with open(bms_file_name, 'rb') as fh:
+            self.orientation = pickle.load(fh)
+            self.extraction_models = pickle.load(fh)
+            self.setup = pickle.load(fh)
+
+

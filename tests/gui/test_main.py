@@ -94,4 +94,10 @@ def test_save_and_load_session():
     assert session.file is None
     assert session.extraction_models == {}
 
+    session.load(data_file_path('Water.bms'))
+
+    assert session.file is not None
+    assert len(session.extraction_models) == 1
+
     os.remove(data_file_path('Water.bms'))
+
