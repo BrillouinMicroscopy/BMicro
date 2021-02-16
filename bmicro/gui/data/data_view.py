@@ -82,12 +82,15 @@ class DataView(QtWidgets.QWidget):
             self.label_calibration.setText(
                 str(not repetition.calibration.is_empty()))
 
-        self.checkbox_reflect_vertically.setChecked(session.orientation.reflection['vertically'])
-        self.checkbox_reflect_horizontally.setChecked(session.orientation.reflection['horizontally'])
+        self.checkbox_reflect_vertically.setChecked(
+            session.orientation.reflection['vertically'])
+        self.checkbox_reflect_horizontally.setChecked(
+            session.orientation.reflection['horizontally'])
 
         self.radio_rotation_none.setChecked(session.orientation.rotation == 0)
         self.radio_rotation_90_cw.setChecked(session.orientation.rotation == 3)
-        self.radio_rotation_90_ccw.setChecked(session.orientation.rotation == 1)
+        self.radio_rotation_90_ccw.setChecked(
+            session.orientation.rotation == 1)
 
     def on_rotation_clicked(self):
 

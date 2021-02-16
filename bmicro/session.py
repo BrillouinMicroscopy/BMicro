@@ -120,5 +120,3 @@ class Session(object):
             self.orientation = pickle.load(fh)
             self.extraction_models = pickle.load(fh)
             self.setup = pickle.load(fh)
-
-
