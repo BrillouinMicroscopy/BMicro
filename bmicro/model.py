@@ -1,5 +1,7 @@
 import numpy as np
 
+from bmlab.image import fit_circle
+
 
 class Orientation(object):
 
@@ -22,11 +24,14 @@ class ExtractionModel(object):
 
     def __init__(self):
         self.points = {}
+        self.circle_fits = {}
 
     def add_point(self, calib_key, xdata, ydata):
         if calib_key not in self.points:
             self.points[calib_key] = []
         self.points[calib_key].append((xdata, ydata))
+        if len(self.points[calib_key]) >= 3:
+            self.circle_fits[calib_key] = fit_circle(self.points[calib_key])
 
     def get_points(self, calib_key):
         if calib_key in self.points:
@@ -35,6 +40,10 @@ class ExtractionModel(object):
 
     def clear_points(self, calib_key):
         self.points[calib_key] = []
+        self.circle_fits[calib_key] = None
+
+    def get_circle_fit(self, calib_key):
+        return self.circle_fits.get(calib_key)
 
 
 class Setup(object):

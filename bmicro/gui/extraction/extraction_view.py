@@ -3,7 +3,7 @@ import pkg_resources
 from PyQt5 import QtWidgets, uic
 from matplotlib.patches import Circle
 
-from bmlab.image import set_orientation, find_max_in_radius, fit_circle
+from bmlab.image import set_orientation, find_max_in_radius
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
@@ -81,10 +81,12 @@ class ExtractionView(QtWidgets.QWidget):
             circle = Circle(p_xy, radius=3, color='red')
             self.image_plot.add_patch(circle)
 
-        center, radius = fit_circle(points)
+        circle_fit = session.extraction_model().get_circle_fit(image_key)
 
-        self.image_plot.add_patch(
-            Circle(center, radius, color='yellow', fill=False))
+        if circle_fit:
+            center, radius = circle_fit
+            self.image_plot.add_patch(
+                Circle(center, radius, color='yellow', fill=False))
 
         self.mplcanvas.draw()
 
