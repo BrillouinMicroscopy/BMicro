@@ -3,7 +3,7 @@ import pkg_resources
 from PyQt5 import QtWidgets, uic
 from matplotlib.patches import Circle
 
-from bmlab.image import set_orientation, find_max_in_radius
+from bmlab.image import set_orientation, find_max_in_radius, fit_circle
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
@@ -45,7 +45,6 @@ class ExtractionView(QtWidgets.QWidget):
     def update_ui(self):
         session = Session.get_instance()
         if not session.current_repetition():
-            # TODO: Clear tab in this case
             return
 
         calib_keys = session.current_repetition().calibration.image_keys()
@@ -81,6 +80,12 @@ class ExtractionView(QtWidgets.QWidget):
             p_xy = p[1], p[0]
             circle = Circle(p_xy, radius=3, color='red')
             self.image_plot.add_patch(circle)
+
+        center, radius = fit_circle(points)
+
+        self.image_plot.add_patch(
+            Circle(center, radius, color='yellow', fill=False))
+
         self.mplcanvas.draw()
 
     def _get_image_data(self):

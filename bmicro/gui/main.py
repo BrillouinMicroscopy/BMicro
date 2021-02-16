@@ -43,32 +43,7 @@ class BMicro(QtWidgets.QMainWindow):
         QtCore.QCoreApplication.setApplicationName('BMicro')
 
         self.tabWidget.currentChanged.connect(self.update_ui)
-
-        self.widget_data_view = data.DataView(self)
-        self.layout_data = QtWidgets.QVBoxLayout()
-        self.tab_data.setLayout(self.layout_data)
-        self.layout_data.addWidget(self.widget_data_view)
-
-        self.widget_extraction_view = extraction.ExtractionView(self)
-        self.layout_extraction = QtWidgets.QVBoxLayout()
-        self.tab_extraction.setLayout(self.layout_extraction)
-        self.layout_extraction.addWidget(self.widget_extraction_view)
-
-        self.widget_calibration_view = calibration.CalibrationView(self)
-        self.layout_calibration = QtWidgets.QVBoxLayout()
-        self.tab_calibration.setLayout(self.layout_calibration)
-        self.layout_calibration.addWidget(self.widget_calibration_view)
-
-        self.widget_peak_selection_view = peak_selection.PeakSelectionView(
-            self)
-        self.layout_peak_selection = QtWidgets.QVBoxLayout()
-        self.tab_peak_selection.setLayout(self.layout_peak_selection)
-        self.layout_peak_selection.addWidget(self.widget_peak_selection_view)
-
-        self.widget_evaluation_view = evaluation.EvaluationView(self)
-        self.layout_evaluation = QtWidgets.QVBoxLayout()
-        self.tab_evaluation.setLayout(self.layout_evaluation)
-        self.layout_evaluation.addWidget(self.widget_evaluation_view)
+        self.build_tabs()
 
         self.connect_menu()
 
@@ -81,6 +56,29 @@ class BMicro(QtWidgets.QMainWindow):
             print(__version__)
             QtWidgets.QApplication.processEvents()
             sys.exit(0)
+
+    def build_tabs(self):
+        self.widget_data_view = data.DataView(self)
+        self.layout_data = QtWidgets.QVBoxLayout()
+        self.tab_data.setLayout(self.layout_data)
+        self.layout_data.addWidget(self.widget_data_view)
+        self.widget_extraction_view = extraction.ExtractionView(self)
+        self.layout_extraction = QtWidgets.QVBoxLayout()
+        self.tab_extraction.setLayout(self.layout_extraction)
+        self.layout_extraction.addWidget(self.widget_extraction_view)
+        self.widget_calibration_view = calibration.CalibrationView(self)
+        self.layout_calibration = QtWidgets.QVBoxLayout()
+        self.tab_calibration.setLayout(self.layout_calibration)
+        self.layout_calibration.addWidget(self.widget_calibration_view)
+        self.widget_peak_selection_view = peak_selection.PeakSelectionView(
+            self)
+        self.layout_peak_selection = QtWidgets.QVBoxLayout()
+        self.tab_peak_selection.setLayout(self.layout_peak_selection)
+        self.layout_peak_selection.addWidget(self.widget_peak_selection_view)
+        self.widget_evaluation_view = evaluation.EvaluationView(self)
+        self.layout_evaluation = QtWidgets.QVBoxLayout()
+        self.tab_evaluation.setLayout(self.layout_evaluation)
+        self.layout_evaluation.addWidget(self.widget_evaluation_view)
 
     def connect_drag_drop(self):
         self.dragEnterEvent = self.drag_enter_event
@@ -138,4 +136,5 @@ class BMicro(QtWidgets.QMainWindow):
             self.open_file(path)
 
     def save_session(self):
+        """ Save the session data to file with ending '.bms' """
         Session.get_instance().save()
