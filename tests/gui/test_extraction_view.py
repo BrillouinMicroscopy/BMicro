@@ -41,8 +41,8 @@ def test_clicking_in_select_mode_adds_points(qtbot, window):
     ev.on_click_image(event)
 
     session = Session.get_instance()
-    assert session.extraction_model.get_points('1') == [(50, 50), (150, 150)]
-    assert session.extraction_model.get_points('2') == []
+    assert session.extraction_model().get_points('1') == [(50, 50), (150, 150)]
+    assert session.extraction_model().get_points('2') == []
 
     # Change back to default mode
     ev.toggle_mode()
@@ -50,7 +50,7 @@ def test_clicking_in_select_mode_adds_points(qtbot, window):
     # Clicking should not add point
     event = Event(111, 111)
     ev.on_click_image(event)
-    assert session.extraction_model.get_points('1') == [(50, 50), (150, 150)]
+    assert session.extraction_model().get_points('1') == [(50, 50), (150, 150)]
 
 
 def test_clicking_clear_deletes_points(qtbot, window):
@@ -62,6 +62,6 @@ def test_clicking_clear_deletes_points(qtbot, window):
     ev.on_click_image(event)
 
     session = Session.get_instance()
-    assert session.extraction_model.get_points('1') == [(50, 50)]
+    assert session.extraction_model().get_points('1') == [(50, 50)]
     ev.clear_points()
-    assert session.extraction_model.get_points('1') == []
+    assert session.extraction_model().get_points('1') == []

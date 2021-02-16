@@ -28,7 +28,7 @@ class Session(object):
         self.file = None
         self.orientation = Orientation()
         self.setup = None
-        self.extraction_model = ExtractionModel()
+        self.extraction_models = {}
 
         self._current_repetition_key = None
 
@@ -39,6 +39,12 @@ class Session(object):
 
     def set_current_repetition(self, rep_key):
         self._current_repetition_key = rep_key
+
+    def extraction_model(self):
+        """
+        Returns ExtractionModel instance for currently selected repetition
+        """
+        return self.extraction_models.get(self._current_repetition_key)
 
     @staticmethod
     def get_instance():
@@ -67,6 +73,9 @@ class Session(object):
         """
         try:
             self.file = BrillouinFile(file_name)
+
+            self.extraction_models = {key: ExtractionModel()
+                                      for key in self.file.repetition_keys()}
         except Exception as e:
             self.file = None
             raise e
