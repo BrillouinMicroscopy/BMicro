@@ -1,3 +1,5 @@
+import pickle
+
 from bmlab.file import BrillouinFile
 
 from bmicro.model import ExtractionModel, Orientation
@@ -24,16 +26,7 @@ class Session(object):
             raise Exception('Session is a singleton!')
         else:
             Session.__instance = self
-
-        # Global session data:
-        self.file = None
-        self.orientation = Orientation()
-        self.setup = None
-
-        # Session data by repetition:
-        self.extraction_models = {}
-
-        self._current_repetition_key = None
+            self.clear()
 
     def current_repetition(self):
         """ Returns the repetition currently selected in data tab """
@@ -88,7 +81,26 @@ class Session(object):
         """
         Close connection to loaded file.
         """
-        Session.__instance = None
+
+        # Global session data:
+        self.file = None
+        self.orientation = Orientation()
+        self.setup = None
+
+        # Session data by repetition:
+        self.extraction_models = {}
+
+        self._current_repetition_key = None
 
     def set_setup(self, setup):
         self.setup = setup
+
+    def save(self):
+        if self.file is None:
+            return
+        h5_file_name = str(self.file.path)
+        bms_file_name = h5_file_name[:-3] + '.bms'
+
+        with open(bms_file_name, 'wb') as fh:
+            pickle.dump(self.orientation, fh)
+            pickle.dump(self.extraction_models, fh)

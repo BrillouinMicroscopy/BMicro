@@ -1,9 +1,11 @@
 import pathlib
+import os
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5 import QtCore
 
 from bmicro.gui.main import BMicro, check_event_mime_data
+from bmicro.session import Session
 
 
 def data_file_path(file_name):
@@ -74,3 +76,22 @@ def test_check_event_mime_data():
     event.mimeData().setUrls([QtCore.QUrl("file:/directory/file.h5")])
     path = check_event_mime_data(event)
     assert path == '/directory/file.h5'
+
+
+def test_save_and_load_session():
+    if os.path.exists(data_file_path('Water.bms')):
+        os.remove(data_file_path('Water.bms'))
+    session = Session.get_instance()
+    session.set_file(data_file_path('Water.h5'))
+    session.orientation.set_reflection(vertically=True)
+    session.extraction_models['0'].add_point('0', 30, 30)
+    session.save()
+
+    assert os.path.exists(data_file_path('Water.bms'))
+
+    session.clear()
+
+    assert session.file is None
+    assert session.extraction_models == {}
+
+    os.remove(data_file_path('Water.bms'))
