@@ -1,6 +1,6 @@
 import numpy as np
 
-from bmlab.image import fit_circle
+from bmlab.image import fit_circle, find_max_in_radius
 
 
 class Orientation(object):
@@ -37,6 +37,16 @@ class ExtractionModel(object):
         if calib_key in self.points:
             return self.points[calib_key]
         return []
+
+    def optimize_points(self, calib_key, img):
+        points = self.get_points(calib_key)
+        self.clear_points(calib_key)
+
+        for p in points:
+            new_point = find_max_in_radius(img, p, 10)
+            # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
+            self.add_point(
+                calib_key, new_point[0], new_point[1])
 
     def clear_points(self, calib_key):
         self.points[calib_key] = []

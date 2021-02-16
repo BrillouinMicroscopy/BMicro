@@ -3,7 +3,7 @@ import pkg_resources
 from PyQt5 import QtWidgets, uic
 from matplotlib.patches import Circle
 
-from bmlab.image import set_orientation, find_max_in_radius
+from bmlab.image import set_orientation
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
@@ -136,16 +136,6 @@ class ExtractionView(QtWidgets.QWidget):
         """
         calib_key = self.combobox_datasets.currentText()
         session = Session.get_instance()
-        model = session.extraction_model()
-        points = model.get_points(calib_key)
-        model.clear_points(calib_key)
-
-        img = self._get_image_data()
-
-        for p in points:
-            new_point = find_max_in_radius(img, p, 10)
-            # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
-            model.add_point(
-                calib_key, new_point[0], new_point[1])
-
+        session.extraction_model().optimize_points(calib_key,
+                                                   self._get_image_data())
         self.refresh_image_plot()
