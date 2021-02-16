@@ -61,7 +61,8 @@ class ExtractionView(QtWidgets.QWidget):
         session = Session.get_instance()
         calib_key = self.combobox_datasets.currentText()
         # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
-        session.extraction_model().add_point(calib_key, event.ydata, event.xdata)
+        session.extraction_model().add_point(calib_key, event.ydata,
+                                             event.xdata)
         self.refresh_image_plot()
 
     def refresh_image_plot(self):
