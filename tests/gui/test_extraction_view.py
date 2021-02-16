@@ -53,6 +53,24 @@ def test_clicking_in_select_mode_adds_points(qtbot, window):
     assert session.extraction_model().get_points('1') == [(50, 50), (150, 150)]
 
 
+def test_selecting_three_points_creates_circle_fit(qtbot, window):
+    ev = window.widget_extraction_view
+    # Change to select mode:
+    ev.toggle_mode()
+    event = Event(0, 100)
+    ev.on_click_image(event)
+    event = Event(100, 0)
+    ev.on_click_image(event)
+    session = Session.get_instance()
+    assert session.extraction_model().get_circle_fit('1') is None
+    event = Event(141, 141)
+    ev.on_click_image(event)
+    fit = session.extraction_model().get_circle_fit('1')
+    center, radius = fit
+    assert center == (-250, -250)
+    assert radius == 600
+
+
 def test_clicking_clear_deletes_points(qtbot, window):
     ev = window.widget_extraction_view
     # Change to select mode:
