@@ -100,4 +100,3 @@ def test_save_and_load_session():
     assert len(session.extraction_models) == 1
 
     os.remove(data_file_path('Water.bms'))
-

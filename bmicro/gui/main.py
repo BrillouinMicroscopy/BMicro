@@ -1,5 +1,6 @@
 import pkg_resources
 import sys
+import os
 
 from PyQt5 import QtWidgets, uic, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
@@ -89,14 +90,21 @@ class BMicro(QtWidgets.QMainWindow):
         """ Registers the menu actions """
         self.action_open.triggered.connect(self.open_file)
         self.action_close.triggered.connect(self.close_file)
+        self.action_save.triggered.connect(self.save_session)
 
     def open_file(self, file_name=None):
         """ Show open file dialog and load file. """
         if not file_name:
             file_name, _ = QFileDialog.getOpenFileName(self, 'Open File...',
                                                        filter='*.h5')
+
+        session = Session.get_instance()
         try:
-            Session.get_instance().set_file(file_name)
+            bms_file_name = str(file_name)[:-3] + '.bms'
+            if os.path.exists(bms_file_name):
+                session.load(bms_file_name)
+            else:
+                session.set_file(file_name)
         except Exception:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
@@ -128,3 +136,6 @@ class BMicro(QtWidgets.QMainWindow):
         path = check_event_mime_data(event)
         if path:
             self.open_file(path)
+
+    def save_session(self):
+        Session.get_instance().save()
