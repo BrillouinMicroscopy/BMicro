@@ -114,7 +114,6 @@ class BMicro(QtWidgets.QMainWindow):
             msg.setInformativeText(str(file_name))
             msg.setWindowTitle('Invalid File Error')
             msg.exec_()
-            self.session.clear()
 
         self.update_ui()
 
