@@ -6,6 +6,12 @@ from PyQt5 import QtGui, QtWidgets
 
 from bmicro.gui.main import BMicro
 
+import ctypes
+try:
+    ctypes.windll.shcore.SetProcessDpiAwareness(True)
+except:  # noqa E722
+    pass
+
 
 def main():
     """

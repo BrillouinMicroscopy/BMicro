@@ -9,6 +9,8 @@ from bmicro.gui.mpl import MplCanvas
 from bmicro.session import Session
 from bmicro.model import AVAILABLE_SETUPS
 
+import os
+
 matplotlib.use('Qt5Agg')
 
 
@@ -51,6 +53,7 @@ class DataView(QtWidgets.QWidget):
         When a new file is selected, update the UI accordingly.
         """
         self.label_selected_file.setText('')
+        self.label_selected_file.setToolTip('')
         self.comboBox_repetition.clear()
         self.label_date.setText('')
         self.label_resolution_x.setText('')
@@ -64,7 +67,9 @@ class DataView(QtWidgets.QWidget):
         if not session.file:
             return
 
-        self.label_selected_file.setText(str(session.file.path))
+        filename = str(os.path.basename(session.file.path))
+        self.label_selected_file.setText(filename)
+        self.label_selected_file.setToolTip(str(session.file.path))
         self.label_selected_file.adjustSize()
         rep_keys = session.file.repetition_keys()
         self.comboBox_repetition.addItems(rep_keys)

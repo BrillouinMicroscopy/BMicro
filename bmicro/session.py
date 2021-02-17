@@ -70,13 +70,14 @@ class Session(object):
 
         """
         try:
-            self.file = BrillouinFile(file_name)
-
-            self.extraction_models = {key: ExtractionModel()
-                                      for key in self.file.repetition_keys()}
+            file = BrillouinFile(file_name)
         except Exception as e:
-            self.file = None
             raise e
+
+        """ Only load data if the file could be opened """
+        self.file = file
+        self.extraction_models = {key: ExtractionModel()
+                                  for key in self.file.repetition_keys()}
 
     def clear(self):
         """

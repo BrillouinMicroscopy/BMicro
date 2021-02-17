@@ -96,6 +96,10 @@ class BMicro(QtWidgets.QMainWindow):
             file_name, _ = QFileDialog.getOpenFileName(self, 'Open File...',
                                                        filter='*.h5')
 
+        """ file_name is empty if user selects 'Cancel' in FileDialog """
+        if not file_name:
+            return
+
         session = Session.get_instance()
         try:
             bms_file_name = str(file_name)[:-3] + '.bms'
@@ -110,7 +114,6 @@ class BMicro(QtWidgets.QMainWindow):
             msg.setInformativeText(str(file_name))
             msg.setWindowTitle('Invalid File Error')
             msg.exec_()
-            self.session.clear()
 
         self.update_ui()
 

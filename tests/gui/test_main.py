@@ -32,10 +32,11 @@ def test_main_window_can_activate_all_tabs(qtbot):
 
 def test_open_file_shows_metadata(qtbot, mocker):
     window = BMicro()
-    file_name = data_file_path('Water.h5')
+    file_name = 'Water.h5'
+    file_path = data_file_path(file_name)
 
     def mock_getOpenFileName(self, *args, **kwargs):
-        return file_name, None
+        return file_path, None
 
     mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
                  mock_getOpenFileName)
@@ -43,6 +44,7 @@ def test_open_file_shows_metadata(qtbot, mocker):
     window.open_file()
     w = window.widget_data_view
     assert w.label_selected_file.text() == str(file_name)
+    assert w.label_selected_file.toolTip() == str(file_path)
     assert w.label_date.text() == '2020-11-03 15:20'
     assert w.label_resolution_x.text() == '10'
     assert w.label_resolution_y.text() == '1'
