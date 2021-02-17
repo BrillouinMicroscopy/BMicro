@@ -44,11 +44,11 @@ class ExtractionView(QtWidgets.QWidget):
 
     def update_ui(self):
         session = Session.get_instance()
+        self.combobox_datasets.clear()
         if not session.current_repetition():
             return
 
         calib_keys = session.current_repetition().calibration.image_keys()
-        self.combobox_datasets.clear()
         self.combobox_datasets.addItems(calib_keys)
 
     def on_select_dataset(self):
@@ -69,6 +69,7 @@ class ExtractionView(QtWidgets.QWidget):
         session = Session.get_instance()
         image_key = self.combobox_datasets.currentText()
         if not image_key:
+            self.mplcanvas.draw()
             return
 
         img = self._get_image_data()
