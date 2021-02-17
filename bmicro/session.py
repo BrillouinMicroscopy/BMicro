@@ -77,7 +77,7 @@ class Session(object):
         """ Only load data if the file could be opened """
         self.file = file
         self.extraction_models = {key: ExtractionModel()
-                                      for key in self.file.repetition_keys()}
+                                  for key in self.file.repetition_keys()}
 
     def clear(self):
         """
