@@ -291,8 +291,8 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>300</width>
-         <height>300</height>
+         <width>500</width>
+         <height>500</height>
         </size>
        </property>
       </widget>
