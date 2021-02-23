@@ -3,7 +3,6 @@ import pkg_resources
 from PyQt5 import QtWidgets, uic
 from matplotlib.patches import Circle as MPLCircle
 import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 
 from bmlab.image import set_orientation

@@ -58,7 +58,8 @@ class ExtractionModel(object):
 
     def set_extracted_values(self, calib_key, phis, values):
         self.extracted_values[calib_key] = [(phi, value)
-                                for phi, value in zip(phis, values)]
+                                            for phi, value in
+                                            zip(phis, values)]
 
 
 class Setup(object):
