@@ -116,6 +116,7 @@ class BMicro(QtWidgets.QMainWindow):
     def update_ui(self):
         self.widget_data_view.update_ui()
         self.widget_extraction_view.update_ui()
+        self.widget_calibration_view.update_ui()
 
     def drag_enter_event(self, event):
         """ Handles dragging a file over the GUI """

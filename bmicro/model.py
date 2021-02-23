@@ -61,6 +61,12 @@ class ExtractionModel(object):
                                             for phi, value in
                                             zip(phis, values)]
 
+    def get_extracted_values(self, calib_key):
+        values = self.extracted_values.get(calib_key)
+        if values:
+            return np.array(values)
+        return []
+
 
 class Setup(object):
 
