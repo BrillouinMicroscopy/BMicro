@@ -143,6 +143,10 @@ class DataView(QtWidgets.QWidget):
                                   orient.reflection['horizontally'])
 
             self.preview.clear()
+
+            # imshow should always get the transposed image such that
+            # the horizontal axis of the plot coincides with the
+            # 0-axis of the plotted array:
             self.preview.imshow(img.T, origin='lower', vmin=100, vmax=300)
             self.preview.axis('off')
             self.mplcanvas.draw()
