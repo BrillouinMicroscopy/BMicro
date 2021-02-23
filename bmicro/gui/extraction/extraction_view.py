@@ -112,7 +112,7 @@ class ExtractionView(QtWidgets.QWidget):
                 self.image_plot.add_patch(
                     matplotlib.patches.Circle(p, radius=3, color='Red'))
                 rotate = matplotlib.transforms.Affine2D(
-                ).rotate_around(p[0], p[1], phi+np.pi/2.)
+                ).rotate_around(p[0], p[1], phi + np.pi/2.)
                 rect.set_transform(rotate + self.image_plot.transData)
                 self.image_plot.add_patch(rect)
 
