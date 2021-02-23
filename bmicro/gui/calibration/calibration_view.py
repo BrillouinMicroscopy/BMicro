@@ -45,8 +45,15 @@ class CalibrationView(QtWidgets.QWidget):
         em = session.extraction_model()
         if em:
             values = em.get_extracted_values(calib_key)
-
             if len(values) > 0:
-                self.plot.plot(values[:, 0], values[:, 1])
+                phis = values[:, 0]
+                amplitudes = values[:, 1]
+                _, radius = em.get_circle_fit(calib_key)
+                arc_lenghts = radius * phis
+                arc_lenghts -= arc_lenghts[0]
+
+                if len(values) > 0:
+                    self.plot.plot(arc_lenghts, amplitudes)
+                    self.plot.set_xlabel('pixels')
 
         self.mplcanvas.draw()
