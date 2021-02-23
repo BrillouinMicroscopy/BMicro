@@ -61,9 +61,6 @@ class DataView(QtWidgets.QWidget):
         self.label_resolution_z.setText('')
         self.label_calibration.setText('')
         self.textedit_comment.setText('')
-        self.radio_rotation_none.setChecked(True)
-        self.checkbox_reflect_vertically.setChecked(False)
-        self.checkbox_reflect_horizontally.setChecked(False)
         self.update_preview()
 
         session = Session.get_instance()
@@ -146,7 +143,7 @@ class DataView(QtWidgets.QWidget):
                                   orient.reflection['horizontally'])
 
             self.preview.clear()
-            self.preview.imshow(img, origin='lower', vmin=100, vmax=300)
+            self.preview.imshow(img.T, origin='lower', vmin=100, vmax=300)
             self.preview.axis('off')
             self.mplcanvas.draw()
         else:

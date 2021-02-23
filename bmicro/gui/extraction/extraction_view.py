@@ -1,9 +1,13 @@
 import pkg_resources
 
 from PyQt5 import QtWidgets, uic
-from matplotlib.patches import Circle
+from matplotlib.patches import Circle as MPLCircle
+import matplotlib
+import numpy as np
 
 from bmlab.image import set_orientation
+from bmlab.geometry import Circle, Rectangle
+
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
@@ -73,13 +77,13 @@ class ExtractionView(QtWidgets.QWidget):
             return
 
         img = self._get_image_data()
-        self.image_plot.imshow(img, origin='lower', vmin=100, vmax=300)
+        self.image_plot.imshow(img.T, origin='lower', vmin=100, vmax=300)
 
         points = session.extraction_model().get_points(image_key)
         for p in points:
             # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
             p_xy = p[1], p[0]
-            circle = Circle(p_xy, radius=3, color='red')
+            circle = MPLCircle(p_xy, radius=3, color='red')
             self.image_plot.add_patch(circle)
 
         circle_fit = session.extraction_model().get_circle_fit(image_key)
@@ -87,7 +91,27 @@ class ExtractionView(QtWidgets.QWidget):
         if circle_fit:
             center, radius = circle_fit
             self.image_plot.add_patch(
-                Circle(center, radius, color='yellow', fill=False))
+                MPLCircle(center, radius, color='yellow', fill=False))
+            circle = Circle(center, radius)
+            rect = Rectangle(img.shape)
+            cut_edges = circle.intersection(rect)
+
+            phis_edges = [circle.angle(p) for p in cut_edges]
+            phi_0 = min(phis_edges)
+            phi_1 = max(phis_edges)
+            phis = np.linspace(phi_0, phi_1, 50)
+
+            for phi in phis:
+                p = circle.point(phi)
+                width = 3
+                length = 10
+                diag = np.array([width, length])
+                llc =  p - diag/2.
+                rect = matplotlib.patches.Rectangle(llc, width, length, color='Yellow')
+                self.image_plot.add_patch(matplotlib.patches.Circle(p, radius=3, color='Red'))
+                rotate = matplotlib.transforms.Affine2D().rotate_around(p[0], p[1], phi+np.pi/2.)
+                rect.set_transform(rotate + self.image_plot.transData)
+                self.image_plot.add_patch(rect)
 
         self.mplcanvas.draw()
 
