@@ -3,6 +3,7 @@ import logging
 
 from PyQt5 import QtWidgets, uic
 from matplotlib.patches import Circle as MPLCircle
+
 import matplotlib
 import numpy as np
 
@@ -34,7 +35,8 @@ class ExtractionView(QtWidgets.QWidget):
 
         self.mode = MODE_DEFAULT
 
-        self.mplcanvas = MplCanvas(self.image_widget)
+        self.mplcanvas = MplCanvas(
+            self.image_widget, toolbar=('Home', 'Pan', 'Zoom'))
         self.image_plot = self.mplcanvas.get_figure().add_subplot(111)
         self.image_plot.axis('off')
         self.mplcanvas.get_figure().canvas.mpl_connect(
@@ -99,7 +101,7 @@ class ExtractionView(QtWidgets.QWidget):
             circle = Circle(center, radius)
             phis = self._polar_angles_of_extraction_points(circle, img)
 
-            width = 3
+            width = 2
             length = 7
 
             self._plot_extraction_patches(circle, phis, length, width)
@@ -135,7 +137,7 @@ class ExtractionView(QtWidgets.QWidget):
         phis_edges = [circle.angle(p) for p in cut_edges]
         phi_0 = min(phis_edges)
         phi_1 = max(phis_edges)
-        phis = np.linspace(phi_0, phi_1, 100)
+        phis = np.linspace(phi_0, phi_1, 200)
         return phis
 
     def _plot_points(self, points):
