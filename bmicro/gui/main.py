@@ -1,6 +1,7 @@
 import pkg_resources
 import sys
 import os
+import logging
 
 from PyQt5 import QtWidgets, uic, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
@@ -51,11 +52,14 @@ class BMicro(QtWidgets.QMainWindow):
 
         self.setAcceptDrops(True)
 
-        # if "--version" was specified, print the version and exit
-        if "--version" in sys.argv:
-            print(__version__)
-            QtWidgets.QApplication.processEvents()
-            sys.exit(0)
+        for arg in sys.argv:
+            if arg == '--version':
+                print(__version__)
+                QtWidgets.QApplication.processEvents()
+                sys.exit(0)
+            if arg.startswith('--log='):
+                log_level = arg[6:]
+                logging.basicConfig(level=log_level)
 
     def build_tabs(self):
         self.widget_data_view = data.DataView(self)
