@@ -36,7 +36,7 @@ class ExtractionView(QtWidgets.QWidget):
         self.mode = MODE_DEFAULT
 
         self.mplcanvas = MplCanvas(
-            self.image_widget, toolbar=('Home', 'Pan', 'Zoom'))
+            self.image_widget, toolbar=('Home', 'Pan'))
         self.image_plot = self.mplcanvas.get_figure().add_subplot(111)
         self.image_plot.axis('off')
         self.mplcanvas.get_figure().canvas.mpl_connect(
