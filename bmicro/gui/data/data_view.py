@@ -52,16 +52,7 @@ class DataView(QtWidgets.QWidget):
         """
         When a new file is selected, update the UI accordingly.
         """
-        self.label_selected_file.setText('')
-        self.label_selected_file.setToolTip('')
-        self.comboBox_repetition.clear()
-        self.label_date.setText('')
-        self.label_resolution_x.setText('')
-        self.label_resolution_y.setText('')
-        self.label_resolution_z.setText('')
-        self.label_calibration.setText('')
-        self.textedit_comment.setText('')
-        self.update_preview()
+        self.reset_ui()
 
         session = Session.get_instance()
         if not session.file:
@@ -97,7 +88,25 @@ class DataView(QtWidgets.QWidget):
         self.radio_rotation_90_ccw.setChecked(
             session.orientation.rotation == 1)
 
+    def reset_ui(self):
+        """
+        Reset the tab to the state when no file is loaded.
+        """
+        self.label_selected_file.setText('')
+        self.label_selected_file.setToolTip('')
+        self.comboBox_repetition.clear()
+        self.label_date.setText('')
+        self.label_resolution_x.setText('')
+        self.label_resolution_y.setText('')
+        self.label_resolution_z.setText('')
+        self.label_calibration.setText('')
+        self.textedit_comment.setText('')
+        self.update_preview()
+
     def on_rotation_clicked(self):
+        """
+        Action triggered when user clicks one of the rotation radio buttons.
+        """
 
         radio_button = self.sender()
         if not radio_button.isChecked():
@@ -129,6 +138,9 @@ class DataView(QtWidgets.QWidget):
         self.update_preview()
 
     def update_preview(self):
+        """
+        Updates the preview plot based on current session settings.
+        """
         session = Session.get_instance()
         rep = session.current_repetition()
 
@@ -156,12 +168,18 @@ class DataView(QtWidgets.QWidget):
             self.mplcanvas.draw()
 
     def on_select_repetition(self):
+        """
+        Action triggered when the user selects a different repetition.
+        """
         session = Session.get_instance()
         rep_key = self.comboBox_repetition.currentText()
         session.set_current_repetition(rep_key)
         self.update_preview()
 
     def on_select_setup(self):
+        """
+        Action triggered when the user selects a different setup.
+        """
         name = self.combobox_setup.currentText()
         setup = None
         session = Session.get_instance()

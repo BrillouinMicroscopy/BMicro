@@ -61,9 +61,20 @@ class ExtractionView(QtWidgets.QWidget):
         self.combobox_datasets.addItems(calib_keys)
 
     def on_select_dataset(self):
+        """
+        Action triggered when user selects a calibration dataset.
+        """
         self.refresh_image_plot()
 
     def on_click_image(self, event):
+        """
+        Action triggered when user clicks on preview image in selection mode.
+
+        Parameters
+        ----------
+        event: matplotlib event object
+            The mouse click event.
+        """
         if self.mode != MODE_SELECT:
             return
         session = Session.get_instance()
@@ -76,6 +87,9 @@ class ExtractionView(QtWidgets.QWidget):
         self.refresh_image_plot()
 
     def refresh_image_plot(self):
+        """
+        Updates the plot of the selected calibration image.
+        """
         self.image_plot.cla()
         session = Session.get_instance()
         image_key = self.combobox_datasets.currentText()

@@ -1,9 +1,13 @@
 import pkg_resources
+import logging
 
 from PyQt5 import QtWidgets, uic
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
+
+
+logger = logging.getLogger(__name__)
 
 
 class CalibrationView(QtWidgets.QWidget):
@@ -42,18 +46,21 @@ class CalibrationView(QtWidgets.QWidget):
         session = Session.get_instance()
         calib_key = self.combobox_calibration.currentText()
 
-        em = session.extraction_model()
-        if em:
-            values = em.get_extracted_values(calib_key)
-            if len(values) > 0:
-                phis = values[:, 0]
-                amplitudes = values[:, 1]
-                _, radius = em.get_circle_fit(calib_key)
-                arc_lenghts = radius * phis
-                arc_lenghts -= arc_lenghts[0]
-
+        try:
+            em = session.extraction_model()
+            if em:
+                values = em.get_extracted_values(calib_key)
                 if len(values) > 0:
-                    self.plot.plot(arc_lenghts, amplitudes)
-                    self.plot.set_xlabel('pixels')
+                    phis = values[:, 0]
+                    amplitudes = values[:, 1]
+                    _, radius = em.get_circle_fit(calib_key)
+                    arc_lenghts = radius * phis
+                    arc_lenghts -= arc_lenghts[0]
 
-        self.mplcanvas.draw()
+                    if len(values) > 0:
+                        self.plot.plot(arc_lenghts, amplitudes)
+                        self.plot.set_xlabel('pixels')
+        except Exception as e:
+            logger.error('Exception occured: %s' % e)
+        finally:
+            self.mplcanvas.draw()
