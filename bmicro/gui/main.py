@@ -1,13 +1,10 @@
 import pkg_resources
-import sys
 import os
-import logging
 
 from PyQt5 import QtWidgets, uic, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 from ..session import Session
-from .._version import version as __version__
 
 from . import data
 from . import extraction
@@ -51,15 +48,6 @@ class BMicro(QtWidgets.QMainWindow):
         self.connect_drag_drop()
 
         self.setAcceptDrops(True)
-
-        for arg in sys.argv:
-            if arg == '--version':
-                print(__version__)
-                QtWidgets.QApplication.processEvents()
-                sys.exit(0)
-            if arg.startswith('--log='):
-                log_level = arg[6:]
-                logging.basicConfig(level=log_level)
 
     def build_tabs(self):
         self.widget_data_view = data.DataView(self)

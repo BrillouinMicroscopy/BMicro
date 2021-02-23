@@ -1,4 +1,5 @@
 import pkg_resources
+import logging
 
 from PyQt5 import QtWidgets, uic
 from matplotlib.patches import Circle as MPLCircle
@@ -15,6 +16,8 @@ from bmicro.gui.mpl import MplCanvas
 
 MODE_DEFAULT = 0
 MODE_SELECT = 1
+
+logger = logging.getLogger(__name__)
 
 
 class ExtractionView(QtWidgets.QWidget):
@@ -63,6 +66,9 @@ class ExtractionView(QtWidgets.QWidget):
             return
         session = Session.get_instance()
         calib_key = self.combobox_datasets.currentText()
+        logger.debug('Adding point (%f, %f) for calibration key %s' % (
+            event.xdata, event.ydata, calib_key
+        ))
         session.extraction_model().add_point(calib_key, event.xdata,
                                              event.ydata)
         self.refresh_image_plot()
