@@ -3,6 +3,7 @@ import pkg_resources
 from PyQt5 import QtWidgets, uic
 from matplotlib.patches import Circle as MPLCircle
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 
 from bmlab.image import set_orientation
@@ -79,12 +80,7 @@ class ExtractionView(QtWidgets.QWidget):
         img = self._get_image_data()
         self.image_plot.imshow(img.T, origin='lower', vmin=100, vmax=300)
 
-        points = session.extraction_model().get_points(image_key)
-        for p in points:
-            # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
-            p_xy = p[1], p[0]
-            circle = MPLCircle(p_xy, radius=3, color='red')
-            self.image_plot.add_patch(circle)
+        self._plot_points(session.extraction_model().get_points(image_key))
 
         circle_fit = session.extraction_model().get_circle_fit(image_key)
 
@@ -93,30 +89,53 @@ class ExtractionView(QtWidgets.QWidget):
             self.image_plot.add_patch(
                 MPLCircle(center, radius, color='yellow', fill=False))
             circle = Circle(center, radius)
-            rect = Rectangle(img.shape)
-            cut_edges = circle.intersection(rect)
+            phis = self._polar_angles_of_extraction_points(circle, img)
 
-            phis_edges = [circle.angle(p) for p in cut_edges]
-            phi_0 = min(phis_edges)
-            phi_1 = max(phis_edges)
-            phis = np.linspace(phi_0, phi_1, 50)
+            width = 3
+            length = 7
 
-            for phi in phis:
-                p = circle.point(phi)
-                width = 3
-                length = 10
-                diag = np.array([width, length])
-                llc = p - diag/2.
-                rect = matplotlib.patches.Rectangle(
-                    llc, width, length, color='Yellow')
-                self.image_plot.add_patch(
-                    matplotlib.patches.Circle(p, radius=3, color='Red'))
-                rotate = matplotlib.transforms.Affine2D(
-                ).rotate_around(p[0], p[1], phi + np.pi/2.)
-                rect.set_transform(rotate + self.image_plot.transData)
-                self.image_plot.add_patch(rect)
+            self._plot_extraction_patches(circle, phis, length, width)
+
+            values = self._extract_values(circle, img, phis, length, width)
+            session.extraction_model().set_extracted_values(
+                image_key, phis, values)
 
         self.mplcanvas.draw()
+
+    def _plot_extraction_patches(self, circle, phis, length, width):
+        for phi in phis:
+            p = circle.point(phi)
+            diag = np.array([width, length])
+            llc = p - diag / 2.
+            rect = matplotlib.patches.Rectangle(
+                llc, width, length, color='Yellow')
+            rotate = matplotlib.transforms.Affine2D(
+            ).rotate_around(p[0], p[1], phi + np.pi / 2.)
+            rect.set_transform(rotate + self.image_plot.transData)
+            self.image_plot.add_patch(rect)
+
+    def _extract_values(self, circle, img, phis, length, width):
+        masks = []
+        for phi in phis:
+            masks.append(circle.rect_mask(img.shape, phi, length, width))
+        values = [np.sum(img[mask]) for mask in masks]
+        return values
+
+    def _polar_angles_of_extraction_points(self, circle, img):
+        rect = Rectangle(img.shape)
+        cut_edges = circle.intersection(rect)
+        phis_edges = [circle.angle(p) for p in cut_edges]
+        phi_0 = min(phis_edges)
+        phi_1 = max(phis_edges)
+        phis = np.linspace(phi_0, phi_1, 100)
+        return phis
+
+    def _plot_points(self, points):
+        for p in points:
+            # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
+            p_xy = p[1], p[0]
+            circle = MPLCircle(p_xy, radius=3, color='red')
+            self.image_plot.add_patch(circle)
 
     def _get_image_data(self):
         image_key = self.combobox_datasets.currentText()

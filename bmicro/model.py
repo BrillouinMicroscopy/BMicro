@@ -25,6 +25,7 @@ class ExtractionModel(object):
     def __init__(self):
         self.points = {}
         self.circle_fits = {}
+        self.extracted_values = {}
 
     def add_point(self, calib_key, xdata, ydata):
         if calib_key not in self.points:
@@ -54,6 +55,10 @@ class ExtractionModel(object):
 
     def get_circle_fit(self, calib_key):
         return self.circle_fits.get(calib_key)
+
+    def set_extracted_values(self, calib_key, phis, values):
+        self.extracted_values[calib_key] = [(phi, value)
+                                for phi, value in zip(phis, values)]
 
 
 class Setup(object):
