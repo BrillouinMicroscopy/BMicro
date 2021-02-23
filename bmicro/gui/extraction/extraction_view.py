@@ -63,9 +63,8 @@ class ExtractionView(QtWidgets.QWidget):
             return
         session = Session.get_instance()
         calib_key = self.combobox_datasets.currentText()
-        # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
-        session.extraction_model().add_point(calib_key, event.ydata,
-                                             event.xdata)
+        session.extraction_model().add_point(calib_key, event.xdata,
+                                             event.ydata)
         self.refresh_image_plot()
 
     def refresh_image_plot(self):
@@ -77,6 +76,10 @@ class ExtractionView(QtWidgets.QWidget):
             return
 
         img = self._get_image_data()
+
+        # imshow should always get the transposed image such that
+        # the horizontal axis of the plot coincides with the
+        # 0-axis of the plotted array:
         self.image_plot.imshow(img.T, origin='lower', vmin=100, vmax=300)
 
         self._plot_points(session.extraction_model().get_points(image_key))
@@ -131,9 +134,7 @@ class ExtractionView(QtWidgets.QWidget):
 
     def _plot_points(self, points):
         for p in points:
-            # Warning: x-axis in imshow is 1-axis in img, y-axis is 0-axis
-            p_xy = p[1], p[0]
-            circle = MPLCircle(p_xy, radius=3, color='red')
+            circle = MPLCircle(p, radius=3, color='red')
             self.image_plot.add_patch(circle)
 
     def _get_image_data(self):
