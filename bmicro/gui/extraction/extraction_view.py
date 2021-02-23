@@ -106,10 +106,13 @@ class ExtractionView(QtWidgets.QWidget):
                 width = 3
                 length = 10
                 diag = np.array([width, length])
-                llc =  p - diag/2.
-                rect = matplotlib.patches.Rectangle(llc, width, length, color='Yellow')
-                self.image_plot.add_patch(matplotlib.patches.Circle(p, radius=3, color='Red'))
-                rotate = matplotlib.transforms.Affine2D().rotate_around(p[0], p[1], phi+np.pi/2.)
+                llc = p - diag/2.
+                rect = matplotlib.patches.Rectangle(
+                    llc, width, length, color='Yellow')
+                self.image_plot.add_patch(
+                    matplotlib.patches.Circle(p, radius=3, color='Red'))
+                rotate = matplotlib.transforms.Affine2D(
+                ).rotate_around(p[0], p[1], phi+np.pi/2.)
                 rect.set_transform(rotate + self.image_plot.transData)
                 self.image_plot.add_patch(rect)
 
