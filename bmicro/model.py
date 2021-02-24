@@ -68,6 +68,19 @@ class ExtractionModel(object):
         return []
 
 
+class CalibrationModel(object):
+
+    def __init__(self):
+        self.brillouin_regions = {}
+
+    def add_brillouin_region(self, calib_key, region):
+
+        if calib_key not in self.brillouin_regions:
+            self.brillouin_regions[calib_key] = []
+
+        self.brillouin_regions[calib_key].append(region)
+
+
 class Setup(object):
 
     def __init__(self, key, name, pixel_size, lambda0, focal_length,

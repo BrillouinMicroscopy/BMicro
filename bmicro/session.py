@@ -3,7 +3,7 @@ import os
 
 from bmlab.file import BrillouinFile
 
-from bmicro.model import ExtractionModel, Orientation
+from bmicro.model import ExtractionModel, Orientation, CalibrationModel
 
 
 class Session(object):
@@ -44,6 +44,9 @@ class Session(object):
         """
         return self.extraction_models.get(self._current_repetition_key)
 
+    def calibration_model(self):
+        return self.calibration_models.get(self._current_repetition_key)
+
     @staticmethod
     def get_instance():
         """
@@ -78,6 +81,8 @@ class Session(object):
         self.file = file
         self.extraction_models = {key: ExtractionModel()
                                   for key in self.file.repetition_keys()}
+        self.calibration_models = {key: CalibrationModel()
+                                   for key in self.file.repetition_keys()}
 
     def clear(self):
         """
