@@ -113,8 +113,7 @@ class ExtractionView(QtWidgets.QWidget):
             self.image_plot.add_patch(
                 MPLCircle(center, radius, color='yellow', fill=False))
             circle = Circle(center, radius)
-            phis = self._polar_angles_of_extraction_points(circle,
-                                                           img.shape, 200)
+            phis = discretize_arc(circle, img.shape, num_points=200)
 
             width = 2
             length = 7
@@ -161,10 +160,6 @@ class ExtractionView(QtWidgets.QWidget):
                 [np.sum(img[mask]) for mask in masks])
 
         return values_by_img.mean(axis=0)
-
-    def _polar_angles_of_extraction_points(self, circle, img_shape,
-                                           num_points):
-        return discretize_arc(circle, img_shape, num_points)
 
     def _plot_points(self, points):
         for p in points:
