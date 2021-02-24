@@ -120,7 +120,8 @@ class ExtractionView(QtWidgets.QWidget):
 
             self._plot_extraction_patches(circle, phis, length, width)
 
-            values = self._extract_values(circle, img, phis, length, width)
+            values = self._extract_values(
+                image_key, circle, phis, length, width)
             session.extraction_model().set_extracted_values(
                 image_key, phis, values)
 
@@ -138,12 +139,23 @@ class ExtractionView(QtWidgets.QWidget):
             rect.set_transform(rotate + self.image_plot.transData)
             self.image_plot.add_patch(rect)
 
-    def _extract_values(self, circle, img, phis, length, width):
+    def _extract_values(self, calib_key, circle, phis, length, width):
         masks = []
+        session = Session.get_instance()
+        images = session.current_repetition().calibration.get_image(calib_key)
+        num_images = len(images)
+        img = self._get_image_data(0)
+
         for phi in phis:
             masks.append(circle.rect_mask(img.shape, phi, length, width))
-        values = [np.sum(img[mask]) for mask in masks]
-        return values
+
+        values_by_img = np.zeros((num_images, len(phis)), dtype=np.float)
+        for i in range(num_images):
+            img = self._get_image_data(i)
+            values_by_img[i, :] = np.array(
+                [np.sum(img[mask]) for mask in masks])
+
+        return values_by_img.mean(axis=0)
 
     def _polar_angles_of_extraction_points(self, circle, img):
         rect = Rectangle(img.shape)
@@ -159,7 +171,7 @@ class ExtractionView(QtWidgets.QWidget):
             circle = MPLCircle(p, radius=3, color='red')
             self.image_plot.add_patch(circle)
 
-    def _get_image_data(self):
+    def _get_image_data(self, index=0):
         image_key = self.combobox_datasets.currentText()
         if not image_key:
             return
@@ -167,7 +179,7 @@ class ExtractionView(QtWidgets.QWidget):
         session = Session.get_instance()
 
         img = session.current_repetition().calibration.get_image(image_key)
-        img = img[0, ...]
+        img = img[index, ...]
 
         img = set_orientation(img, session.orientation.rotation,
                               session.orientation.reflection['vertically'],
