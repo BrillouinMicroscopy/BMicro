@@ -8,7 +8,7 @@ import matplotlib
 import numpy as np
 
 from bmlab.image import set_orientation
-from bmlab.geometry import Circle, Rectangle
+from bmlab.geometry import Circle, discretize_arc
 
 
 from bmicro.session import Session
@@ -113,7 +113,8 @@ class ExtractionView(QtWidgets.QWidget):
             self.image_plot.add_patch(
                 MPLCircle(center, radius, color='yellow', fill=False))
             circle = Circle(center, radius)
-            phis = self._polar_angles_of_extraction_points(circle, img)
+            phis = self._polar_angles_of_extraction_points(circle,
+                                                           img.shape, 200)
 
             width = 2
             length = 7
@@ -143,6 +144,10 @@ class ExtractionView(QtWidgets.QWidget):
         masks = []
         session = Session.get_instance()
         images = session.current_repetition().calibration.get_image(calib_key)
+
+        # TODO: Move the rest of this method to bmlab.image; when doing this
+        # remember to set the orientation of the images!
+
         num_images = len(images)
         img = self._get_image_data(0)
 
@@ -157,14 +162,9 @@ class ExtractionView(QtWidgets.QWidget):
 
         return values_by_img.mean(axis=0)
 
-    def _polar_angles_of_extraction_points(self, circle, img):
-        rect = Rectangle(img.shape)
-        cut_edges = circle.intersection(rect)
-        phis_edges = [circle.angle(p) for p in cut_edges]
-        phi_0 = min(phis_edges)
-        phi_1 = max(phis_edges)
-        phis = np.linspace(phi_0, phi_1, 200)
-        return phis
+    def _polar_angles_of_extraction_points(self, circle, img_shape,
+                                           num_points):
+        return discretize_arc(circle, img_shape, num_points)
 
     def _plot_points(self, points):
         for p in points:
