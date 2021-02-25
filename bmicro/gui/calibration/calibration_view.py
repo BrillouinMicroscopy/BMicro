@@ -3,6 +3,9 @@ import logging
 
 from PyQt5 import QtWidgets, uic
 from matplotlib.widgets import SpanSelector
+import numpy as np
+
+from bmlab.fits import fit_lorentz
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
@@ -44,6 +47,8 @@ class CalibrationView(QtWidgets.QWidget):
             self.clear_regions)
         self.button_rayleigh_clear.released.connect(
             self.clear_regions)
+
+        self.button_calibrate.released.connect(self.calibrate)
 
         self.mode = MODE_DEFAULT
 
@@ -101,6 +106,36 @@ class CalibrationView(QtWidgets.QWidget):
     def on_select_calibration(self):
         self.refresh_plot()
 
+    def calibrate(self):
+        session = Session.get_instance()
+        cm = session.calibration_model()
+        if not cm:
+            return
+
+        calib_key = self.combobox_calibration.currentText()
+        em = session.extraction_model()
+
+        data = em.get_extracted_values(calib_key)
+        if len(data) == 0:
+            return
+
+        center, radius = em.get_circle_fit(calib_key)
+
+        xdata = (data[:, 0] - data[0, 0]) * radius
+        ydata = data[:, 1]
+
+        regions = cm.get_brillouin_regions(calib_key)
+
+        for region in regions:
+            mask = (region[0] < xdata) & (xdata < region[1])
+            w0, gam, offset = fit_lorentz(xdata[mask], ydata[mask])
+            logger.debug('Lorentz fit: w0 = %f, gam = %f, offset = %f' % (
+                w0, gam, offset
+            ))
+            cm.add_brillouin_fit(calib_key, w0, gam, offset)
+
+        self.refresh_plot()
+
     def update_ui(self):
         self.combobox_calibration.clear()
         session = Session.get_instance()
@@ -144,6 +179,11 @@ class CalibrationView(QtWidgets.QWidget):
                     mask = (region[0] < arc_lenghts) & (
                         arc_lenghts < region[1])
                     self.plot.plot(arc_lenghts[mask], amplitudes[mask], 'm')
+
+                fits = cm.get_brillouin_fits(calib_key)
+                for fit in fits:
+                    self.plot.vlines(fit['w0'], 0, np.max(
+                        amplitudes), colors=['black'])
 
         except Exception as e:
             logger.error('Exception occured: %s' % e)
