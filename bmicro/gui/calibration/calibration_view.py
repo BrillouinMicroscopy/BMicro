@@ -38,6 +38,12 @@ class CalibrationView(QtWidgets.QWidget):
 
         self.button_brillouin_select_done.clicked.connect(
             self.on_select_brillouin_clicked)
+        self.button_rayleigh_select_done.clicked.connect(
+            self.on_select_rayleigh_clicked)
+        self.button_brillouin_clear.released.connect(
+            self.clear_regions)
+        self.button_rayleigh_clear.released.connect(
+            self.clear_regions)
 
         self.mode = MODE_DEFAULT
 
@@ -46,11 +52,36 @@ class CalibrationView(QtWidgets.QWidget):
 
     def on_select_brillouin_clicked(self):
         if self.mode == MODE_SELECT_BRILLOUIN:
+            self.mode = MODE_DEFAULT
             self.button_brillouin_select_done.setText('Select')
+            self.button_rayleigh_select_done.setText('Select')
         else:
             self.mode = MODE_SELECT_BRILLOUIN
             self.button_brillouin_select_done.setText('Done')
-        self.button_rayleigh_select_done.setText('Select')
+            self.button_rayleigh_select_done.setText('Select')
+
+    def on_select_rayleigh_clicked(self):
+        if self.mode == MODE_SELECT_RAYLEIGH:
+            self.mode = MODE_DEFAULT
+            self.button_brillouin_select_done.setText('Select')
+            self.button_rayleigh_select_done.setText('Select')
+        else:
+            self.mode = MODE_SELECT_RAYLEIGH
+            self.button_brillouin_select_done.setText('Select')
+            self.button_rayleigh_select_done.setText('Done')
+
+    def clear_regions(self):
+        button = self.sender()
+        session = Session.get_instance()
+        cm = session.calibration_model()
+        if not cm:
+            return
+        calib_key = self.combobox_calibration.currentText()
+        if button is self.button_brillouin_clear:
+            cm.clear_brillouin_regions(calib_key)
+        elif button is self.button_rayleigh_clear:
+            cm.clear_rayleigh_regions(calib_key)
+        self.refresh_plot()
 
     def on_select_data(self, xmin, xmax):
         if self.mode == MODE_DEFAULT:
@@ -58,10 +89,12 @@ class CalibrationView(QtWidgets.QWidget):
         session = Session.get_instance()
         calib_key = self.combobox_calibration.currentText()
 
-        if self.mode == MODE_SELECT_BRILLOUIN:
-            cal_model = session.calibration_model()
-            if cal_model:
+        cal_model = session.calibration_model()
+        if cal_model:
+            if self.mode == MODE_SELECT_BRILLOUIN:
                 cal_model.add_brillouin_region(calib_key, (xmin, xmax))
+            elif self.mode == MODE_SELECT_RAYLEIGH:
+                cal_model.add_rayleigh_region(calib_key, (xmin, xmax))
 
         self.refresh_plot()
 
@@ -105,6 +138,12 @@ class CalibrationView(QtWidgets.QWidget):
                     mask = (region[0] < arc_lenghts) & (
                         arc_lenghts < region[1])
                     self.plot.plot(arc_lenghts[mask], amplitudes[mask], 'r')
+
+                regions = cm.rayleigh_regions[calib_key]
+                for region in regions:
+                    mask = (region[0] < arc_lenghts) & (
+                        arc_lenghts < region[1])
+                    self.plot.plot(arc_lenghts[mask], amplitudes[mask], 'm')
 
         except Exception as e:
             logger.error('Exception occured: %s' % e)
