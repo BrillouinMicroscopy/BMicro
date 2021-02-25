@@ -5,7 +5,7 @@ from PyQt5 import QtWidgets, uic
 from matplotlib.widgets import SpanSelector
 import numpy as np
 
-from bmlab.fits import fit_lorentz
+from bmlab.fits import fit_spectral_region
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
@@ -141,21 +141,13 @@ class CalibrationView(QtWidgets.QWidget):
         regions = cm.get_brillouin_regions(calib_key)
 
         for region in regions:
-            mask = (region[0] < xdata) & (xdata < region[1])
-            w0, gam, offset = fit_lorentz(xdata[mask], ydata[mask])
-            logger.debug('Lorentz fit: w0 = %f, gam = %f, offset = %f' % (
-                w0, gam, offset
-            ))
+            gam, offset, w0 = fit_spectral_region(region, xdata, ydata)
             cm.add_brillouin_fit(calib_key, w0, gam, offset)
 
         regions = cm.get_rayleigh_regions(calib_key)
 
         for region in regions:
-            mask = (region[0] < xdata) & (xdata < region[1])
-            w0, gam, offset = fit_lorentz(xdata[mask], ydata[mask])
-            logger.debug('Lorentz fit: w0 = %f, gam = %f, offset = %f' % (
-                w0, gam, offset
-            ))
+            gam, offset, w0 = fit_spectral_region(region, xdata, ydata)
             cm.add_rayleigh_fit(calib_key, w0, gam, offset)
 
         self.refresh_plot()
