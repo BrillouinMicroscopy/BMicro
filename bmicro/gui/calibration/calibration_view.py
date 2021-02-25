@@ -135,6 +135,16 @@ class CalibrationView(QtWidgets.QWidget):
             ))
             cm.add_brillouin_fit(calib_key, w0, gam, offset)
 
+        regions = cm.get_rayleigh_regions(calib_key)
+
+        for region in regions:
+            mask = (region[0] < xdata) & (xdata < region[1])
+            w0, gam, offset = fit_lorentz(xdata[mask], ydata[mask])
+            logger.debug('Lorentz fit: w0 = %f, gam = %f, offset = %f' % (
+                w0, gam, offset
+            ))
+            cm.add_rayleigh_fit(calib_key, w0, gam, offset)
+
         self.refresh_plot()
 
     def update_ui(self):
@@ -183,6 +193,11 @@ class CalibrationView(QtWidgets.QWidget):
                     self.plot.plot(arc_lenghts[mask], amplitudes[mask], 'm')
 
                 fits = cm.get_brillouin_fits(calib_key)
+                for fit in fits:
+                    self.plot.vlines(fit['w0'], 0, np.max(
+                        amplitudes), colors=['black'])
+
+                fits = cm.get_rayleigh_fits(calib_key)
                 for fit in fits:
                     self.plot.vlines(fit['w0'], 0, np.max(
                         amplitudes), colors=['black'])
