@@ -49,12 +49,25 @@ class CalibrationView(QtWidgets.QWidget):
         self.button_rayleigh_clear.released.connect(
             self.clear_regions)
 
+        self.button_fit_clear.released.connect(self.clear_fits)
+
         self.button_calibrate.released.connect(self.calibrate)
 
         self.mode = MODE_DEFAULT
 
         self.combobox_calibration.currentIndexChanged.connect(
             self.on_select_calibration)
+
+    def clear_fits(self):
+        session = Session.get_instance()
+        cm = session.calibration_model()
+        if not cm:
+            return
+
+        calib_key = self.combobox_calibration.currentText()
+        cm.clear_brillouin_fits(calib_key)
+        cm.clear_rayleigh_fits(calib_key)
+        self.refresh_plot()
 
     def on_select_brillouin_clicked(self):
         if self.mode == MODE_SELECT_BRILLOUIN:
