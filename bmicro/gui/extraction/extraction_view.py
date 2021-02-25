@@ -8,7 +8,7 @@ import matplotlib
 import numpy as np
 
 from bmlab.geometry import Circle, discretize_arc
-
+from bmlab.image import extract_values_along_arc
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
@@ -96,7 +96,7 @@ class ExtractionView(QtWidgets.QWidget):
             self.mplcanvas.draw()
             return
 
-        img = self._get_image_data()
+        img = self._get_image_data(image_key)
 
         # imshow should always get the transposed image such that
         # the horizontal axis of the plot coincides with the
@@ -139,40 +139,23 @@ class ExtractionView(QtWidgets.QWidget):
             self.image_plot.add_patch(rect)
 
     def _extract_values(self, calib_key, circle, phis, length, width):
-        masks = []
+
         session = Session.get_instance()
         images = session.current_repetition().calibration.get_image(calib_key)
 
-        # TODO: Move the rest of this method to bmlab.image; when doing this
-        # remember to set the orientation of the images!
-
-        num_images = len(images)
-        img = self._get_image_data(0)
-
-        for phi in phis:
-            masks.append(circle.rect_mask(img.shape, phi, length, width))
-
-        values_by_img = np.zeros((num_images, len(phis)), dtype=np.float)
-        for i in range(num_images):
-            img = self._get_image_data(i)
-            values_by_img[i, :] = np.array(
-                [np.sum(img[mask]) for mask in masks])
-
-        return values_by_img.mean(axis=0)
+        return extract_values_along_arc(images, session.orientation, phis,
+                                        circle, length, width)
 
     def _plot_points(self, points):
         for p in points:
             circle = MPLCircle(p, radius=3, color='red')
             self.image_plot.add_patch(circle)
 
-    def _get_image_data(self, index=0):
-        image_key = self.combobox_datasets.currentText()
-        if not image_key:
-            return
+    def _get_image_data(self, calib_key, index=0):
 
         session = Session.get_instance()
 
-        img = session.current_repetition().calibration.get_image(image_key)
+        img = session.current_repetition().calibration.get_image(calib_key)
         img = img[index, ...]
 
         return session.orientation.apply(img)
@@ -207,6 +190,6 @@ class ExtractionView(QtWidgets.QWidget):
         """
         calib_key = self.combobox_datasets.currentText()
         session = Session.get_instance()
-        session.extraction_model().optimize_points(calib_key,
-                                                   self._get_image_data())
+        img = self._get_image_data(calib_key)
+        session.extraction_model().optimize_points(calib_key, img)
         self.refresh_image_plot()
