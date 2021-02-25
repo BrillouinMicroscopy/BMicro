@@ -30,7 +30,8 @@ class CalibrationView(QtWidgets.QWidget):
             'bmicro.gui.calibration', 'calibration_view.ui')
         uic.loadUi(ui_file, self)
 
-        self.mplcanvas = MplCanvas(self.image_widget)
+        self.mplcanvas = MplCanvas(self.image_widget,
+                                   toolbar=('Home', 'Pan', 'Zoom'))
         self.plot = self.mplcanvas.get_figure().add_subplot(111)
 
         rectprops = dict(facecolor='green', alpha=0.5)
@@ -164,6 +165,7 @@ class CalibrationView(QtWidgets.QWidget):
 
                     if len(values) > 0:
                         self.plot.plot(arc_lenghts, amplitudes)
+                        self.plot.set_ylim(bottom=0)
                         self.plot.set_xlabel('pixels')
 
             cm = session.calibration_model()
