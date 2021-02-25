@@ -4,6 +4,7 @@ import pytest
 
 from bmicro.session import Session
 
+
 def data_file_path(file_name):
     return pathlib.Path(__file__).parent / 'data' / file_name
 
@@ -29,7 +30,7 @@ def test_session_initializes():
     assert len(session.extraction_models) == 1
     assert len(session.calibration_models) == 1
     assert '0' in session.calibration_models.keys()
-    
+
 
 def test_clear_session():
     # Arrange; set up session
@@ -45,4 +46,3 @@ def test_clear_session():
     assert session.file is None
     assert session.orientation.rotation == 0
     assert session.current_repetition() is None
-
