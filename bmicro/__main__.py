@@ -37,7 +37,7 @@ def main():
             log_level = arg[6:]
             logging.basicConfig(level=log_level)
 
-    if not sys.argv[-1].startswith('--'):
+    if sys.argv[-1].endswith('.h5'):
         main.open_file(sys.argv[-1])
 
     sys.exit(app.exec_())
