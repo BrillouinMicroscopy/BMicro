@@ -4,10 +4,11 @@ from PyQt5 import uic, QtWidgets
 import matplotlib
 
 from bmlab.image import set_orientation
+from bmlab.model import AVAILABLE_SETUPS
 
 from bmicro.gui.mpl import MplCanvas
 from bmicro.session import Session
-from bmicro.model import AVAILABLE_SETUPS
+
 
 import os
 
