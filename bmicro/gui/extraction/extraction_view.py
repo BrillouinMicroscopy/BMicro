@@ -7,7 +7,6 @@ from matplotlib.patches import Circle as MPLCircle
 import matplotlib
 import numpy as np
 
-from bmlab.image import set_orientation
 from bmlab.geometry import Circle, discretize_arc
 
 
@@ -176,11 +175,7 @@ class ExtractionView(QtWidgets.QWidget):
         img = session.current_repetition().calibration.get_image(image_key)
         img = img[index, ...]
 
-        img = set_orientation(img, session.orientation.rotation,
-                              session.orientation.reflection['vertically'],
-                              session.orientation.reflection['horizontally'])
-
-        return img
+        return session.orientation.apply(img)
 
     def toggle_mode(self):
         """
