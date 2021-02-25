@@ -132,7 +132,7 @@ class ExtractionView(QtWidgets.QWidget):
             diag = np.array([width, length])
             llc = p - diag / 2.
             rect = matplotlib.patches.Rectangle(
-                llc, width, length, color='Yellow')
+                llc, width, length, color='Yellow', fill=False)
             rotate = matplotlib.transforms.Affine2D(
             ).rotate_around(p[0], p[1], phi + np.pi / 2.)
             rect.set_transform(rotate + self.image_plot.transData)
