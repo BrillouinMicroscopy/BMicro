@@ -133,13 +133,13 @@ class CalibrationView(QtWidgets.QWidget):
 
             cm = session.calibration_model()
             if cm:
-                regions = cm.brillouin_regions[calib_key]
+                regions = cm.get_brillouin_regions(calib_key)
                 for region in regions:
                     mask = (region[0] < arc_lenghts) & (
                         arc_lenghts < region[1])
                     self.plot.plot(arc_lenghts[mask], amplitudes[mask], 'r')
 
-                regions = cm.rayleigh_regions[calib_key]
+                regions = cm.get_rayleigh_regions(calib_key)
                 for region in regions:
                     mask = (region[0] < arc_lenghts) & (
                         arc_lenghts < region[1])
