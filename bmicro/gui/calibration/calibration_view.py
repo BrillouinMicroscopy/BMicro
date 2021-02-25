@@ -2,10 +2,11 @@ import pkg_resources
 import logging
 
 from PyQt5 import QtWidgets, uic
+from PyQt5.QtWidgets import QMessageBox
 from matplotlib.widgets import SpanSelector
 import numpy as np
 
-from bmlab.fits import fit_spectral_region
+from bmlab.fits import fit_spectral_region, FitError
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
@@ -138,17 +139,26 @@ class CalibrationView(QtWidgets.QWidget):
         xdata = (data[:, 0] - data[0, 0]) * radius
         ydata = data[:, 1]
 
-        regions = cm.get_brillouin_regions(calib_key)
+        try:
+            regions = cm.get_brillouin_regions(calib_key)
 
-        for region in regions:
-            gam, offset, w0 = fit_spectral_region(region, xdata, ydata)
-            cm.add_brillouin_fit(calib_key, w0, gam, offset)
+            for region in regions:
+                gam, offset, w0 = fit_spectral_region(region, xdata, ydata)
+                cm.add_brillouin_fit(calib_key, w0, gam, offset)
 
-        regions = cm.get_rayleigh_regions(calib_key)
+            regions = cm.get_rayleigh_regions(calib_key)
 
-        for region in regions:
-            gam, offset, w0 = fit_spectral_region(region, xdata, ydata)
-            cm.add_rayleigh_fit(calib_key, w0, gam, offset)
+            for region in regions:
+                gam, offset, w0 = fit_spectral_region(region, xdata, ydata)
+                cm.add_rayleigh_fit(calib_key, w0, gam, offset)
+
+        except FitError as e:
+            logger.warning('Unable to fit region', e)
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText('Unable to fit region.')
+            msg.setWindowTitle('Fit Error')
+            msg.exec_()
 
         self.refresh_plot()
 
