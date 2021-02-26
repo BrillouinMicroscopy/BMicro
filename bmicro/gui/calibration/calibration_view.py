@@ -109,12 +109,12 @@ class CalibrationView(QtWidgets.QWidget):
         session = Session.get_instance()
         calib_key = self.combobox_calibration.currentText()
 
-        cal_model = session.calibration_model()
-        if cal_model:
+        cm = session.calibration_model()
+        if cm:
             if self.mode == MODE_SELECT_BRILLOUIN:
-                cal_model.add_brillouin_region(calib_key, (xmin, xmax))
+                cm.add_brillouin_region(calib_key, (xmin, xmax))
             elif self.mode == MODE_SELECT_RAYLEIGH:
-                cal_model.add_rayleigh_region(calib_key, (xmin, xmax))
+                cm.add_rayleigh_region(calib_key, (xmin, xmax))
 
         self.refresh_plot()
 
