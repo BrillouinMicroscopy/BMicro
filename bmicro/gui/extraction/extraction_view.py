@@ -112,13 +112,15 @@ class ExtractionView(QtWidgets.QWidget):
             self.image_plot.add_patch(
                 MPLCircle(center, radius, color='yellow', fill=False))
             circle = Circle(center, radius)
-            phis = discretize_arc(circle, img.shape, num_points=200)
+            phis = discretize_arc(circle, img.shape, num_points=500)
 
             width = 2
             length = 7
 
             self._plot_extraction_patches(circle, phis, length, width)
 
+            # Extracting the values is the most time consuming part on
+            # this tab.
             values = self._extract_values(
                 image_key, circle, phis, length, width)
             session.extraction_model().set_extracted_values(
