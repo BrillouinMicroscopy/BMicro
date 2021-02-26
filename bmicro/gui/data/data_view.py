@@ -5,7 +5,6 @@ from PyQt5 import uic, QtWidgets
 import matplotlib
 
 from bmlab.model import AVAILABLE_SETUPS
-from bmlab.image import autofind_orientation
 
 from bmicro.gui.mpl import MplCanvas
 from bmicro.session import Session
@@ -174,15 +173,6 @@ class DataView(QtWidgets.QWidget):
         session = Session.get_instance()
         rep_key = self.comboBox_repetition.currentText()
         session.set_current_repetition(rep_key)
-
-        try:
-            cal_key = session.current_repetition().calibration.image_keys()[0]
-            img = session.current_repetition().calibration.get_image(cal_key)
-            orientation = autofind_orientation(img[0, ...])
-            session.orientation = orientation
-        except Exception:
-            logger.debug('Cannot find orientation.')
-
         self.update_preview()
 
     def on_select_setup(self):
