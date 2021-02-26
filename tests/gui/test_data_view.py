@@ -53,25 +53,25 @@ def test_clicking_reflect_updates_session(qtbot, window):
 
     session = Session.get_instance()
     assert session.orientation.reflection == {
-        'vertically': False, 'horizontally': False}
+        'vertically': True, 'horizontally': False}
 
     qtbot.mouseClick(
         window.widget_data_view.checkbox_reflect_horizontally,
-        QtCore.Qt.LeftButton)
-    assert session.orientation.reflection == {
-        'vertically': False, 'horizontally': True}
-
-    qtbot.mouseClick(
-        window.widget_data_view.checkbox_reflect_vertically,
         QtCore.Qt.LeftButton)
     assert session.orientation.reflection == {
         'vertically': True, 'horizontally': True}
 
     qtbot.mouseClick(
+        window.widget_data_view.checkbox_reflect_vertically,
+        QtCore.Qt.LeftButton)
+    assert session.orientation.reflection == {
+        'vertically': False, 'horizontally': True}
+
+    qtbot.mouseClick(
         window.widget_data_view.checkbox_reflect_horizontally,
         QtCore.Qt.LeftButton)
     assert session.orientation.reflection == {
-        'vertically': True, 'horizontally': False}
+        'vertically': False, 'horizontally': False}
 
 
 def test_open_file_shows_preview(qtbot, window):
