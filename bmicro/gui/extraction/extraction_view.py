@@ -31,6 +31,7 @@ class ExtractionView(QtWidgets.QWidget):
         uic.loadUi(ui_file, self)
 
         self.mode = MODE_DEFAULT
+        self.current_frame = 0
 
         self.mplcanvas = MplCanvas(
             self.image_widget, toolbar=('Home', 'Pan', 'Zoom'))
@@ -46,7 +47,23 @@ class ExtractionView(QtWidgets.QWidget):
         self.button_clear.clicked.connect(self.clear_points)
         self.button_optimize.clicked.connect(self.optimize_points)
 
+        self.button_prev_frame.clicked.connect(self.prev_frame)
+        self.button_next_frame.clicked.connect(self.next_frame)
+
         self.update_ui()
+
+    def prev_frame(self):
+        if self.current_frame > 0:
+            self.current_frame -= 1
+        self.refresh_image_plot()
+
+    def next_frame(self):
+        session = Session.get_instance()
+        cal_key = self.combobox_datasets.currentText()
+        imgs = session.current_repetition().calibration.get_image(cal_key)
+        if self.current_frame < len(imgs) - 1:
+            self.current_frame += 1
+        self.refresh_image_plot()
 
     def update_ui(self):
         session = Session.get_instance()
@@ -94,12 +111,13 @@ class ExtractionView(QtWidgets.QWidget):
             self.mplcanvas.draw()
             return
 
-        img = self._get_image_data(calib_key)
+        img = self._get_image_data(calib_key, index=self.current_frame)
 
         # imshow should always get the transposed image such that
         # the horizontal axis of the plot coincides with the
         # 0-axis of the plotted array:
         self.image_plot.imshow(img.T, origin='lower', vmin=100, vmax=300)
+        self.image_plot.set_title('Frame %d' % self.current_frame)
 
         self._plot_points(session.extraction_model().get_points(calib_key))
 

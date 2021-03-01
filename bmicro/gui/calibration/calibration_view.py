@@ -56,10 +56,27 @@ class CalibrationView(QtWidgets.QWidget):
 
         self.button_calibrate.released.connect(self.calibrate)
 
+        self.current_frame = 0
+        self.button_prev_frame.clicked.connect(self.prev_frame)
+        self.button_next_frame.clicked.connect(self.next_frame)
+
         self.mode = MODE_DEFAULT
 
         self.combobox_calibration.currentIndexChanged.connect(
             self.on_select_calibration)
+
+    def prev_frame(self):
+        if self.current_frame > 0:
+            self.current_frame -= 1
+            self.refresh_plot()
+
+    def next_frame(self):
+        cal_key = self.combobox_calibration.currentText()
+        session = Session.get_instance()
+        imgs = session.current_repetition().calibration.get_image(cal_key)
+        if self.current_frame < len(imgs) - 1:
+            self.current_frame += 1
+            self.refresh_plot()
 
     def clear_fits(self):
         session = Session.get_instance()
@@ -204,7 +221,7 @@ class CalibrationView(QtWidgets.QWidget):
             circle = Circle(center, radius)
             phis = em.get_extraction_angles(cal_key)
             imgs = session.current_repetition().calibration.get_image(cal_key)
-            img = np.mean(imgs, axis=0)
+            img = imgs[self.current_frame]
             amps = extract_lines_along_arc(img, session.orientation, phis,
                                            circle, num_points=3)
 
@@ -215,6 +232,8 @@ class CalibrationView(QtWidgets.QWidget):
                 self.plot.plot(arc_lenghts, amps)
                 self.plot.set_ylim(bottom=0)
                 self.plot.set_xlabel('pixels')
+                self.plot.set_title('Frame %d / %d' %
+                                    (self.current_frame, len(imgs)))
 
             cm = session.calibration_model()
             if cm:

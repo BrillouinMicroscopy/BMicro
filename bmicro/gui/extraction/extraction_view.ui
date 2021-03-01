@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>884</width>
+    <width>914</width>
     <height>615</height>
    </rect>
   </property>
@@ -148,6 +148,20 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="0">
+           <widget class="QPushButton" name="button_prev_frame">
+            <property name="text">
+             <string>&lt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="button_next_frame">
+            <property name="text">
+             <string>&gt;</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -169,13 +183,18 @@
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="image_widget" native="true">
+    <widget class="QWidget" name="widget_4" native="true">
      <property name="minimumSize">
       <size>
        <width>500</width>
        <height>500</height>
       </size>
      </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QWidget" name="image_widget" native="true"/>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
