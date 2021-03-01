@@ -2,11 +2,11 @@ import pkg_resources
 import logging
 
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import QMessageBox
+# from PyQt5.QtWidgets import QMessageBox
 from matplotlib.widgets import SpanSelector
 import numpy as np
 
-from bmlab.fits import fit_spectral_region, FitError
+# from bmlab.fits import fit_spectral_region, FitError
 from bmlab.image import extract_lines_along_arc
 from bmlab.geometry import Circle
 
@@ -132,35 +132,49 @@ class CalibrationView(QtWidgets.QWidget):
         calib_key = self.combobox_calibration.currentText()
         em = session.extraction_model()
 
+        imgs = session.current_repetition().calibration.get_image(calib_key)
+        phis = em.get_extraction_angles(calib_key)
+        circle = Circle(*em.get_circle_fit(calib_key))
+
+        # Extract values from *all* images in the current calibration
+        extracted_values = []
+        for img in imgs:
+            values_by_img = extract_lines_along_arc(
+                img, session.orientation, phis, circle, num_points=3)
+            extracted_values.append(values_by_img)
+        em.set_extracted_values(calib_key, extracted_values)
+
         data = em.get_extracted_values(calib_key)
         if len(data) == 0:
             return
 
-        center, radius = em.get_circle_fit(calib_key)
-
-        xdata = (data[:, 0] - data[0, 0]) * radius
-        ydata = data[:, 1]
-
-        try:
-            regions = cm.get_brillouin_regions(calib_key)
-
-            for region in regions:
-                gam, offset, w0 = fit_spectral_region(region, xdata, ydata)
-                cm.add_brillouin_fit(calib_key, w0, gam, offset)
-
-            regions = cm.get_rayleigh_regions(calib_key)
-
-            for region in regions:
-                gam, offset, w0 = fit_spectral_region(region, xdata, ydata)
-                cm.add_rayleigh_fit(calib_key, w0, gam, offset)
-
-        except FitError as e:
-            logger.warning('Unable to fit region', e)
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Warning)
-            msg.setText('Unable to fit region.')
-            msg.setWindowTitle('Fit Error')
-            msg.exec_()
+        # center, radius = em.get_circle_fit(calib_key)
+        # xdata = radius * (phis - phis[0])
+        # regions = cm.get_brillouin_regions(calib_key)
+        # fits = []
+        # for region in regions:
+        #    for k, img in enumerate(imgs):
+        #        ydata = data[k]
+        #        gam, offset, w0 = fit_spectral_region(region, xdata, ydata)
+        #        fits.append((gam, offset, w0))
+        #    try:
+        #        regions = cm.get_brillouin_regions(calib_key)
+        #        for region in regions:
+        #            gam, offset, w0 = fit_spectral_region(region,
+        #            xdata, ydata)
+        #            cm.add_brillouin_fit(calib_key, w0, gam, offset)
+        #        regions = cm.get_rayleigh_regions(calib_key)
+        #        for region in regions:
+        #            gam, offset, w0 = fit_spectral_region(region, xdata,
+        #            ydata)
+        #            cm.add_rayleigh_fit(calib_key, w0, gam, offset)
+        #    except FitError as e:
+        #        logger.warning('Unable to fit region', e)
+        #        msg = QMessageBox()
+        #        msg.setIcon(QMessageBox.Warning)
+        #        msg.setText('Unable to fit region.')
+        #        msg.setWindowTitle('Fit Error')
+        #        msg.exec_()
 
         self.refresh_plot()
 
@@ -218,31 +232,15 @@ class CalibrationView(QtWidgets.QWidget):
 
                 fits = cm.get_brillouin_fits(cal_key)
                 for fit in fits:
-                    self.plot.vlines(fit['w0'], 0, np.max(
+                    self.plot.vlines(fit['w0'], 0, np.nanmax(
                         amps), colors=['black'])
 
                 fits = cm.get_rayleigh_fits(cal_key)
                 for fit in fits:
-                    self.plot.vlines(fit['w0'], 0, np.max(
+                    self.plot.vlines(fit['w0'], 0, np.nanmax(
                         amps), colors=['black'])
 
         except Exception as e:
             logger.error('Exception occured: %s' % e)
         finally:
             self.mplcanvas.draw()
-
-    def _extract_values(self, calib_key, circle, phis, length, which=None):
-
-        session = Session.get_instance()
-        images = session.current_repetition().calibration.get_image(calib_key)
-
-        values = []
-        if which is not None:
-            images = list(which)
-
-        for img in images:
-            v = extract_lines_along_arc(img, session.orientation, phis,
-                                        circle, num_points=length)
-            values.append(v)
-
-        return values
