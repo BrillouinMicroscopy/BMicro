@@ -5,10 +5,8 @@ from PyQt5 import QtWidgets, uic
 from matplotlib.patches import Circle as MPLCircle
 
 import matplotlib
-import numpy as np
 
 from bmlab.geometry import Circle, discretize_arc
-from bmlab.image import extract_values_along_arc
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
@@ -91,21 +89,21 @@ class ExtractionView(QtWidgets.QWidget):
         """
         self.image_plot.cla()
         session = Session.get_instance()
-        image_key = self.combobox_datasets.currentText()
-        if not image_key:
+        calib_key = self.combobox_datasets.currentText()
+        if not calib_key:
             self.mplcanvas.draw()
             return
 
-        img = self._get_image_data(image_key)
+        img = self._get_image_data(calib_key)
 
         # imshow should always get the transposed image such that
         # the horizontal axis of the plot coincides with the
         # 0-axis of the plotted array:
         self.image_plot.imshow(img.T, origin='lower', vmin=100, vmax=300)
 
-        self._plot_points(session.extraction_model().get_points(image_key))
+        self._plot_points(session.extraction_model().get_points(calib_key))
 
-        circle_fit = session.extraction_model().get_circle_fit(image_key)
+        circle_fit = session.extraction_model().get_circle_fit(calib_key)
 
         if circle_fit:
             center, radius = circle_fit
@@ -114,39 +112,23 @@ class ExtractionView(QtWidgets.QWidget):
             circle = Circle(center, radius)
             phis = discretize_arc(circle, img.shape, num_points=500)
 
-            width = 2
-            length = 7
+            session.extraction_model().set_extraction_angles(calib_key, phis)
 
-            self._plot_extraction_patches(circle, phis, length, width)
-
-            # Extracting the values is the most time consuming part on
-            # this tab.
-            values = self._extract_values(
-                image_key, circle, phis, length, width)
-            session.extraction_model().set_extracted_values(
-                image_key, phis, values)
+            self._plot_extraction_lines(circle, phis, length=3)
 
         self.mplcanvas.draw()
 
-    def _plot_extraction_patches(self, circle, phis, length, width):
+    def _plot_extraction_lines(self, circle, phis, length):
+        r = circle.radius
         for phi in phis:
-            p = circle.point(phi)
-            diag = np.array([width, length])
-            llc = p - diag / 2.
-            rect = matplotlib.patches.Rectangle(
-                llc, width, length, color='Yellow', fill=False)
-            rotate = matplotlib.transforms.Affine2D(
-            ).rotate_around(p[0], p[1], phi + np.pi / 2.)
-            rect.set_transform(rotate + self.image_plot.transData)
-            self.image_plot.add_patch(rect)
-
-    def _extract_values(self, calib_key, circle, phis, length, width):
-
-        session = Session.get_instance()
-        images = session.current_repetition().calibration.get_image(calib_key)
-
-        return extract_values_along_arc(images, session.orientation, phis,
-                                        circle, length, width)
+            e_r = circle.e_r(phi)
+            start = (r-length) * e_r + circle.center
+            end = (r+length) * e_r + circle.center
+            dr = (end - start)
+            line = matplotlib.patches.FancyArrow(
+                *start, dr[0], dr[1], head_width=0,
+                head_length=0, color='Yellow')
+            self.image_plot.add_patch(line)
 
     def _plot_points(self, points):
         for p in points:

@@ -7,6 +7,8 @@ from matplotlib.widgets import SpanSelector
 import numpy as np
 
 from bmlab.fits import fit_spectral_region, FitError
+from bmlab.image import extract_lines_along_arc
+from bmlab.geometry import Circle
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
@@ -175,49 +177,72 @@ class CalibrationView(QtWidgets.QWidget):
     def refresh_plot(self):
         self.plot.cla()
         session = Session.get_instance()
-        calib_key = self.combobox_calibration.currentText()
+        cal_key = self.combobox_calibration.currentText()
 
         try:
             em = session.extraction_model()
-            if em:
-                values = em.get_extracted_values(calib_key)
-                if len(values) > 0:
-                    phis = values[:, 0]
-                    amplitudes = values[:, 1]
-                    _, radius = em.get_circle_fit(calib_key)
-                    arc_lenghts = radius * phis
-                    arc_lenghts -= arc_lenghts[0]
+            if not em:
+                return
+            cf = em.get_circle_fit(cal_key)
+            if not cf:
+                return
+            center, radius = cf
+            circle = Circle(center, radius)
+            phis = em.get_extraction_angles(cal_key)
+            imgs = session.current_repetition().calibration.get_image(cal_key)
+            img = np.mean(imgs, axis=0)
+            amps = extract_lines_along_arc(img, session.orientation, phis,
+                                           circle, num_points=3)
 
-                    if len(values) > 0:
-                        self.plot.plot(arc_lenghts, amplitudes)
-                        self.plot.set_ylim(bottom=0)
-                        self.plot.set_xlabel('pixels')
+            arc_lenghts = radius * phis
+            arc_lenghts -= arc_lenghts[0]
+
+            if len(amps) > 0:
+                self.plot.plot(arc_lenghts, amps)
+                self.plot.set_ylim(bottom=0)
+                self.plot.set_xlabel('pixels')
 
             cm = session.calibration_model()
             if cm:
-                regions = cm.get_brillouin_regions(calib_key)
+                regions = cm.get_brillouin_regions(cal_key)
                 for region in regions:
                     mask = (region[0] < arc_lenghts) & (
                         arc_lenghts < region[1])
-                    self.plot.plot(arc_lenghts[mask], amplitudes[mask], 'r')
+                    self.plot.plot(arc_lenghts[mask], amps[mask], 'r')
 
-                regions = cm.get_rayleigh_regions(calib_key)
+                regions = cm.get_rayleigh_regions(cal_key)
                 for region in regions:
                     mask = (region[0] < arc_lenghts) & (
                         arc_lenghts < region[1])
-                    self.plot.plot(arc_lenghts[mask], amplitudes[mask], 'm')
+                    self.plot.plot(arc_lenghts[mask], amps[mask], 'm')
 
-                fits = cm.get_brillouin_fits(calib_key)
+                fits = cm.get_brillouin_fits(cal_key)
                 for fit in fits:
                     self.plot.vlines(fit['w0'], 0, np.max(
-                        amplitudes), colors=['black'])
+                        amps), colors=['black'])
 
-                fits = cm.get_rayleigh_fits(calib_key)
+                fits = cm.get_rayleigh_fits(cal_key)
                 for fit in fits:
                     self.plot.vlines(fit['w0'], 0, np.max(
-                        amplitudes), colors=['black'])
+                        amps), colors=['black'])
 
         except Exception as e:
             logger.error('Exception occured: %s' % e)
         finally:
             self.mplcanvas.draw()
+
+    def _extract_values(self, calib_key, circle, phis, length, which=None):
+
+        session = Session.get_instance()
+        images = session.current_repetition().calibration.get_image(calib_key)
+
+        values = []
+        if which is not None:
+            images = list(which)
+
+        for img in images:
+            v = extract_lines_along_arc(img, session.orientation, phis,
+                                        circle, num_points=length)
+            values.append(v)
+
+        return values
