@@ -117,7 +117,7 @@ class ExtractionView(QtWidgets.QWidget):
         # the horizontal axis of the plot coincides with the
         # 0-axis of the plotted array:
         self.image_plot.imshow(img.T, origin='lower', vmin=100, vmax=300)
-        self.image_plot.set_title('Frame %d' % self.current_frame+1)
+        self.image_plot.set_title('Frame %d' % (self.current_frame+1))
 
         self._plot_points(session.extraction_model().get_points(calib_key))
 
