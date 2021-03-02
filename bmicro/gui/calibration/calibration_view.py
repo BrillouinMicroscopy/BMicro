@@ -153,7 +153,7 @@ class CalibrationView(QtWidgets.QWidget):
         phis = em.get_extraction_angles(calib_key)
         circle = Circle(*em.get_circle_fit(calib_key))
 
-        # Extract values from *all* images in the current calibration
+        # Extract values from *all* frames in the current calibration
         extracted_values = []
         for img in imgs:
             values_by_img = extract_lines_along_arc(
@@ -225,29 +225,29 @@ class CalibrationView(QtWidgets.QWidget):
             amps = extract_lines_along_arc(img, session.orientation, phis,
                                            circle, num_points=3)
 
-            arc_lenghts = radius * phis
-            arc_lenghts -= arc_lenghts[0]
+            arc_lengths = radius * phis
+            arc_lengths -= arc_lengths[0]
 
             if len(amps) > 0:
-                self.plot.plot(arc_lenghts, amps)
+                self.plot.plot(arc_lengths, amps)
                 self.plot.set_ylim(bottom=0)
                 self.plot.set_xlabel('pixels')
                 self.plot.set_title('Frame %d / %d' %
-                                    (self.current_frame, len(imgs)))
+                                    (self.current_frame+1, len(imgs)))
 
             cm = session.calibration_model()
             if cm:
                 regions = cm.get_brillouin_regions(cal_key)
                 for region in regions:
-                    mask = (region[0] < arc_lenghts) & (
-                        arc_lenghts < region[1])
-                    self.plot.plot(arc_lenghts[mask], amps[mask], 'r')
+                    mask = (region[0] < arc_lengths) & (
+                        arc_lengths < region[1])
+                    self.plot.plot(arc_lengths[mask], amps[mask], 'r')
 
                 regions = cm.get_rayleigh_regions(cal_key)
                 for region in regions:
-                    mask = (region[0] < arc_lenghts) & (
-                        arc_lenghts < region[1])
-                    self.plot.plot(arc_lenghts[mask], amps[mask], 'm')
+                    mask = (region[0] < arc_lengths) & (
+                        arc_lengths < region[1])
+                    self.plot.plot(arc_lengths[mask], amps[mask], 'm')
 
                 fits = cm.get_brillouin_fits(cal_key)
                 for fit in fits:
