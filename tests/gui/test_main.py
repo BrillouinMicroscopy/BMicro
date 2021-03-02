@@ -1,9 +1,11 @@
 import pathlib
+import os
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5 import QtCore
 
-from bmicro.gui.main import BMicro
+from bmicro.gui.main import BMicro, check_event_mime_data
+from bmicro.session import Session
 
 
 def data_file_path(file_name):
@@ -30,10 +32,11 @@ def test_main_window_can_activate_all_tabs(qtbot):
 
 def test_open_file_shows_metadata(qtbot, mocker):
     window = BMicro()
-    file_name = data_file_path('Water.h5')
+    file_name = 'Water.h5'
+    file_path = data_file_path(file_name)
 
     def mock_getOpenFileName(self, *args, **kwargs):
-        return file_name, None
+        return file_path, None
 
     mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
                  mock_getOpenFileName)
@@ -41,6 +44,7 @@ def test_open_file_shows_metadata(qtbot, mocker):
     window.open_file()
     w = window.widget_data_view
     assert w.label_selected_file.text() == str(file_name)
+    assert w.label_selected_file.toolTip() == str(file_path)
     assert w.label_date.text() == '2020-11-03 15:20'
     assert w.label_resolution_x.text() == '10'
     assert w.label_resolution_y.text() == '1'
@@ -49,3 +53,52 @@ def test_open_file_shows_metadata(qtbot, mocker):
     assert w.textedit_comment.toPlainText() == 'Brillouin data'
 
     window.close()
+
+
+def test_check_event_mime_data():
+    class DummyEvent:
+        def __init__(self, *args, **kwargs):
+            self.__mimeData = QtCore.QMimeData()
+
+        def mimeData(self):
+            return self.__mimeData
+
+    event = DummyEvent()
+
+    """ Test for empty url """
+    path = check_event_mime_data(event)
+    assert path is False
+
+    """ Test for wrong file type """
+    event.mimeData().setUrls([QtCore.QUrl("file:/directory/file.txt")])
+    path = check_event_mime_data(event)
+    assert path is False
+
+    """ Test for correct file type """
+    event.mimeData().setUrls([QtCore.QUrl("file:/directory/file.h5")])
+    path = check_event_mime_data(event)
+    assert path == '/directory/file.h5'
+
+
+def test_save_and_load_session():
+    if os.path.exists(data_file_path('Water.bms')):
+        os.remove(data_file_path('Water.bms'))
+    session = Session.get_instance()
+    session.set_file(data_file_path('Water.h5'))
+    session.orientation.set_reflection(vertically=True)
+    session.extraction_models['0'].add_point('0', 30, 30)
+    session.save()
+
+    assert os.path.exists(data_file_path('Water.bms'))
+
+    session.clear()
+
+    assert session.file is None
+    assert session.extraction_models == {}
+
+    session.load(data_file_path('Water.bms'))
+
+    assert session.file is not None
+    assert len(session.extraction_models) == 1
+
+    os.remove(data_file_path('Water.bms'))
