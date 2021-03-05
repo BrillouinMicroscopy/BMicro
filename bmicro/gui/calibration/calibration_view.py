@@ -271,10 +271,16 @@ class CalibrationView(QtWidgets.QWidget):
         self.table_Brillouin_regions.setColumnCount(2)
         self.table_Brillouin_regions\
             .setHorizontalHeaderLabels(["start", "end"])
+        header = self.table_Brillouin_regions.horizontalHeader()
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
         self.table_Rayleigh_regions.setColumnCount(2)
         self.table_Rayleigh_regions\
             .setHorizontalHeaderLabels(["start", "end"])
+        header = self.table_Rayleigh_regions.horizontalHeader()
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
     def refresh_regions(self, arc_lengths, amps, regions, table, color):
         table.setRowCount(len(regions))
