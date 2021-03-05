@@ -66,9 +66,9 @@ class CalibrationView(QtWidgets.QWidget):
             self.on_select_calibration)
 
         self.table_Brillouin_regions.itemChanged.connect(
-            self.on_Brillouin_range_changed)
+            lambda item: self.on_region_changed(MODE_SELECT_BRILLOUIN, item))
         self.table_Rayleigh_regions.itemChanged.connect(
-            self.on_Rayleigh_range_changed)
+            lambda item: self.on_region_changed(MODE_SELECT_RAYLEIGH, item))
 
         self.setupTables()
 
@@ -291,7 +291,7 @@ class CalibrationView(QtWidgets.QWidget):
                 table.setItem(rowIdx, columnIdx, item)
             table.blockSignals(False)
 
-    def on_Brillouin_range_changed(self, item):
+    def on_region_changed(self, type, item):
         row = item.row()
         column = item.column()
         value = float(item.text())
@@ -300,27 +300,17 @@ class CalibrationView(QtWidgets.QWidget):
         calib_key = self.combobox_calibration.currentText()
 
         cm = session.calibration_model()
-        regions = cm.get_brillouin_regions(calib_key)
-        current_region = np.asarray(regions[row])
-        current_region[column] = value
-        current_region = tuple(current_region)
         if cm:
-            cm.set_brillouin_region(calib_key, row, current_region)
-            self.refresh_plot()
-
-    def on_Rayleigh_range_changed(self, item):
-        row = item.row()
-        column = item.column()
-        value = float(item.text())
-
-        session = Session.get_instance()
-        calib_key = self.combobox_calibration.currentText()
-
-        cm = session.calibration_model()
-        regions = cm.get_rayleigh_regions(calib_key)
-        current_region = np.asarray(regions[row])
-        current_region[column] = value
-        current_region = tuple(current_region)
-        if cm:
-            cm.set_rayleigh_region(calib_key, row, current_region)
+            if type == MODE_SELECT_BRILLOUIN:
+                regions = cm.get_brillouin_regions(calib_key)
+                current_region = np.asarray(regions[row])
+                current_region[column] = value
+                current_region = tuple(current_region)
+                cm.set_brillouin_region(calib_key, row, current_region)
+            elif type == MODE_SELECT_RAYLEIGH:
+                regions = cm.get_rayleigh_regions(calib_key)
+                current_region = np.asarray(regions[row])
+                current_region[column] = value
+                current_region = tuple(current_region)
+                cm.set_rayleigh_region(calib_key, row, current_region)
             self.refresh_plot()
