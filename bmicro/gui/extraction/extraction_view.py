@@ -51,11 +51,13 @@ class ExtractionView(QtWidgets.QWidget):
         self.button_next_frame.clicked.connect(self.next_frame)
 
         self.update_ui()
+        self.checkFrameNavigationButtons()
 
     def prev_frame(self):
         if self.current_frame > 0:
             self.current_frame -= 1
         self.refresh_image_plot()
+        self.checkFrameNavigationButtons()
 
     def next_frame(self):
         session = Session.get_instance()
@@ -64,6 +66,7 @@ class ExtractionView(QtWidgets.QWidget):
         if self.current_frame < len(imgs) - 1:
             self.current_frame += 1
         self.refresh_image_plot()
+        self.checkFrameNavigationButtons()
 
     def update_ui(self):
         session = Session.get_instance()
@@ -74,10 +77,26 @@ class ExtractionView(QtWidgets.QWidget):
         calib_keys = session.current_repetition().calibration.image_keys()
         self.combobox_datasets.addItems(calib_keys)
 
+    def checkFrameNavigationButtons(self):
+        if self.current_frame > 0:
+            self.button_prev_frame.setEnabled(True)
+        else:
+            self.button_prev_frame.setEnabled(False)
+
+        session = Session.get_instance()
+        cal_key = self.combobox_datasets.currentText()
+        if cal_key:
+            imgs = session.current_repetition().calibration.get_image(cal_key)
+            if self.current_frame < len(imgs) - 1:
+                self.button_next_frame.setEnabled(True)
+            else:
+                self.button_next_frame.setEnabled(False)
+
     def on_select_dataset(self):
         """
         Action triggered when user selects a calibration dataset.
         """
+        self.checkFrameNavigationButtons()
         self.refresh_image_plot()
 
     def on_click_image(self, event):
