@@ -65,6 +65,13 @@ class CalibrationView(QtWidgets.QWidget):
         self.combobox_calibration.currentIndexChanged.connect(
             self.on_select_calibration)
 
+        self.table_Brillouin_regions.itemChanged.connect(
+            self.on_Brillouin_range_changed)
+        self.table_Rayleigh_regions.itemChanged.connect(
+            self.on_Rayleigh_range_changed)
+
+        self.setupTables()
+
     def prev_frame(self):
         if self.current_frame > 0:
             self.current_frame -= 1
@@ -238,16 +245,36 @@ class CalibrationView(QtWidgets.QWidget):
             cm = session.calibration_model()
             if cm:
                 regions = cm.get_brillouin_regions(cal_key)
-                for region in regions:
+                self.table_Brillouin_regions.setRowCount(len(regions))
+                for rowIdx, region in enumerate(regions):
                     mask = (region[0] < arc_lengths) & (
                         arc_lengths < region[1])
                     self.plot.plot(arc_lengths[mask], amps[mask], 'r')
+                    # Add Brillouin regions to table
+                    # Block signals, so the itemChanged signal is not
+                    # emitted during table creation
+                    self.table_Brillouin_regions.blockSignals(True)
+                    for columnIdx, value in enumerate(region):
+                        item = QtWidgets.QTableWidgetItem(str(value))
+                        self.table_Brillouin_regions.setItem(rowIdx,
+                                                             columnIdx, item)
+                    self.table_Brillouin_regions.blockSignals(False)
 
                 regions = cm.get_rayleigh_regions(cal_key)
-                for region in regions:
+                self.table_Rayleigh_regions.setRowCount(len(regions))
+                for rowIdx, region in enumerate(regions):
                     mask = (region[0] < arc_lengths) & (
                         arc_lengths < region[1])
                     self.plot.plot(arc_lengths[mask], amps[mask], 'm')
+                    # Add Rayleigh regions to table
+                    # Block signals, so the itemChanged signal is not
+                    # emitted during table creation
+                    self.table_Rayleigh_regions.blockSignals(True)
+                    for columnIdx, value in enumerate(region):
+                        item = QtWidgets.QTableWidgetItem(str(value))
+                        self.table_Rayleigh_regions.setItem(rowIdx,
+                                                            columnIdx, item)
+                    self.table_Rayleigh_regions.blockSignals(False)
 
                 fits = cm.get_brillouin_fits(cal_key)
                 for fit in fits:
@@ -263,3 +290,46 @@ class CalibrationView(QtWidgets.QWidget):
             logger.error('Exception occured: %s' % e)
         finally:
             self.mplcanvas.draw()
+
+    def setupTables(self):
+        self.table_Brillouin_regions.setColumnCount(2)
+        self.table_Brillouin_regions\
+            .setHorizontalHeaderLabels(["start", "end"])
+
+        self.table_Rayleigh_regions.setColumnCount(2)
+        self.table_Rayleigh_regions\
+            .setHorizontalHeaderLabels(["start", "end"])
+
+    def on_Brillouin_range_changed(self, item):
+        row = item.row()
+        column = item.column()
+        value = float(item.text())
+
+        session = Session.get_instance()
+        calib_key = self.combobox_calibration.currentText()
+
+        cm = session.calibration_model()
+        regions = cm.get_brillouin_regions(calib_key)
+        current_region = np.asarray(regions[row])
+        current_region[column] = value
+        current_region = tuple(current_region)
+        if cm:
+            cm.set_brillouin_region(calib_key, row, current_region)
+            self.refresh_plot()
+
+    def on_Rayleigh_range_changed(self, item):
+        row = item.row()
+        column = item.column()
+        value = float(item.text())
+
+        session = Session.get_instance()
+        calib_key = self.combobox_calibration.currentText()
+
+        cm = session.calibration_model()
+        regions = cm.get_rayleigh_regions(calib_key)
+        current_region = np.asarray(regions[row])
+        current_region[column] = value
+        current_region = tuple(current_region)
+        if cm:
+            cm.set_rayleigh_region(calib_key, row, current_region)
+            self.refresh_plot()
