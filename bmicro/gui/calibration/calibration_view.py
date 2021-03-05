@@ -245,36 +245,12 @@ class CalibrationView(QtWidgets.QWidget):
             cm = session.calibration_model()
             if cm:
                 regions = cm.get_brillouin_regions(cal_key)
-                self.table_Brillouin_regions.setRowCount(len(regions))
-                for rowIdx, region in enumerate(regions):
-                    mask = (region[0] < arc_lengths) & (
-                        arc_lengths < region[1])
-                    self.plot.plot(arc_lengths[mask], amps[mask], 'r')
-                    # Add Brillouin regions to table
-                    # Block signals, so the itemChanged signal is not
-                    # emitted during table creation
-                    self.table_Brillouin_regions.blockSignals(True)
-                    for columnIdx, value in enumerate(region):
-                        item = QtWidgets.QTableWidgetItem(str(value))
-                        self.table_Brillouin_regions.setItem(rowIdx,
-                                                             columnIdx, item)
-                    self.table_Brillouin_regions.blockSignals(False)
+                table = self.table_Brillouin_regions
+                self.refresh_regions(arc_lengths, amps, regions, table, 'r')
 
                 regions = cm.get_rayleigh_regions(cal_key)
-                self.table_Rayleigh_regions.setRowCount(len(regions))
-                for rowIdx, region in enumerate(regions):
-                    mask = (region[0] < arc_lengths) & (
-                        arc_lengths < region[1])
-                    self.plot.plot(arc_lengths[mask], amps[mask], 'm')
-                    # Add Rayleigh regions to table
-                    # Block signals, so the itemChanged signal is not
-                    # emitted during table creation
-                    self.table_Rayleigh_regions.blockSignals(True)
-                    for columnIdx, value in enumerate(region):
-                        item = QtWidgets.QTableWidgetItem(str(value))
-                        self.table_Rayleigh_regions.setItem(rowIdx,
-                                                            columnIdx, item)
-                    self.table_Rayleigh_regions.blockSignals(False)
+                table = self.table_Rayleigh_regions
+                self.refresh_regions(arc_lengths, amps, regions, table, 'm')
 
                 fits = cm.get_brillouin_fits(cal_key)
                 for fit in fits:
@@ -299,6 +275,21 @@ class CalibrationView(QtWidgets.QWidget):
         self.table_Rayleigh_regions.setColumnCount(2)
         self.table_Rayleigh_regions\
             .setHorizontalHeaderLabels(["start", "end"])
+
+    def refresh_regions(self, arc_lengths, amps, regions, table, color):
+        table.setRowCount(len(regions))
+        for rowIdx, region in enumerate(regions):
+            mask = (region[0] < arc_lengths) & (
+                    arc_lengths < region[1])
+            self.plot.plot(arc_lengths[mask], amps[mask], color)
+            # Add regions to table
+            # Block signals, so the itemChanged signal is not
+            # emitted during table creation
+            table.blockSignals(True)
+            for columnIdx, value in enumerate(region):
+                item = QtWidgets.QTableWidgetItem(str(value))
+                table.setItem(rowIdx, columnIdx, item)
+            table.blockSignals(False)
 
     def on_Brillouin_range_changed(self, item):
         row = item.row()
