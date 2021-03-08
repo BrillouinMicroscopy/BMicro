@@ -4,7 +4,7 @@ import logging
 from PyQt5 import uic, QtWidgets
 import matplotlib
 
-from bmlab.model import AVAILABLE_SETUPS
+from bmlab.models.setup import AVAILABLE_SETUPS
 
 from bmicro.gui.mpl import MplCanvas
 from bmicro.session import Session

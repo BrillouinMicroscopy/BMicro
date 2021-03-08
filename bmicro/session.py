@@ -3,7 +3,9 @@ import os
 
 from bmlab.file import BrillouinFile
 
-from bmlab.model import ExtractionModel, Orientation, CalibrationModel
+from bmlab.models.extraction_model import ExtractionModel
+from bmlab.models.orientation import Orientation
+from bmlab.models.calibration_model import CalibrationModel
 
 
 class Session(object):
