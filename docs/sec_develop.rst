@@ -74,18 +74,23 @@ your favorite browser. This also applies to bmlab.
 Tests
 =====
 We try to adhere to test-driven development. Please always write test
-functions for your code. You can run all tests via
+functions for your code. Make sure you have the required packages
+installed::
+
+    pip install -r tests/requirements.txt
+
+You can run all tests via
 
 ::
 
-    python setup.py test
+    python -m pytest tests
 
 To check for code coverage, make sure the `coverage` Python package is
 installed and run
 
 ::
 
-    coverage run --source="bmicro" setup.py test
+    coverage run --source="bmicro" -m pytest tests
     coverage report
 
 
