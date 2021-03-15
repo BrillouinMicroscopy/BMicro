@@ -8,7 +8,6 @@ import numpy as np
 
 # from bmlab.fits import fit_spectral_region, FitError
 from bmlab.image import extract_lines_along_arc
-from bmlab.geometry import Circle
 
 from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
@@ -154,17 +153,21 @@ class CalibrationView(QtWidgets.QWidget):
             return
 
         calib_key = self.combobox_calibration.currentText()
+
         em = session.extraction_model()
+        if not em:
+            return
+        arc = em.get_arc_by_time(calib_key)
+        if not arc:
+            return
 
         imgs = session.current_repetition().calibration.get_image(calib_key)
-        phis = em.get_extraction_angles(calib_key)
-        circle = Circle(*em.get_circle_fit(calib_key))
 
         # Extract values from *all* frames in the current calibration
         extracted_values = []
         for img in imgs:
-            values_by_img = extract_lines_along_arc(
-                img, session.orientation, phis, circle, num_points=3)
+            values_by_img = extract_lines_along_arc(img,
+                                                    session.orientation, arc)
             extracted_values.append(values_by_img)
         em.set_extracted_values(calib_key, extracted_values)
 
@@ -221,22 +224,17 @@ class CalibrationView(QtWidgets.QWidget):
             em = session.extraction_model()
             if not em:
                 return
-            cf = em.get_circle_fit(cal_key)
-            if not cf:
+            arc = em.get_arc_by_time(cal_key)
+            if not arc:
                 return
-            center, radius = cf
-            circle = Circle(center, radius)
-            phis = em.get_extraction_angles(cal_key)
+
             imgs = session.current_repetition().calibration.get_image(cal_key)
             img = imgs[self.current_frame]
-            amps = extract_lines_along_arc(img, session.orientation, phis,
-                                           circle, num_points=3)
 
-            arc_lengths = radius * phis
-            arc_lengths -= arc_lengths[0]
+            amps = extract_lines_along_arc(img, session.orientation, arc)
 
             if len(amps) > 0:
-                self.plot.plot(arc_lengths, amps)
+                self.plot.plot(amps)
                 self.plot.set_ylim(bottom=0)
                 self.plot.set_xlabel('pixels')
                 self.plot.set_title('Frame %d / %d' %
@@ -246,11 +244,11 @@ class CalibrationView(QtWidgets.QWidget):
             if cm:
                 regions = cm.get_brillouin_regions(cal_key)
                 table = self.table_Brillouin_regions
-                self.refresh_regions(arc_lengths, amps, regions, table, 'r')
+                self.refresh_regions(amps, regions, table, 'r')
 
                 regions = cm.get_rayleigh_regions(cal_key)
                 table = self.table_Rayleigh_regions
-                self.refresh_regions(arc_lengths, amps, regions, table, 'm')
+                self.refresh_regions(amps, regions, table, 'm')
 
                 fits = cm.get_brillouin_fits(cal_key)
                 for fit in fits:
@@ -282,12 +280,11 @@ class CalibrationView(QtWidgets.QWidget):
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
-    def refresh_regions(self, arc_lengths, amps, regions, table, color):
+    def refresh_regions(self, amps, regions, table, color):
         table.setRowCount(len(regions))
         for rowIdx, region in enumerate(regions):
-            mask = (region[0] < arc_lengths) & (
-                    arc_lengths < region[1])
-            self.plot.plot(arc_lengths[mask], amps[mask], color)
+            mask = np.arange(int(region[0]), int(region[1]))
+            self.plot.plot(mask, amps[mask], color)
             # Add regions to table
             # Block signals, so the itemChanged signal is not
             # emitted during table creation
