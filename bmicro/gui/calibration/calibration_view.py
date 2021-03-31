@@ -153,6 +153,8 @@ class CalibrationView(QtWidgets.QWidget):
             return
 
         calib_key = self.combobox_calibration.currentText()
+        if not calib_key:
+            return
 
         em = session.extraction_model()
         if not em:
@@ -219,6 +221,8 @@ class CalibrationView(QtWidgets.QWidget):
         self.plot.cla()
         session = Session.get_instance()
         calib_key = self.combobox_calibration.currentText()
+        if not calib_key:
+            return
 
         try:
             em = session.extraction_model()
