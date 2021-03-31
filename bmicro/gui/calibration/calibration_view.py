@@ -77,9 +77,9 @@ class CalibrationView(QtWidgets.QWidget):
             self.refresh_plot()
 
     def next_frame(self):
-        cal_key = self.combobox_calibration.currentText()
+        calib_key = self.combobox_calibration.currentText()
         session = Session.get_instance()
-        imgs = session.current_repetition().calibration.get_image(cal_key)
+        imgs = session.current_repetition().calibration.get_image(calib_key)
         if self.current_frame < len(imgs) - 1:
             self.current_frame += 1
             self.refresh_plot()
@@ -218,17 +218,17 @@ class CalibrationView(QtWidgets.QWidget):
     def refresh_plot(self):
         self.plot.cla()
         session = Session.get_instance()
-        cal_key = self.combobox_calibration.currentText()
+        calib_key = self.combobox_calibration.currentText()
 
         try:
             em = session.extraction_model()
             if not em:
                 return
-            arc = em.get_arc_by_time(cal_key)
+            arc = em.get_arc_by_time(calib_key)
             if not arc:
                 return
 
-            imgs = session.current_repetition().calibration.get_image(cal_key)
+            imgs = session.current_repetition().calibration.get_image(calib_key)
             img = imgs[self.current_frame]
 
             amps = extract_lines_along_arc(img, session.orientation, arc)
@@ -242,20 +242,20 @@ class CalibrationView(QtWidgets.QWidget):
 
             cm = session.calibration_model()
             if cm:
-                regions = cm.get_brillouin_regions(cal_key)
+                regions = cm.get_brillouin_regions(calib_key)
                 table = self.table_Brillouin_regions
                 self.refresh_regions(amps, regions, table, 'r')
 
-                regions = cm.get_rayleigh_regions(cal_key)
+                regions = cm.get_rayleigh_regions(calib_key)
                 table = self.table_Rayleigh_regions
                 self.refresh_regions(amps, regions, table, 'm')
 
-                fits = cm.get_brillouin_fits(cal_key)
+                fits = cm.get_brillouin_fits(calib_key)
                 for fit in fits:
                     self.plot.vlines(fit['w0'], 0, np.nanmax(
                         amps), colors=['black'])
 
-                fits = cm.get_rayleigh_fits(cal_key)
+                fits = cm.get_rayleigh_fits(calib_key)
                 for fit in fits:
                     self.plot.vlines(fit['w0'], 0, np.nanmax(
                         amps), colors=['black'])
