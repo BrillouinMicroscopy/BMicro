@@ -232,7 +232,8 @@ class CalibrationView(QtWidgets.QWidget):
             if not arc:
                 return
 
-            imgs = session.current_repetition().calibration.get_image(calib_key)
+            imgs = session.current_repetition()\
+                .calibration.get_image(calib_key)
             img = imgs[self.current_frame]
 
             amps = extract_lines_along_arc(img, session.orientation, arc)
