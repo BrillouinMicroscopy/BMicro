@@ -4,8 +4,9 @@ import os
 from PyQt5.QtWidgets import QWidget
 from PyQt5 import QtCore
 
+from bmlab.session import Session
+
 from bmicro.gui.main import BMicro, check_event_mime_data
-from bmicro.session import Session
 
 
 def data_file_path(file_name):

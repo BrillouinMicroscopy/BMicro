@@ -5,9 +5,10 @@ from PyQt5 import uic, QtWidgets
 import matplotlib
 
 from bmlab.models.setup import AVAILABLE_SETUPS
+from bmlab.session import Session
 
 from bmicro.gui.mpl import MplCanvas
-from bmicro.session import Session
+
 
 
 import os

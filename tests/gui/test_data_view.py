@@ -3,8 +3,9 @@ import pathlib
 from PyQt5 import QtCore
 import pytest
 
+from bmlab.session import Session
+
 from bmicro.gui.main import BMicro
-from bmicro.session import Session
 
 
 def data_file_path(file_name):

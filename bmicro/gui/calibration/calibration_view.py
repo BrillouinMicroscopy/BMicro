@@ -8,8 +8,8 @@ import numpy as np
 
 # from bmlab.fits import fit_spectral_region, FitError
 from bmlab.image import extract_lines_along_arc
+from bmlab.session import Session
 
-from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
 
 

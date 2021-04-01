@@ -7,8 +7,8 @@ from matplotlib.patches import Circle as MPLCircle
 import matplotlib
 
 from bmlab.geometry import Circle, discretize_arc
+from bmlab.session import Session
 
-from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
 
 
