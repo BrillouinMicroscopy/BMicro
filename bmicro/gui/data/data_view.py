@@ -10,7 +10,6 @@ from bmlab.session import Session
 from bmicro.gui.mpl import MplCanvas
 
 
-
 import os
 
 matplotlib.use('Qt5Agg')
