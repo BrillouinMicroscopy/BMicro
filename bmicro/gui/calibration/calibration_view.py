@@ -159,7 +159,7 @@ class CalibrationView(QtWidgets.QWidget):
         em = session.extraction_model()
         if not em:
             return
-        arc = em.get_arc_by_time(calib_key)
+        arc = em.get_arc_by_calib_key(calib_key)
         if not arc:
             return
 
@@ -228,7 +228,7 @@ class CalibrationView(QtWidgets.QWidget):
             em = session.extraction_model()
             if not em:
                 return
-            arc = em.get_arc_by_time(calib_key)
+            arc = em.get_arc_by_calib_key(calib_key)
             if not arc:
                 return
 
