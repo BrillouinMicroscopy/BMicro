@@ -151,21 +151,15 @@ class ExtractionView(QtWidgets.QWidget):
 
             session.extraction_model().set_extraction_angles(calib_key, phis)
 
-            self._plot_extraction_lines(circle, phis, length=3)
+            arcs = session.extraction_model().get_arc_by_calib_key(calib_key)
+            for arc in arcs:
+                dr = arc[-1] - arc[0]
+                line = matplotlib.patches.FancyArrow(
+                    *arc[0], dr[0], dr[1], head_width=0,
+                    head_length=0, color='Yellow')
+                self.image_plot.add_patch(line)
 
         self.mplcanvas.draw()
-
-    def _plot_extraction_lines(self, circle, phis, length):
-        r = circle.radius
-        for phi in phis:
-            e_r = circle.e_r(phi)
-            start = (r-length) * e_r + circle.center
-            end = (r+length) * e_r + circle.center
-            dr = (end - start)
-            line = matplotlib.patches.FancyArrow(
-                *start, dr[0], dr[1], head_width=0,
-                head_length=0, color='Yellow')
-            self.image_plot.add_patch(line)
 
     def _plot_points(self, points):
         for p in points:
