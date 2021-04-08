@@ -115,7 +115,8 @@ class ExtractionView(QtWidgets.QWidget):
         logger.debug('Adding point (%f, %f) for calibration key %s' % (
             event.xdata, event.ydata, calib_key
         ))
-        session.extraction_model().add_point(calib_key, event.xdata,
+        time = self._get_image_time(calib_key)
+        session.extraction_model().add_point(calib_key, time, event.xdata,
                                              event.ydata)
         self.refresh_image_plot()
 
@@ -174,6 +175,12 @@ class ExtractionView(QtWidgets.QWidget):
         img = img[index, ...]
 
         return session.orientation.apply(img)
+
+    def _get_image_time(self, calib_key):
+
+        session = Session.get_instance()
+
+        return session.current_repetition().calibration.get_time(calib_key)
 
     def toggle_mode(self):
         """

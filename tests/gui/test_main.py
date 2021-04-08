@@ -87,7 +87,7 @@ def test_save_and_load_session():
     session = Session.get_instance()
     session.set_file(data_file_path('Water.h5'))
     session.orientation.set_reflection(vertically=True)
-    session.extraction_models['0'].add_point('0', 30, 30)
+    session.extraction_models['0'].add_point('0', 10, 30, 30)
     session.save()
 
     assert os.path.exists(data_file_path('Water.bms'))
