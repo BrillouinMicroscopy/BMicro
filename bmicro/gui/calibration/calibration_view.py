@@ -6,7 +6,7 @@ from PyQt5 import QtWidgets, uic
 from matplotlib.widgets import SpanSelector
 import numpy as np
 
-# from bmlab.fits import fit_spectral_region, FitError
+from bmlab.fits import fit_rayleigh_region, fit_brillouin_region
 from bmlab.image import extract_lines_along_arc
 from bmlab.session import Session
 
@@ -38,7 +38,7 @@ class CalibrationView(QtWidgets.QWidget):
 
         rectprops = dict(facecolor='green', alpha=0.5)
         self.span_selector = SpanSelector(
-            self.plot, onselect=self.on_select_data,
+            self.plot, onselect=self.on_select_data_region,
             useblit=True,
             direction='horizontal', rectprops=rectprops)
 
@@ -128,7 +128,7 @@ class CalibrationView(QtWidgets.QWidget):
             cm.clear_rayleigh_regions(calib_key)
         self.refresh_plot()
 
-    def on_select_data(self, xmin, xmax):
+    def on_select_data_region(self, xmin, xmax):
         if self.mode == MODE_DEFAULT:
             return
         session = Session.get_instance()
@@ -177,33 +177,25 @@ class CalibrationView(QtWidgets.QWidget):
         if len(data) == 0:
             return
 
-        # center, radius = em.get_circle_fit(calib_key)
-        # xdata = radius * (phis - phis[0])
-        # regions = cm.get_brillouin_regions(calib_key)
-        # fits = []
-        # for region in regions:
-        #    for k, img in enumerate(imgs):
-        #        ydata = data[k]
-        #        gam, offset, w0 = fit_spectral_region(region, xdata, ydata)
-        #        fits.append((gam, offset, w0))
-        #    try:
-        #        regions = cm.get_brillouin_regions(calib_key)
-        #        for region in regions:
-        #            gam, offset, w0 = fit_spectral_region(region,
-        #            xdata, ydata)
-        #            cm.add_brillouin_fit(calib_key, w0, gam, offset)
-        #        regions = cm.get_rayleigh_regions(calib_key)
-        #        for region in regions:
-        #            gam, offset, w0 = fit_spectral_region(region, xdata,
-        #            ydata)
-        #            cm.add_rayleigh_fit(calib_key, w0, gam, offset)
-        #    except FitError as e:
-        #        logger.warning('Unable to fit region', e)
-        #        msg = QMessageBox()
-        #        msg.setIcon(QMessageBox.Warning)
-        #        msg.setText('Unable to fit region.')
-        #        msg.setWindowTitle('Fit Error')
-        #        msg.exec_()
+        regions = cm.get_rayleigh_regions(calib_key)
+        for region in regions:
+            for k, img in enumerate(imgs):
+                ydata = data[k]
+                xdata = np.arange(len(ydata))
+                w0, fwhm, intensity, offset = fit_rayleigh_region(region,
+                                                                  xdata, ydata)
+                cm.add_rayleigh_fit(calib_key, region, k,
+                                    w0, fwhm, intensity, offset)
+
+        regions = cm.get_brillouin_regions(calib_key)
+        for region in regions:
+            for k, img in enumerate(imgs):
+                ydata = data[k]
+                xdata = np.arange(len(ydata))
+                w0s, fwhms, intensities, offset = \
+                    fit_brillouin_region(region, xdata, ydata)
+                cm.add_brillouin_fit(calib_key, region, k,
+                                     w0s, fwhms, intensities, offset)
 
         self.refresh_plot()
 
@@ -253,18 +245,20 @@ class CalibrationView(QtWidgets.QWidget):
                 table = self.table_Brillouin_regions
                 self.refresh_regions(amps, regions, table, 'r')
 
+                for region in regions:
+                    avg_w0 = cm.brillouin_fits.average_fits(calib_key, region)
+                    self.plot.vlines(avg_w0[0], 0, np.nanmax(
+                        amps), colors=['black'])
+                    self.plot.vlines(avg_w0[1], 0, np.nanmax(
+                        amps), colors=['black'])
+
                 regions = cm.get_rayleigh_regions(calib_key)
                 table = self.table_Rayleigh_regions
                 self.refresh_regions(amps, regions, table, 'm')
 
-                fits = cm.get_brillouin_fits(calib_key)
-                for fit in fits:
-                    self.plot.vlines(fit['w0'], 0, np.nanmax(
-                        amps), colors=['black'])
-
-                fits = cm.get_rayleigh_fits(calib_key)
-                for fit in fits:
-                    self.plot.vlines(fit['w0'], 0, np.nanmax(
+                for region in regions:
+                    avg_w0 = cm.rayleigh_fits.average_fits(calib_key, region)
+                    self.plot.vlines(avg_w0, 0, np.nanmax(
                         amps), colors=['black'])
 
         except Exception as e:
