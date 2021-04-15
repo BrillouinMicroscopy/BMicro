@@ -48,6 +48,9 @@ class DataView(QtWidgets.QWidget):
         self.combobox_setup.currentIndexChanged.connect(
             self.on_select_setup)
 
+        # Initialize current setup to first entry
+        Session.get_instance().set_setup(AVAILABLE_SETUPS[0])
+
         self.update_ui()
 
     def update_ui(self):
@@ -186,4 +189,4 @@ class DataView(QtWidgets.QWidget):
             if s.name == name:
                 setup = s
                 break
-        session.setup = setup
+        session.set_setup(setup)
