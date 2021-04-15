@@ -6,7 +6,8 @@ from PyQt5 import QtWidgets, uic
 from matplotlib.widgets import SpanSelector
 import numpy as np
 
-from bmlab.fits import fit_rayleigh_region, fit_brillouin_region
+from bmlab.fits import fit_rayleigh_region,\
+    fit_brillouin_region, fit_vipa, VIPA
 from bmlab.image import extract_lines_along_arc
 from bmlab.session import Session
 
@@ -149,6 +150,7 @@ class CalibrationView(QtWidgets.QWidget):
     def calibrate(self):
         session = Session.get_instance()
         cm = session.calibration_model()
+        setup = session.setup
         if not cm:
             return
 
@@ -173,31 +175,67 @@ class CalibrationView(QtWidgets.QWidget):
             extracted_values.append(values_by_img)
         em.set_extracted_values(calib_key, extracted_values)
 
-        data = em.get_extracted_values(calib_key)
-        if len(data) == 0:
+        if len(extracted_values) == 0:
             return
 
+        # TODO: Construction of rayleigh_peaks, brillouin_peaks
+        #  and peaks is awkward
+
         regions = cm.get_rayleigh_regions(calib_key)
-        for region in regions:
-            for k, img in enumerate(imgs):
-                ydata = data[k]
-                xdata = np.arange(len(ydata))
-                w0, fwhm, intensity, offset = fit_rayleigh_region(region,
-                                                                  xdata, ydata)
-                cm.add_rayleigh_fit(calib_key, region, k,
+        rayleigh_peaks = []
+        for frame_num, img in enumerate(imgs):
+            tmp = []
+            for region_key, region in enumerate(regions):
+                spectrum = extracted_values[frame_num]
+                xdata = np.arange(len(spectrum))
+                w0, fwhm, intensity, offset =\
+                    fit_rayleigh_region(region, xdata, spectrum)
+                tmp.append(w0)
+                cm.add_rayleigh_fit(calib_key, region_key, frame_num,
                                     w0, fwhm, intensity, offset)
+            rayleigh_peaks.append(tmp)
 
         regions = cm.get_brillouin_regions(calib_key)
-        for region in regions:
-            for k, img in enumerate(imgs):
-                ydata = data[k]
-                xdata = np.arange(len(ydata))
+        brillouin_peaks = []
+        for frame_num, img in enumerate(imgs):
+            tmp = []
+            for region_key, region in enumerate(regions):
+                spectrum = extracted_values[frame_num]
+                xdata = np.arange(len(spectrum))
                 w0s, fwhms, intensities, offset = \
-                    fit_brillouin_region(region, xdata, ydata)
-                cm.add_brillouin_fit(calib_key, region, k,
-                                     w0s, fwhms, intensities, offset)
+                    fit_brillouin_region(region, xdata, spectrum)
 
-        self.refresh_plot()
+                for w in w0s:
+                    tmp.append(w)
+                cm.add_brillouin_fit(calib_key, region_key, frame_num,
+                                     w0s, fwhms, intensities, offset)
+            brillouin_peaks.append(tmp)
+
+        vipa_params = []
+        frequencies = []
+        for i, spectrum in enumerate(extracted_values):
+            # TODO: Get peaks from fits
+            r = rayleigh_peaks[i]
+            b = brillouin_peaks[i]
+            peaks = np.sort(r + b)
+            # peaks = np.array([
+            #     111.08883398049197,
+            #     195.0540522772982,
+            #     218.32407478097127,
+            #     304.85637517968166,
+            #     324.0253923508515,
+            #     381.09920004017096
+            # ])
+
+            params = fit_vipa(peaks, setup)
+            vipa_params.append(params)
+            xdata = np.arange(len(spectrum))
+
+            frequencies.append(VIPA(xdata, params) - setup.f0)
+
+        # TODO: write frequencies and vipa_params to model
+
+        self.refresh_plot(frequencies)
 
     def update_ui(self):
         self.combobox_calibration.clear()
@@ -209,7 +247,7 @@ class CalibrationView(QtWidgets.QWidget):
         calib_keys = session.current_repetition().calibration.image_keys()
         self.combobox_calibration.addItems(calib_keys)
 
-    def refresh_plot(self):
+    def refresh_plot(self, frequencies=None):
         self.plot.cla()
         session = Session.get_instance()
         calib_key = self.combobox_calibration.currentText()
@@ -233,9 +271,14 @@ class CalibrationView(QtWidgets.QWidget):
             amps = extract_lines_along_arc(img, session.orientation, arc)
 
             if len(amps) > 0:
-                self.plot.plot(amps)
+                # TODO: Get frequencies from model, show in GHz
+                if frequencies is not None:
+                    self.plot.plot(frequencies[self.current_frame], amps)
+                    self.plot.set_xlabel('f [Hz]')
+                else:
+                    self.plot.plot(amps)
+                    self.plot.set_xlabel('pixels')
                 self.plot.set_ylim(bottom=0)
-                self.plot.set_xlabel('pixels')
                 self.plot.set_title('Frame %d / %d' %
                                     (self.current_frame+1, len(imgs)))
 
@@ -247,10 +290,12 @@ class CalibrationView(QtWidgets.QWidget):
 
                 for region in regions:
                     avg_w0 = cm.brillouin_fits.average_fits(calib_key, region)
-                    self.plot.vlines(avg_w0[0], 0, np.nanmax(
-                        amps), colors=['black'])
-                    self.plot.vlines(avg_w0[1], 0, np.nanmax(
-                        amps), colors=['black'])
+                    # TODO: Plot in terms of frequency if available
+                    if avg_w0 is not None:
+                        self.plot.vlines(avg_w0[0], 0, np.nanmax(
+                            amps), colors=['black'])
+                        self.plot.vlines(avg_w0[1], 0, np.nanmax(
+                            amps), colors=['black'])
 
                 regions = cm.get_rayleigh_regions(calib_key)
                 table = self.table_Rayleigh_regions
@@ -258,8 +303,10 @@ class CalibrationView(QtWidgets.QWidget):
 
                 for region in regions:
                     avg_w0 = cm.rayleigh_fits.average_fits(calib_key, region)
-                    self.plot.vlines(avg_w0, 0, np.nanmax(
-                        amps), colors=['black'])
+                    # TODO: Plot in terms of frequency if available
+                    if avg_w0 is not None:
+                        self.plot.vlines(avg_w0, 0, np.nanmax(
+                            amps), colors=['black'])
 
         except Exception as e:
             logger.error('Exception occured: %s' % e)
