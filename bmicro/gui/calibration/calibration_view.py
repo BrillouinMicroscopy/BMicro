@@ -218,9 +218,10 @@ class CalibrationView(QtWidgets.QWidget):
 
             frequencies.append(VIPA(xdata, params) - setup.f0)
 
-        # TODO: write frequencies and vipa_params to model
+        cm.set_vipa_params(calib_key, vipa_params)
+        cm.set_frequencies(calib_key, frequencies)
 
-        self.refresh_plot(frequencies)
+        self.refresh_plot()
 
     def update_ui(self):
         self.combobox_calibration.clear()
@@ -232,7 +233,7 @@ class CalibrationView(QtWidgets.QWidget):
         calib_keys = session.current_repetition().calibration.image_keys()
         self.combobox_calibration.addItems(calib_keys)
 
-    def refresh_plot(self, frequencies=None):
+    def refresh_plot(self):
         self.plot.cla()
         session = Session.get_instance()
         calib_key = self.combobox_calibration.currentText()
@@ -242,6 +243,9 @@ class CalibrationView(QtWidgets.QWidget):
         try:
             em = session.extraction_model()
             if not em:
+                return
+            cm = session.calibration_model()
+            if not cm:
                 return
             time = session.current_repetition()\
                 .calibration.get_time(calib_key)
@@ -256,8 +260,8 @@ class CalibrationView(QtWidgets.QWidget):
             amps = extract_lines_along_arc(img, session.orientation, arc)
 
             if len(amps) > 0:
-                # TODO: Get frequencies from model, show in GHz
-                if frequencies is not None:
+                frequencies = cm.get_frequencies_by_calib_key(calib_key)
+                if frequencies:
                     self.plot.plot(frequencies[self.current_frame], amps)
                     self.plot.set_xlabel('f [Hz]')
                 else:
