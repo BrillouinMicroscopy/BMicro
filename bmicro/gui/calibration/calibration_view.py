@@ -178,54 +178,29 @@ class CalibrationView(QtWidgets.QWidget):
         if len(extracted_values) == 0:
             return
 
-        # TODO: Construction of rayleigh_peaks, brillouin_peaks
-        #  and peaks is awkward
-
         regions = cm.get_rayleigh_regions(calib_key)
-        rayleigh_peaks = []
-        for frame_num, img in enumerate(imgs):
-            tmp = []
+        for frame_num, spectrum in enumerate(extracted_values):
             for region_key, region in enumerate(regions):
                 spectrum = extracted_values[frame_num]
                 xdata = np.arange(len(spectrum))
                 w0, fwhm, intensity, offset =\
                     fit_rayleigh_region(region, xdata, spectrum)
-                tmp.append(w0)
                 cm.add_rayleigh_fit(calib_key, region_key, frame_num,
                                     w0, fwhm, intensity, offset)
-            rayleigh_peaks.append(tmp)
 
         regions = cm.get_brillouin_regions(calib_key)
-        brillouin_peaks = []
-        for frame_num, img in enumerate(imgs):
-            tmp = []
+        for frame_num, spectrum in enumerate(extracted_values):
             for region_key, region in enumerate(regions):
-                spectrum = extracted_values[frame_num]
                 xdata = np.arange(len(spectrum))
                 w0s, fwhms, intensities, offset = \
                     fit_brillouin_region(region, xdata, spectrum)
-
-                for w in w0s:
-                    tmp.append(w)
                 cm.add_brillouin_fit(calib_key, region_key, frame_num,
                                      w0s, fwhms, intensities, offset)
-            brillouin_peaks.append(tmp)
 
         vipa_params = []
         frequencies = []
-        for i, spectrum in enumerate(extracted_values):
-            # TODO: Get peaks from fits
-            r = rayleigh_peaks[i]
-            b = brillouin_peaks[i]
-            peaks = np.sort(r + b)
-            # peaks = np.array([
-            #     111.08883398049197,
-            #     195.0540522772982,
-            #     218.32407478097127,
-            #     304.85637517968166,
-            #     324.0253923508515,
-            #     381.09920004017096
-            # ])
+        for frame_num, spectrum in enumerate(extracted_values):
+            peaks = cm.get_sorted_peaks(calib_key, frame_num)
 
             params = fit_vipa(peaks, setup)
             vipa_params.append(params)
