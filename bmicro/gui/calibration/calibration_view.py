@@ -149,9 +149,13 @@ class CalibrationView(QtWidgets.QWidget):
 
     def calibrate(self):
         session = Session.get_instance()
+
         cm = session.calibration_model()
-        setup = session.setup
         if not cm:
+            return
+
+        setup = session.setup
+        if not setup:
             return
 
         calib_key = self.combobox_calibration.currentText()
@@ -161,6 +165,7 @@ class CalibrationView(QtWidgets.QWidget):
         em = session.extraction_model()
         if not em:
             return
+
         arc = em.get_arc_by_calib_key(calib_key)
         if not arc:
             return
