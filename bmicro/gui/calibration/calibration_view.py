@@ -6,7 +6,8 @@ from PyQt5 import QtWidgets, uic
 from matplotlib.widgets import SpanSelector
 import numpy as np
 
-from bmlab.fits import fit_rayleigh_region, fit_brillouin_region, fit_vipa, VIPA
+from bmlab.fits import fit_rayleigh_region,\
+    fit_brillouin_region, fit_vipa, VIPA
 from bmlab.image import extract_lines_along_arc
 from bmlab.session import Session
 
@@ -177,7 +178,8 @@ class CalibrationView(QtWidgets.QWidget):
         if len(extracted_values) == 0:
             return
 
-        # TODO: Construction of rayleigh_peaks, brillouin_peaks and peaks is awkward
+        # TODO: Construction of rayleigh_peaks, brillouin_peaks
+        #  and peaks is awkward
 
         regions = cm.get_rayleigh_regions(calib_key)
         rayleigh_peaks = []
@@ -186,8 +188,8 @@ class CalibrationView(QtWidgets.QWidget):
             for region_key, region in enumerate(regions):
                 spectrum = extracted_values[frame_num]
                 xdata = np.arange(len(spectrum))
-                w0, fwhm, intensity, offset = fit_rayleigh_region(region,
-                                                                  xdata, spectrum)
+                w0, fwhm, intensity, offset =\
+                    fit_rayleigh_region(region, xdata, spectrum)
                 tmp.append(w0)
                 cm.add_rayleigh_fit(calib_key, region_key, frame_num,
                                     w0, fwhm, intensity, offset)
@@ -229,7 +231,7 @@ class CalibrationView(QtWidgets.QWidget):
             vipa_params.append(params)
             xdata = np.arange(len(spectrum))
 
-            frequencies.append(VIPA(xdata,params) - setup.f0)
+            frequencies.append(VIPA(xdata, params) - setup.f0)
 
         # TODO: write frequencies and vipa_params to model
 
