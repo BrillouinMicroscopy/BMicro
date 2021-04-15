@@ -181,33 +181,31 @@ class CalibrationView(QtWidgets.QWidget):
 
         regions = cm.get_rayleigh_regions(calib_key)
         rayleigh_peaks = []
-        for k, img in enumerate(imgs):
+        for frame_num, img in enumerate(imgs):
             tmp = []
-            for region in regions:
-                spectrum = extracted_values[k]
+            for region_key, region in enumerate(regions):
+                spectrum = extracted_values[frame_num]
                 xdata = np.arange(len(spectrum))
                 w0, fwhm, intensity, offset = fit_rayleigh_region(region,
                                                                   xdata, spectrum)
                 tmp.append(w0)
-                # TODO: Don't add the same Rayleigh fit multiple time
-                cm.add_rayleigh_fit(calib_key, region, k,
+                cm.add_rayleigh_fit(calib_key, region_key, frame_num,
                                     w0, fwhm, intensity, offset)
             rayleigh_peaks.append(tmp)
 
         regions = cm.get_brillouin_regions(calib_key)
         brillouin_peaks = []
-        for k, img in enumerate(imgs):
+        for frame_num, img in enumerate(imgs):
             tmp = []
-            for region in regions:
-                spectrum = extracted_values[k]
+            for region_key, region in enumerate(regions):
+                spectrum = extracted_values[frame_num]
                 xdata = np.arange(len(spectrum))
                 w0s, fwhms, intensities, offset = \
                     fit_brillouin_region(region, xdata, spectrum)
 
                 for w in w0s:
                     tmp.append(w)
-                # TODO: Don't add the same Brillouin fit multiple time
-                cm.add_brillouin_fit(calib_key, region, k,
+                cm.add_brillouin_fit(calib_key, region_key, frame_num,
                                      w0s, fwhms, intensities, offset)
             brillouin_peaks.append(tmp)
 
