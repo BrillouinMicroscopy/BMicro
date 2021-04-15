@@ -288,8 +288,8 @@ class CalibrationView(QtWidgets.QWidget):
                 table = self.table_Brillouin_regions
                 self.refresh_regions(amps, regions, table, 'r')
 
-                for region in regions:
-                    avg_w0 = cm.brillouin_fits.average_fits(calib_key, region)
+                for region_key, region in enumerate(regions):
+                    avg_w0 = cm.brillouin_fits.average_fits(calib_key, region_key)
                     # TODO: Plot in terms of frequency if available
                     if avg_w0 is not None:
                         self.plot.vlines(avg_w0[0], 0, np.nanmax(
@@ -301,8 +301,8 @@ class CalibrationView(QtWidgets.QWidget):
                 table = self.table_Rayleigh_regions
                 self.refresh_regions(amps, regions, table, 'm')
 
-                for region in regions:
-                    avg_w0 = cm.rayleigh_fits.average_fits(calib_key, region)
+                for region_key, region in enumerate(regions):
+                    avg_w0 = cm.rayleigh_fits.average_fits(calib_key, region_key)
                     # TODO: Plot in terms of frequency if available
                     if avg_w0 is not None:
                         self.plot.vlines(avg_w0, 0, np.nanmax(
