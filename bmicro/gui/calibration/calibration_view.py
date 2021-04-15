@@ -6,8 +6,8 @@ from PyQt5 import QtWidgets, uic
 from matplotlib.widgets import SpanSelector
 import numpy as np
 
-from bmlab.fits import fit_rayleigh_region,\
-    fit_brillouin_region, fit_vipa, VIPA
+from bmlab.fits import fit_lorentz_region,\
+    fit_vipa, VIPA
 from bmlab.image import extract_lines_along_arc
 from bmlab.session import Session
 
@@ -184,7 +184,7 @@ class CalibrationView(QtWidgets.QWidget):
                 spectrum = extracted_values[frame_num]
                 xdata = np.arange(len(spectrum))
                 w0, fwhm, intensity, offset =\
-                    fit_rayleigh_region(region, xdata, spectrum)
+                    fit_lorentz_region(region, xdata, spectrum)
                 cm.add_rayleigh_fit(calib_key, region_key, frame_num,
                                     w0, fwhm, intensity, offset)
 
@@ -193,7 +193,12 @@ class CalibrationView(QtWidgets.QWidget):
             for region_key, region in enumerate(regions):
                 xdata = np.arange(len(spectrum))
                 w0s, fwhms, intensities, offset = \
-                    fit_brillouin_region(region, xdata, spectrum)
+                    fit_lorentz_region(
+                        region,
+                        xdata,
+                        spectrum,
+                        setup.calibration.num_brillouin_samples
+                    )
                 cm.add_brillouin_fit(calib_key, region_key, frame_num,
                                      w0s, fwhms, intensities, offset)
 
