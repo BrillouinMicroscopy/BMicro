@@ -246,12 +246,18 @@ class CalibrationView(QtWidgets.QWidget):
                 for region_key, region in enumerate(regions):
                     avg_w0 = cm.brillouin_fits.average_fits(
                         calib_key, region_key)
-                    # TODO: Plot in terms of frequency if available
                     if avg_w0 is not None:
-                        self.plot.vlines(avg_w0[0], 0, np.nanmax(
-                            spectrum), colors=['black'])
-                        self.plot.vlines(avg_w0[1], 0, np.nanmax(
-                            spectrum), colors=['black'])
+                        w0_f = cm.get_frequency_by_calib_key(avg_w0, calib_key)
+                        if w0_f is not None:
+                            self.plot.vlines(1e-9*w0_f[0], 0, np.nanmax(
+                                spectrum), colors=['black'])
+                            self.plot.vlines(1e-9*w0_f[1], 0, np.nanmax(
+                                spectrum), colors=['black'])
+                        else:
+                            self.plot.vlines(avg_w0[0], 0, np.nanmax(
+                                spectrum), colors=['black'])
+                            self.plot.vlines(avg_w0[1], 0, np.nanmax(
+                                spectrum), colors=['black'])
 
                 regions = cm.get_rayleigh_regions(calib_key)
                 table = self.table_Rayleigh_regions
@@ -260,10 +266,14 @@ class CalibrationView(QtWidgets.QWidget):
                 for region_key, region in enumerate(regions):
                     avg_w0 = cm.rayleigh_fits.average_fits(
                         calib_key, region_key)
-                    # TODO: Plot in terms of frequency if available
                     if avg_w0 is not None:
-                        self.plot.vlines(avg_w0, 0, np.nanmax(
-                            spectrum), colors=['black'])
+                        w0_f = cm.get_frequency_by_calib_key(avg_w0, calib_key)
+                        if w0_f is not None:
+                            self.plot.vlines(1e-9*w0_f, 0, np.nanmax(
+                                spectrum), colors=['black'])
+                        else:
+                            self.plot.vlines(avg_w0, 0, np.nanmax(
+                                spectrum), colors=['black'])
 
         except Exception as e:
             logger.error('Exception occured: %s' % e)
