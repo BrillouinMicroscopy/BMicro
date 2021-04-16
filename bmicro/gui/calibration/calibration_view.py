@@ -166,46 +166,13 @@ class CalibrationView(QtWidgets.QWidget):
         if not em:
             return
 
-        arc = em.get_arc_by_calib_key(calib_key)
-        if not arc:
-            return
-
-        imgs = session.current_repetition().calibration.get_image(calib_key)
-
-        # Extract values from *all* frames in the current calibration
-        extracted_values = []
-        for img in imgs:
-            values_by_img = extract_lines_along_arc(img,
-                                                    session.orientation, arc)
-            extracted_values.append(values_by_img)
-        em.set_extracted_values(calib_key, extracted_values)
+        extracted_values = session.extract(calib_key)
 
         if len(extracted_values) == 0:
             return
 
-        regions = cm.get_rayleigh_regions(calib_key)
-        for frame_num, spectrum in enumerate(extracted_values):
-            for region_key, region in enumerate(regions):
-                spectrum = extracted_values[frame_num]
-                xdata = np.arange(len(spectrum))
-                w0, fwhm, intensity, offset =\
-                    fit_lorentz_region(region, xdata, spectrum)
-                cm.add_rayleigh_fit(calib_key, region_key, frame_num,
-                                    w0, fwhm, intensity, offset)
-
-        regions = cm.get_brillouin_regions(calib_key)
-        for frame_num, spectrum in enumerate(extracted_values):
-            for region_key, region in enumerate(regions):
-                xdata = np.arange(len(spectrum))
-                w0s, fwhms, intensities, offset = \
-                    fit_lorentz_region(
-                        region,
-                        xdata,
-                        spectrum,
-                        setup.calibration.num_brillouin_samples
-                    )
-                cm.add_brillouin_fit(calib_key, region_key, frame_num,
-                                     w0s, fwhms, intensities, offset)
+        session.fit_rayleigh_regions(calib_key)
+        session.fit_brillouin_regions(calib_key)
 
         vipa_params = []
         frequencies = []
