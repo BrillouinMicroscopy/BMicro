@@ -224,25 +224,25 @@ class CalibrationView(QtWidgets.QWidget):
                 .calibration.get_image(calib_key)
             img = imgs[self.current_frame]
 
-            amps = extract_lines_along_arc(img, session.orientation, arc)
+            spectrum = extract_lines_along_arc(img, session.orientation, arc)
 
-            if len(amps) > 0:
+            if len(spectrum) > 0:
                 frequencies = cm.get_frequencies_by_calib_key(calib_key)
+                frequency = None
                 if frequencies:
-                    self.plot.plot(frequencies[self.current_frame], amps)
-                    self.plot.set_xlabel('f [Hz]')
+                    frequency = 1e-9*frequencies[self.current_frame]
+                    self.plot.plot(frequency, spectrum)
+                    self.plot.set_xlabel('f [GHz]')
                 else:
-                    self.plot.plot(amps)
+                    self.plot.plot(spectrum)
                     self.plot.set_xlabel('pixels')
                 self.plot.set_ylim(bottom=0)
                 self.plot.set_title('Frame %d / %d' %
                                     (self.current_frame+1, len(imgs)))
 
-            cm = session.calibration_model()
-            if cm:
                 regions = cm.get_brillouin_regions(calib_key)
                 table = self.table_Brillouin_regions
-                self.refresh_regions(amps, regions, table, 'r')
+                self.refresh_regions(spectrum, regions, table, 'r', frequency)
 
                 for region_key, region in enumerate(regions):
                     avg_w0 = cm.brillouin_fits.average_fits(
@@ -250,13 +250,13 @@ class CalibrationView(QtWidgets.QWidget):
                     # TODO: Plot in terms of frequency if available
                     if avg_w0 is not None:
                         self.plot.vlines(avg_w0[0], 0, np.nanmax(
-                            amps), colors=['black'])
+                            spectrum), colors=['black'])
                         self.plot.vlines(avg_w0[1], 0, np.nanmax(
-                            amps), colors=['black'])
+                            spectrum), colors=['black'])
 
                 regions = cm.get_rayleigh_regions(calib_key)
                 table = self.table_Rayleigh_regions
-                self.refresh_regions(amps, regions, table, 'm')
+                self.refresh_regions(spectrum, regions, table, 'm', frequency)
 
                 for region_key, region in enumerate(regions):
                     avg_w0 = cm.rayleigh_fits.average_fits(
@@ -264,7 +264,7 @@ class CalibrationView(QtWidgets.QWidget):
                     # TODO: Plot in terms of frequency if available
                     if avg_w0 is not None:
                         self.plot.vlines(avg_w0, 0, np.nanmax(
-                            amps), colors=['black'])
+                            spectrum), colors=['black'])
 
         except Exception as e:
             logger.error('Exception occured: %s' % e)
@@ -286,11 +286,14 @@ class CalibrationView(QtWidgets.QWidget):
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
-    def refresh_regions(self, amps, regions, table, color):
+    def refresh_regions(self, spectrum, regions, table, color, frequencies=None):
         table.setRowCount(len(regions))
         for rowIdx, region in enumerate(regions):
             mask = np.arange(int(region[0]), int(region[1]))
-            self.plot.plot(mask, amps[mask], color)
+            if frequencies is not None:
+                self.plot.plot(frequencies[mask], spectrum[mask], color)
+            else:
+                self.plot.plot(mask, spectrum[mask], color)
             # Add regions to table
             # Block signals, so the itemChanged signal is not
             # emitted during table creation
