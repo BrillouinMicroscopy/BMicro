@@ -6,8 +6,7 @@ from PyQt5 import QtWidgets, uic
 from matplotlib.widgets import SpanSelector
 import numpy as np
 
-from bmlab.fits import fit_lorentz_region,\
-    fit_vipa, VIPA
+from bmlab.fits import fit_vipa, VIPA
 from bmlab.image import extract_lines_along_arc
 from bmlab.session import Session
 
@@ -286,7 +285,8 @@ class CalibrationView(QtWidgets.QWidget):
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
         header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
-    def refresh_regions(self, spectrum, regions, table, color, frequencies=None):
+    def refresh_regions(self, spectrum, regions, table, color,
+                        frequencies=None):
         table.setRowCount(len(regions))
         for rowIdx, region in enumerate(regions):
             mask = np.arange(int(region[0]), int(region[1]))
