@@ -129,6 +129,13 @@ class CalibrationView(QtWidgets.QWidget):
         self.refresh_plot()
 
     def on_select_data_region(self, xmin, xmax):
+        if not self.plot.lines[0]:
+            return
+        # Since we might operate on a frequency axis,
+        # we need the indices instead of the values.
+        xdata = self.plot.lines[0].get_xdata()
+        indmin, indmax = np.searchsorted(xdata, (xmin, xmax))
+
         if self.mode == MODE_DEFAULT:
             return
         session = Session.get_instance()
@@ -137,9 +144,9 @@ class CalibrationView(QtWidgets.QWidget):
         cm = session.calibration_model()
         if cm:
             if self.mode == MODE_SELECT_BRILLOUIN:
-                cm.add_brillouin_region(calib_key, (xmin, xmax))
+                cm.add_brillouin_region(calib_key, (indmin, indmax))
             elif self.mode == MODE_SELECT_RAYLEIGH:
-                cm.add_rayleigh_region(calib_key, (xmin, xmax))
+                cm.add_rayleigh_region(calib_key, (indmin, indmax))
 
         self.refresh_plot()
 
