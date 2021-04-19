@@ -7,7 +7,6 @@ from matplotlib.widgets import SpanSelector
 import numpy as np
 
 from bmlab.fits import fit_vipa, VIPA
-from bmlab.image import extract_lines_along_arc
 from bmlab.session import Session
 
 from bmicro.gui.mpl import MplCanvas
@@ -172,9 +171,12 @@ class CalibrationView(QtWidgets.QWidget):
         if not em:
             return
 
-        extracted_values = session.extract(calib_key)
+        spectra = session.extract_calibration_spectrum(calib_key)
 
-        if len(extracted_values) == 0:
+        if spectra is None:
+            return
+
+        if len(spectra) == 0:
             return
 
         session.fit_rayleigh_regions(calib_key)
@@ -182,7 +184,7 @@ class CalibrationView(QtWidgets.QWidget):
 
         vipa_params = []
         frequencies = []
-        for frame_num, spectrum in enumerate(extracted_values):
+        for frame_num, spectrum in enumerate(spectra):
             peaks = cm.get_sorted_peaks(calib_key, frame_num)
 
             params = fit_vipa(peaks, setup)
@@ -214,23 +216,14 @@ class CalibrationView(QtWidgets.QWidget):
             return
 
         try:
-            em = session.extraction_model()
-            if not em:
+            spectra = session.extract_calibration_spectrum(calib_key)
+            if spectra is None:
                 return
+            spectrum = spectra[self.current_frame]
+
             cm = session.calibration_model()
             if not cm:
                 return
-            time = session.current_repetition()\
-                .calibration.get_time(calib_key)
-            arc = em.get_arc_by_time(time)
-            if not arc:
-                return
-
-            imgs = session.current_repetition()\
-                .calibration.get_image(calib_key)
-            img = imgs[self.current_frame]
-
-            spectrum = extract_lines_along_arc(img, session.orientation, arc)
 
             if len(spectrum) > 0:
                 frequencies = cm.get_frequencies_by_calib_key(calib_key)
@@ -244,7 +237,7 @@ class CalibrationView(QtWidgets.QWidget):
                     self.plot.set_xlabel('pixels')
                 self.plot.set_ylim(bottom=0)
                 self.plot.set_title('Frame %d / %d' %
-                                    (self.current_frame+1, len(imgs)))
+                                    (self.current_frame+1, len(spectra)))
 
                 regions = cm.get_brillouin_regions(calib_key)
                 table = self.table_Brillouin_regions
