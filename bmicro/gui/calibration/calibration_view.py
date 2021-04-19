@@ -218,28 +218,34 @@ class CalibrationView(QtWidgets.QWidget):
             return
 
         try:
-            spectra = session.extract_calibration_spectrum(calib_key)
-            if spectra is None:
+            spectrum = session.extract_calibration_spectrum(
+                calib_key,
+                frame_num=self.current_frame
+            )
+            if spectrum is None:
                 return
-            spectrum = spectra[self.current_frame]
 
             cm = session.calibration_model()
             if not cm:
                 return
 
             if len(spectrum) > 0:
+                spectrum = spectrum[0]
                 frequencies = cm.get_frequencies_by_calib_key(calib_key)
                 frequency = None
                 if frequencies:
                     frequency = 1e-9*frequencies[self.current_frame]
                     self.plot.plot(frequency, spectrum)
                     self.plot.set_xlabel('f [GHz]')
+                    self.plot.set_xlim(1e-9*np.min(frequencies),
+                                       1e-9*np.max(frequencies))
                 else:
                     self.plot.plot(spectrum)
                     self.plot.set_xlabel('pixels')
+                    self.plot.set_xlim(0, len(spectrum))
                 self.plot.set_ylim(bottom=0)
-                self.plot.set_title('Frame %d / %d' %
-                                    (self.current_frame+1, len(spectra)))
+                self.plot.set_title('Frame %d' %
+                                    (self.current_frame+1))
 
                 regions = cm.get_brillouin_regions(calib_key)
                 table = self.table_Brillouin_regions
