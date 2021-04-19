@@ -188,6 +188,8 @@ class CalibrationView(QtWidgets.QWidget):
             peaks = cm.get_sorted_peaks(calib_key, frame_num)
 
             params = fit_vipa(peaks, setup)
+            if params is None:
+                continue
             vipa_params.append(params)
             xdata = np.arange(len(spectrum))
 
