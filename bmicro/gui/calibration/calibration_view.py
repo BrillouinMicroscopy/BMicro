@@ -172,6 +172,7 @@ class CalibrationView(QtWidgets.QWidget):
             return
 
         spectra = session.extract_calibration_spectrum(calib_key)
+        time = session.current_repetition().calibration.get_time(calib_key)
 
         if spectra is None:
             return
@@ -196,7 +197,7 @@ class CalibrationView(QtWidgets.QWidget):
             frequencies.append(VIPA(xdata, params) - setup.f0)
 
         cm.set_vipa_params(calib_key, vipa_params)
-        cm.set_frequencies(calib_key, frequencies)
+        cm.set_frequencies(calib_key, time, frequencies)
 
         self.refresh_plot()
 
