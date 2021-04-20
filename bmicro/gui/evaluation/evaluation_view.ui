@@ -83,7 +83,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="combobox_selection_2">
+           <widget class="QComboBox" name="combobox_parameter">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -103,7 +103,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="combobox_selection">
+           <widget class="QComboBox" name="combobox_peak_number">
             <property name="enabled">
              <bool>false</bool>
             </property>
