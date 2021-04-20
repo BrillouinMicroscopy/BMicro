@@ -121,6 +121,7 @@ class PeakSelectionView(QtWidgets.QWidget):
             spectrum = session.extract_payload_spectrum(
                 image_key
             )
+            time = session.current_repetition().payload.get_time(image_key)
             if spectrum is None:
                 return
 
@@ -133,12 +134,10 @@ class PeakSelectionView(QtWidgets.QWidget):
                 return
 
             if len(spectrum) > 0:
-                spectrum = spectrum[0]
-                frequencies = cm.get_frequency_by_time(0, 0)
-                frequency = None
-                if frequencies:
-                    frequency = 1e-9*frequencies[self.current_frame]
-                    self.plot.plot(frequency, spectrum)
+                spectrum = np.nanmean(spectrum, 0)
+                frequencies = cm.get_frequencies_by_time(time)
+                if frequencies is not None:
+                    self.plot.plot(1e-9*frequencies, spectrum)
                     self.plot.set_xlabel('f [GHz]')
                     self.plot.set_xlim(1e-9*np.min(frequencies),
                                        1e-9*np.max(frequencies))
@@ -150,11 +149,13 @@ class PeakSelectionView(QtWidgets.QWidget):
 
                 regions = pm.get_brillouin_regions()
                 table = self.table_Brillouin_regions
-                self.refresh_regions(spectrum, regions, table, 'r', frequency)
+                self.refresh_regions(
+                    spectrum, regions, table, 'r', frequencies)
 
                 regions = pm.get_rayleigh_regions()
                 table = self.table_Rayleigh_regions
-                self.refresh_regions(spectrum, regions, table, 'm', frequency)
+                self.refresh_regions(
+                    spectrum, regions, table, 'm', frequencies)
 
         except Exception as e:
             logger.error('Exception occured: %s' % e)
@@ -182,7 +183,7 @@ class PeakSelectionView(QtWidgets.QWidget):
         for rowIdx, region in enumerate(regions):
             mask = np.arange(int(region[0]), int(region[1]))
             if frequencies is not None:
-                self.plot.plot(frequencies[mask], spectrum[mask], color)
+                self.plot.plot(1e-9*frequencies[mask], spectrum[mask], color)
             else:
                 self.plot.plot(mask, spectrum[mask], color)
             # Add regions to table
