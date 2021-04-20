@@ -121,7 +121,6 @@ class PeakSelectionView(QtWidgets.QWidget):
             spectrum = session.extract_payload_spectrum(
                 image_key
             )
-            time = session.current_repetition().payload.get_time(image_key)
             if spectrum is None:
                 return
 
@@ -135,6 +134,7 @@ class PeakSelectionView(QtWidgets.QWidget):
 
             if len(spectrum) > 0:
                 spectrum = np.nanmean(spectrum, 0)
+                time = session.current_repetition().payload.get_time(image_key)
                 frequencies = cm.get_frequencies_by_time(time)
                 if frequencies is not None:
                     self.plot.plot(1e-9*frequencies, spectrum)
