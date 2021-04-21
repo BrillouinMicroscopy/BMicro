@@ -1,15 +1,18 @@
 import pkg_resources
 import logging
 
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, QtCore, uic
 # from PyQt5.QtWidgets import QMessageBox
 from matplotlib.widgets import SpanSelector
 import numpy as np
+import multiprocessing as mp
+import time
 
 from bmlab.session import Session
 
 from bmlab.controllers.calibration_controller import CalibrationController
 
+from bmicro.BGThread import BGThread
 from bmicro.gui.mpl import MplCanvas
 
 
@@ -158,7 +161,26 @@ class CalibrationView(QtWidgets.QWidget):
     def calibrate(self):
         calib_key = self.combobox_calibration.currentText()
 
-        self.calibration_controller.calibrate(calib_key)
+        count = mp.Value('I', 0, lock=True)
+        max_count = mp.Value('i', 0, lock=True)
+
+        dnkw = {
+            "calib_key": calib_key,
+            "count": count,
+            "max_count": max_count,
+        }
+
+        thread = BGThread(func=self.calibration_controller.calibrate, fkw=dnkw)
+        thread.start()
+        # Show a progress until computation is done
+        while max_count.value == 0 or count.value < max_count.value:
+            time.sleep(.05)
+            self.calibration_progress.setValue(count.value)
+            if max_count.value >= 0:
+                self.calibration_progress.setMaximum(max_count.value)
+            QtCore.QCoreApplication.instance().processEvents()
+        # make sure the thread finishes
+        thread.wait()
 
         self.refresh_plot()
 

@@ -267,7 +267,7 @@
            <height>16777215</height>
           </size>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <layout class="QVBoxLayout" name="verticalLayout_5">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -281,25 +281,39 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_fit">
-            <property name="text">
-             <string>Fit:</string>
+           <widget class="QProgressBar" name="calibration_progress">
+            <property name="value">
+             <number>0</number>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="button_fit_clear">
-            <property name="text">
-             <string>Clear</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="button_calibrate">
-            <property name="text">
-             <string>Calibrate</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_fit">
+              <property name="text">
+               <string>Fit:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_fit_clear">
+              <property name="text">
+               <string>Clear</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_calibrate">
+              <property name="text">
+               <string>Calibrate</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
