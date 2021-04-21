@@ -6,8 +6,9 @@ from PyQt5 import QtWidgets, uic
 from matplotlib.widgets import SpanSelector
 import numpy as np
 
-from bmlab.fits import fit_vipa, VIPA
 from bmlab.session import Session
+
+from bmlab.controllers.calibration_controller import CalibrationController
 
 from bmicro.gui.mpl import MplCanvas
 
@@ -69,6 +70,8 @@ class CalibrationView(QtWidgets.QWidget):
             lambda item: self.on_region_changed(MODE_SELECT_RAYLEIGH, item))
 
         self.setupTables()
+
+        self.calibration_controller = CalibrationController()
 
     def prev_frame(self):
         if self.current_frame > 0:
@@ -153,51 +156,9 @@ class CalibrationView(QtWidgets.QWidget):
         self.refresh_plot()
 
     def calibrate(self):
-        session = Session.get_instance()
-
-        cm = session.calibration_model()
-        if not cm:
-            return
-
-        setup = session.setup
-        if not setup:
-            return
-
         calib_key = self.combobox_calibration.currentText()
-        if not calib_key:
-            return
 
-        em = session.extraction_model()
-        if not em:
-            return
-
-        spectra = session.extract_calibration_spectrum(calib_key)
-        time = session.current_repetition().calibration.get_time(calib_key)
-
-        if spectra is None:
-            return
-
-        if len(spectra) == 0:
-            return
-
-        session.fit_rayleigh_regions(calib_key)
-        session.fit_brillouin_regions(calib_key)
-
-        vipa_params = []
-        frequencies = []
-        for frame_num, spectrum in enumerate(spectra):
-            peaks = cm.get_sorted_peaks(calib_key, frame_num)
-
-            params = fit_vipa(peaks, setup)
-            if params is None:
-                continue
-            vipa_params.append(params)
-            xdata = np.arange(len(spectrum))
-
-            frequencies.append(VIPA(xdata, params) - setup.f0)
-
-        cm.set_vipa_params(calib_key, vipa_params)
-        cm.set_frequencies(calib_key, time, frequencies)
+        self.calibration_controller.calibrate(calib_key)
 
         self.refresh_plot()
 
