@@ -165,7 +165,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QProgressBar" name="progress_evaluation">
+           <widget class="QProgressBar" name="evaluation_progress">
             <property name="value">
              <number>0</number>
             </property>
@@ -175,7 +175,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="button_evaluation">
+           <widget class="QPushButton" name="button_evaluate">
             <property name="text">
              <string>Evaluate</string>
             </property>

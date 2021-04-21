@@ -1,11 +1,16 @@
 import pkg_resources
 import logging
 
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, QtCore, uic
+import multiprocessing as mp
+import time
 
 # from bmlab.session import Session
 
+from bmicro.BGThread import BGThread
 from bmicro.gui.mpl import MplCanvas
+
+from bmlab.controllers.evaluation_controller import EvaluationController
 
 logger = logging.getLogger(__name__)
 
@@ -26,10 +31,11 @@ class EvaluationView(QtWidgets.QWidget):
                                    toolbar=('Home', 'Pan', 'Zoom'))
         self.plot = self.mplcanvas.get_figure().add_subplot(111)
 
-        self.button_evaluation.clicked.connect(
-            self.on_button_evaluation_clicked)
+        self.button_evaluate.released.connect(self.evaluate)
 
         self.setup_parameter_selection_combobox()
+
+        self.evaluation_controller = EvaluationController()
 
     def setup_parameter_selection_combobox(self):
         return
@@ -46,6 +52,29 @@ class EvaluationView(QtWidgets.QWidget):
         #
         # self.combobox_parameter.addItems(param_labels)
 
-    def on_button_evaluation_clicked(self):
-        # TODO Start evaluation
+    def evaluate(self):
+        count = mp.Value('I', 0, lock=True)
+        max_count = mp.Value('i', 0, lock=True)
+
+        dnkw = {
+            "count": count,
+            "max_count": max_count,
+        }
+
+        thread = BGThread(func=self.evaluation_controller.evaluate, fkw=dnkw)
+        thread.start()
+        # Show a progress until computation is done
+        while max_count.value == 0 or count.value < max_count.value:
+            time.sleep(.05)
+            self.evaluation_progress.setValue(count.value)
+            if max_count.value >= 0:
+                self.evaluation_progress.setMaximum(max_count.value)
+            self.refresh_plot()
+            QtCore.QCoreApplication.instance().processEvents()
+        # make sure the thread finishes
+        thread.wait()
+
+        self.refresh_plot()
+
+    def refresh_plot(self):
         return
