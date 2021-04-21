@@ -3,7 +3,7 @@ import logging
 
 from PyQt5 import QtWidgets, uic
 
-from bmlab.session import Session
+# from bmlab.session import Session
 
 from bmicro.gui.mpl import MplCanvas
 
