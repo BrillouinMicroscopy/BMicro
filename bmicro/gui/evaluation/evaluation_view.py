@@ -37,6 +37,9 @@ class EvaluationView(QtWidgets.QWidget):
 
         self.evaluation_controller = EvaluationController()
 
+        self.evaluation_abort = mp.Value('I', False, lock=True)
+        self.evaluation_running = False
+
     def setup_parameter_selection_combobox(self):
         return
         # session = Session.get_instance()
@@ -53,18 +56,32 @@ class EvaluationView(QtWidgets.QWidget):
         # self.combobox_parameter.addItems(param_labels)
 
     def evaluate(self):
+        # If the evaluation is already running, we abort it and reset
+        #  the button label
+        if self.evaluation_running:
+            self.evaluation_abort.value = True
+            self.evaluation_running = False
+            self.button_evaluate.setText('Evaluate')
+            return
+
+        self.evaluation_abort.value = False
+        self.evaluation_running = True
+        self.button_evaluate.setText('Cancel')
+
         count = mp.Value('I', 0, lock=True)
         max_count = mp.Value('i', 0, lock=True)
 
         dnkw = {
             "count": count,
             "max_count": max_count,
+            "abort": self.evaluation_abort,
         }
 
         thread = BGThread(func=self.evaluation_controller.evaluate, fkw=dnkw)
         thread.start()
         # Show a progress until computation is done
-        while max_count.value == 0 or count.value < max_count.value:
+        while (max_count.value == 0 or count.value < max_count.value
+               and not self.evaluation_abort.value):
             time.sleep(.05)
             self.evaluation_progress.setValue(count.value)
             if max_count.value >= 0:
@@ -73,6 +90,9 @@ class EvaluationView(QtWidgets.QWidget):
             QtCore.QCoreApplication.instance().processEvents()
         # make sure the thread finishes
         thread.wait()
+
+        self.evaluation_running = False
+        self.button_evaluate.setText('Evaluate')
 
         self.refresh_plot()
 
