@@ -5,7 +5,7 @@ from PyQt5 import QtWidgets, QtCore, uic
 import multiprocessing as mp
 import time
 
-# from bmlab.session import Session
+from bmlab.session import Session
 
 from bmicro.BGThread import BGThread
 from bmicro.gui.mpl import MplCanvas
@@ -82,7 +82,7 @@ class EvaluationView(QtWidgets.QWidget):
         # Show a progress until computation is done
         while (max_count.value == 0 or count.value < max_count.value
                and not self.evaluation_abort.value):
-            time.sleep(.05)
+            time.sleep(2)
             self.evaluation_progress.setValue(count.value)
             if max_count.value >= 0:
                 self.evaluation_progress.setMaximum(max_count.value)
@@ -97,4 +97,10 @@ class EvaluationView(QtWidgets.QWidget):
         self.refresh_plot()
 
     def refresh_plot(self):
+        session = Session.get_instance()
+        evm = session.evaluation_model()
+        data = evm.results['brillouin_peak_position']
+        self.plot.imshow(data)
+        self.mplcanvas.draw()
+
         return
