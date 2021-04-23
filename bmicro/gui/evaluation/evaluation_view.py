@@ -107,7 +107,8 @@ class EvaluationView(QtWidgets.QWidget):
         evm = session.evaluation_model()
         # TODO Adjust that for measurements of arbitrary orientations
         #  (currently assumes x-y-measurement)
-        data = np.nanmean(evm.results['brillouin_peak_position'], axis=2)
+        data = np.nanmean(evm.results['brillouin_peak_position'],
+                          axis=(2, 3, 4, 5))
         if self.image_map is None:
             self.image_map = self.plot.imshow(data, interpolation='nearest')
         else:
