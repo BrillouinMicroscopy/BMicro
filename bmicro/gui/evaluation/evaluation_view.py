@@ -1,5 +1,6 @@
 import pkg_resources
 import logging
+import numpy as np
 
 from PyQt5 import QtWidgets, QtCore, uic
 import multiprocessing as mp
@@ -30,6 +31,7 @@ class EvaluationView(QtWidgets.QWidget):
         self.mplcanvas = MplCanvas(self.image_widget,
                                    toolbar=('Home', 'Pan', 'Zoom'))
         self.plot = self.mplcanvas.get_figure().add_subplot(111)
+        self.image_map = None
 
         self.button_evaluate.released.connect(self.evaluate)
 
@@ -80,13 +82,17 @@ class EvaluationView(QtWidgets.QWidget):
         thread = BGThread(func=self.evaluation_controller.evaluate, fkw=dnkw)
         thread.start()
         # Show a progress until computation is done
+        plot_count = 0
         while (max_count.value == 0 or count.value < max_count.value
                and not self.evaluation_abort.value):
-            time.sleep(2)
+            time.sleep(.25)
             self.evaluation_progress.setValue(count.value)
             if max_count.value >= 0:
                 self.evaluation_progress.setMaximum(max_count.value)
-            self.refresh_plot()
+            # We refresh the image every twenty points to not slow down to much
+            if (count.value - plot_count) > 30:
+                plot_count = count.value
+                self.refresh_plot()
             QtCore.QCoreApplication.instance().processEvents()
         # make sure the thread finishes
         thread.wait()
@@ -99,8 +105,12 @@ class EvaluationView(QtWidgets.QWidget):
     def refresh_plot(self):
         session = Session.get_instance()
         evm = session.evaluation_model()
-        data = evm.results['brillouin_peak_position']
-        self.plot.imshow(data)
+        # TODO Adjust that for measurements of arbitrary orientations
+        #  (currently assumes x-y-measurement)
+        data = np.nanmean(evm.results['brillouin_peak_position'], axis=2)
+        if self.image_map is None:
+            self.image_map = self.plot.imshow(data, interpolation='nearest')
+        else:
+            self.image_map.set_data(data)
         self.mplcanvas.draw()
-
         return
