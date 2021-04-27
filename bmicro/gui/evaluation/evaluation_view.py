@@ -112,7 +112,9 @@ class EvaluationView(QtWidgets.QWidget):
 
         param_labels = []
         for key, parameter in self.parameters.items():
-            param_labels.append(parameter['label'] + ' [' + parameter['unit'] + ']')
+            param_labels.append(
+                parameter['label'] + ' [' + parameter['unit'] + ']'
+            )
 
         self.combobox_parameter.clear()
         self.combobox_parameter.addItems(param_labels)
@@ -182,11 +184,12 @@ class EvaluationView(QtWidgets.QWidget):
             data = np.nanmean(data, axis=tuple(range(2, data.ndim)))
 
             if self.image_map is None:
-                self.image_map = self.plot.imshow(data, interpolation='nearest')
+                self.image_map = self.plot.imshow(
+                    data, interpolation='nearest'
+                )
             else:
                 self.image_map.set_data(data)
             self.image_map.set_clim(np.nanmin(data), np.nanmax(data))
             self.mplcanvas.draw()
         except Exception:
             pass
-
