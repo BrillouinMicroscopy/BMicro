@@ -35,7 +35,73 @@ class EvaluationView(QtWidgets.QWidget):
 
         self.button_evaluate.released.connect(self.evaluate)
 
+        self.parameters = {
+            'brillouin_shift_f': {          # [GHz] Brillouin frequency shift
+                'unit': 'GHz',
+                'symbol': r'$\nu_\mathrm{B}$',
+                'label': 'Brillouin frequency shift',
+            },
+            'brillouin_shift': {            # [pix] Brillouin frequency shift
+                'unit': 'pix',
+                'symbol': r'$\nu_\mathrm{B}$',
+                'label': 'Brillouin frequency shift'
+            },
+            'brillouin_peak_fwhm_f': {      # [GHz] Brillouin peak FWHM
+                'unit': 'GHz',
+                'symbol': r'$\Delta_\mathrm{B}$',
+                'label': 'Brillouin peak width',
+            },
+            'brillouin_peak_fwhm': {        # [pix] Brillouin peak FWHM
+                'unit': 'pix',
+                'symbol': r'$\Delta_\mathrm{B}$',
+                'label': 'Brillouin peak width',
+            },
+            'brillouin_peak_position': {    # [pix] Brillouin peak position
+                'unit': 'pix',
+                'symbol': r'$s_\mathrm{B}$',
+                'label': 'Brillouin peak position',
+            },
+            'brillouin_peak_intensity': {   # [a.u.] Brillouin peak intensity
+                'unit': 'a.u.',
+                'symbol': r'$I_\mathrm{B}$',
+                'label': 'Brillouin peak intensity',
+            },
+            'rayleigh_peak_fwhm_f': {       # [GHz] Rayleigh peak FWHM
+                'unit': 'GHz',
+                'symbol': r'$\Delta_\mathrm{R}$',
+                'label': 'Rayleigh peak width'
+            },
+            'rayleigh_peak_fwhm': {         # [pix] Rayleigh peak FWHM
+                'unit': 'pix',
+                'symbol': r'$\Delta_\mathrm{R}$',
+                'label': 'Rayleigh peak width'
+            },
+            'rayleigh_peak_position': {     # [pix] Rayleigh peak position
+                'unit': 'pix',
+                'symbol': r'$s_\mathrm{R}$',
+                'label': 'Rayleigh peak position'
+            },
+            'rayleigh_peak_intensity': {    # [a.u.] Rayleigh peak intensity
+                'unit': 'a.u.',
+                'symbol': r'$I_\mathrm{R}$',
+                'label': 'Rayleigh peak intensity'
+            },
+            'intensity': {                  # [a.u.] Overall intensity of image
+                'unit': 'a.u.',
+                'symbol': r'$I_\mathrm{total}$',
+                'label': 'Intensity'
+            },
+            'time': {                       # [s] The time the measurement
+                'unit': 's',                # point was taken at
+                'symbol': r'$t$',
+                'label': 'Time'
+            },
+        }
+
         self.setup_parameter_selection_combobox()
+
+        self.combobox_parameter.currentIndexChanged.connect(
+            self.on_select_parameter)
 
         self.evaluation_controller = EvaluationController()
 
@@ -43,19 +109,16 @@ class EvaluationView(QtWidgets.QWidget):
         self.evaluation_running = False
 
     def setup_parameter_selection_combobox(self):
-        return
-        # session = Session.get_instance()
-        # em = session.evaluation_model()
-        #
-        # if em is None:
-        #     return
-        #
-        # parameters = em.get_parameters
-        # param_labels = []
-        # for parameter in parameters:
-        #     param_labels.append(parameter.label + parameter.unit)
-        #
-        # self.combobox_parameter.addItems(param_labels)
+
+        param_labels = []
+        for key, parameter in self.parameters.items():
+            param_labels.append(parameter['label'] + ' [' + parameter['unit'] + ']')
+
+        self.combobox_parameter.clear()
+        self.combobox_parameter.addItems(param_labels)
+
+    def on_select_parameter(self):
+        self.refresh_plot()
 
     def evaluate(self):
         # If the evaluation is already running, we abort it and reset
@@ -105,13 +168,25 @@ class EvaluationView(QtWidgets.QWidget):
     def refresh_plot(self):
         session = Session.get_instance()
         evm = session.evaluation_model()
+        if evm is None:
+            return
+
+        parameter_index = self.combobox_parameter.currentIndex()
+        parameter_key = list(self.parameters)[parameter_index]
+
         # TODO Adjust that for measurements of arbitrary orientations
         #  (currently assumes x-y-measurement)
-        data = np.nanmean(evm.results['brillouin_peak_position'],
-                          axis=(2, 3, 4, 5))
-        if self.image_map is None:
-            self.image_map = self.plot.imshow(data, interpolation='nearest')
-        else:
-            self.image_map.set_data(data)
-        self.mplcanvas.draw()
-        return
+        data = evm.results[parameter_key]
+        # Average all non spatial dimensions
+        try:
+            data = np.nanmean(data, axis=tuple(range(2, data.ndim)))
+
+            if self.image_map is None:
+                self.image_map = self.plot.imshow(data, interpolation='nearest')
+            else:
+                self.image_map.set_data(data)
+            self.image_map.set_clim(np.nanmin(data), np.nanmax(data))
+            self.mplcanvas.draw()
+        except Exception:
+            pass
+
