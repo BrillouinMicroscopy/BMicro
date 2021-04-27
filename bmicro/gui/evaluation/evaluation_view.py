@@ -190,6 +190,7 @@ class EvaluationView(QtWidgets.QWidget):
             else:
                 self.image_map.set_data(data)
             self.image_map.set_clim(np.nanmin(data), np.nanmax(data))
+            self.plot.set_title(self.parameters[parameter_key]['label'])
             self.mplcanvas.draw()
         except Exception:
             pass
