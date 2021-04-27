@@ -268,7 +268,7 @@ class CalibrationView(QtWidgets.QWidget):
                                 spectrum), colors=['black'])
 
         except Exception as e:
-            logger.error('Exception occured: %s' % e)
+            logger.error('Exception occurred in calibration: %s' % e)
         finally:
             self.mplcanvas.draw()
 

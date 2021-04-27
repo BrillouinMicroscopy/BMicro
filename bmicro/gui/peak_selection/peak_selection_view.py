@@ -158,7 +158,7 @@ class PeakSelectionView(QtWidgets.QWidget):
                     spectrum, regions, table, 'm', frequencies)
 
         except Exception as e:
-            logger.error('Exception occured: %s' % e)
+            logger.error('Exception occurred in peak selection: %s' % e)
         finally:
             self.mplcanvas.draw()
 
