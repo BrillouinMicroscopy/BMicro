@@ -118,7 +118,7 @@ class PeakSelectionView(QtWidgets.QWidget):
 
         try:
             image_key = '0'
-            spectrum = session.extract_payload_spectrum(
+            spectrum, times = session.extract_payload_spectrum(
                 image_key
             )
             if spectrum is None:
