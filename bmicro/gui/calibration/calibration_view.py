@@ -98,6 +98,7 @@ class CalibrationView(QtWidgets.QWidget):
         calib_key = self.combobox_calibration.currentText()
         cm.clear_brillouin_fits(calib_key)
         cm.clear_rayleigh_fits(calib_key)
+        cm.clear_frequencies(calib_key)
         self.refresh_plot()
 
     def on_select_brillouin_clicked(self):
