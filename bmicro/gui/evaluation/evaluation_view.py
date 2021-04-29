@@ -2,9 +2,9 @@ import pkg_resources
 import logging
 import numpy as np
 
-from PyQt5 import QtWidgets, QtCore, uic
+from PyQt5 import QtWidgets, uic
+from PyQt5.QtCore import QTimer
 import multiprocessing as mp
-import time
 
 from bmlab.session import Session
 
@@ -108,6 +108,15 @@ class EvaluationView(QtWidgets.QWidget):
         self.evaluation_abort = mp.Value('I', False, lock=True)
         self.evaluation_running = False
 
+        self.evaluation_timer = QTimer()
+        self.evaluation_timer.timeout.connect(self.refresh_ui)
+        self.count = None
+        self.max_count = None
+        self.thread = None
+        # Currently used to determine if we should update the plot
+        # Might not be necessary anymore once the plot is fast enough.
+        self.plot_count = 0
+
     def setup_parameter_selection_combobox(self):
 
         param_labels = []
@@ -126,6 +135,7 @@ class EvaluationView(QtWidgets.QWidget):
         # If the evaluation is already running, we abort it and reset
         #  the button label
         if self.evaluation_running:
+            self.evaluation_timer.stop()
             self.evaluation_abort.value = True
             self.evaluation_running = False
             self.button_evaluate.setText('Evaluate')
@@ -134,38 +144,42 @@ class EvaluationView(QtWidgets.QWidget):
         self.evaluation_abort.value = False
         self.evaluation_running = True
         self.button_evaluate.setText('Cancel')
+        self.evaluation_timer.start(500)
 
-        count = mp.Value('I', 0, lock=True)
-        max_count = mp.Value('i', 0, lock=True)
+        self.plot_count = 0
+        self.count = mp.Value('I', 0, lock=True)
+        self.max_count = mp.Value('i', 0, lock=True)
 
         dnkw = {
-            "count": count,
-            "max_count": max_count,
+            "count": self.count,
+            "max_count": self.max_count,
             "abort": self.evaluation_abort,
         }
 
-        thread = BGThread(func=self.evaluation_controller.evaluate, fkw=dnkw)
-        thread.start()
-        # Show a progress until computation is done
-        plot_count = 0
-        while (max_count.value == 0 or count.value < max_count.value
-               and not self.evaluation_abort.value):
-            time.sleep(.05)
-            self.evaluation_progress.setValue(count.value)
-            if max_count.value >= 0:
-                self.evaluation_progress.setMaximum(max_count.value)
-            # We refresh the image every twenty points to not slow down to much
-            if (count.value - plot_count) > 30:
-                plot_count = count.value
-                self.refresh_plot()
-            QtCore.QCoreApplication.instance().processEvents()
-        # make sure the thread finishes
-        thread.wait()
+        self.thread = BGThread(
+            func=self.evaluation_controller.evaluate, fkw=dnkw
+        )
+        self.thread.start()
 
-        self.evaluation_running = False
-        self.button_evaluate.setText('Evaluate')
+    def refresh_ui(self):
+        # If evaluation is aborted by user,
+        # couldn't start or is finished,
+        # we stop the timer
+        if self.evaluation_abort.value or\
+           self.max_count.value < 0 or\
+           self.count.value >= self.max_count.value:
+            self.evaluation_timer.stop()
+            self.evaluation_running = False
+            self.button_evaluate.setText('Evaluate')
 
-        self.refresh_plot()
+        if self.max_count.value >= 0:
+            self.evaluation_progress.setMaximum(self.max_count.value)
+        self.evaluation_progress.setValue(self.count.value)
+
+        # We refresh the image every thirty points to not slow down to much
+        if (self.count.value - self.plot_count) > 30:
+            self.plot_count = self.count.value
+            self.refresh_plot()
 
     def refresh_plot(self):
         session = Session.get_instance()
