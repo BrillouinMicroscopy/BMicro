@@ -150,7 +150,7 @@ class EvaluationView(QtWidgets.QWidget):
         plot_count = 0
         while (max_count.value == 0 or count.value < max_count.value
                and not self.evaluation_abort.value):
-            time.sleep(.25)
+            time.sleep(.05)
             self.evaluation_progress.setValue(count.value)
             if max_count.value >= 0:
                 self.evaluation_progress.setMaximum(max_count.value)
