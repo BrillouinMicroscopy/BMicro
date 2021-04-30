@@ -3,7 +3,7 @@ import pkg_resources
 import sys
 import logging
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 from bmicro.gui.main import BMicro
 from bmicro._version import version as __version__
@@ -25,20 +25,27 @@ def main():
     icon_path = os.path.join(imdir, "icon.png")
     app.setWindowIcon(QtGui.QIcon(icon_path))
 
-    main = BMicro()
-    main.show()
+    mw = BMicro()
+    mw.show()
 
+    # print version and exit
+    if "--version" in sys.argv:
+        print(__version__)
+        mw.close()
+        QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents,
+                                             1000)
+        sys.exit(0)
+
+    # set log level
     for arg in sys.argv:
-        if arg == '--version':
-            print(__version__)
-            QtWidgets.QApplication.processEvents()
-            sys.exit(0)
-        elif arg.startswith('--log='):
+        if arg.startswith('--log='):
             log_level = arg[6:]
             logging.basicConfig(level=log_level)
+            break
 
+    # load dataset
     if sys.argv[-1].endswith('.h5'):
-        main.open_file(sys.argv[-1])
+        mw.open_file(sys.argv[-1])
 
     sys.exit(app.exec_())
 
