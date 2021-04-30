@@ -47,7 +47,7 @@ jobs:
         pip freeze
     - name: Start application and print version
       run: |
-        QT_DEBUG_PLUGINS=1 python -m dcoraid --version
+        QT_DEBUG_PLUGINS=1 python -m bmicro --version
     - name: Test with pytest
       run: |
         coverage run --source=bmicro -m pytest tests
