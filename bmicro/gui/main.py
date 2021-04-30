@@ -4,7 +4,7 @@ import sys
 from PyQt5 import QtWidgets, uic, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
-from bmlab.session import Session
+# from bmlab.session import Session
 
 from .._version import version
 
@@ -101,9 +101,10 @@ class BMicro(QtWidgets.QMainWindow):
         if not file_name:
             return
 
-        session = Session.get_instance()
+        # session = Session.get_instance()
         try:
-            session.set_file(file_name)
+            pass
+            # session.set_file(file_name)
         except Exception:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
@@ -115,7 +116,7 @@ class BMicro(QtWidgets.QMainWindow):
         self.update_ui()
 
     def close_file(self):
-        Session.get_instance().clear()
+        # Session.get_instance().clear()
         self.update_ui()
 
     def update_ui(self):
@@ -138,4 +139,4 @@ class BMicro(QtWidgets.QMainWindow):
 
     def save_session(self):
         """ Save the session data to file with ending '.bms' """
-        Session.get_instance().save()
+        # Session.get_instance().save()
