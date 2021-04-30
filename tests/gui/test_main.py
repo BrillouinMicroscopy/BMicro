@@ -4,8 +4,9 @@ import os
 from PyQt5.QtWidgets import QWidget
 from PyQt5 import QtCore
 
+from bmlab.session import Session
+
 from bmicro.gui.main import BMicro, check_event_mime_data
-from bmicro.session import Session
 
 
 def data_file_path(file_name):
@@ -81,24 +82,24 @@ def test_check_event_mime_data():
 
 
 def test_save_and_load_session():
-    if os.path.exists(data_file_path('Water.bms')):
-        os.remove(data_file_path('Water.bms'))
+    if os.path.exists(data_file_path('Water.session.h5')):
+        os.remove(data_file_path('Water.session.h5'))
     session = Session.get_instance()
     session.set_file(data_file_path('Water.h5'))
     session.orientation.set_reflection(vertically=True)
-    session.extraction_models['0'].add_point('0', 30, 30)
+    session.extraction_models['0'].add_point('0', 10, 30, 30)
     session.save()
 
-    assert os.path.exists(data_file_path('Water.bms'))
+    assert os.path.exists(data_file_path('Water.session.h5'))
 
     session.clear()
 
     assert session.file is None
     assert session.extraction_models == {}
 
-    session.load(data_file_path('Water.bms'))
+    session.load(data_file_path('Water.session.h5'))
 
     assert session.file is not None
     assert len(session.extraction_models) == 1
 
-    os.remove(data_file_path('Water.bms'))
+    os.remove(data_file_path('Water.session.h5'))

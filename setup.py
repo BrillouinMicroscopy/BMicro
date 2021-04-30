@@ -45,9 +45,7 @@ setup(
                       "pyqtgraph",
                       "matplotlib"
                       ],
-    setup_requires=["pytest-runner"],  # required for pytest
     python_requires=">=3.6",
-    tests_require=["pytest", "pytest-qt", "pytest-mock"],
     keywords=["Brillouin Microscopy"],
     classifiers=['Operating System :: OS Independent',
                  'Programming Language :: Python :: 3',

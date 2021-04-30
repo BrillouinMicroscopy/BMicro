@@ -41,9 +41,9 @@ build: off
 
 test_script:
   - python -c "import bmicro; print(bmicro.__version__)"
-  - pip install coverage
-  - pip install codecov
-  - coverage run --source=bmicro ./setup.py test
+  - pip install coverage codecov
+  - pip install -r tests/requirements.txt
+  - coverage run --source=bmicro -m pytest tests
   - coverage report -m
   # Allow codecov to fail
   - codecov || exit 0

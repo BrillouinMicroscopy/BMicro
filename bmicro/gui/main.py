@@ -4,7 +4,7 @@ import os
 from PyQt5 import QtWidgets, uic, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
-from ..session import Session
+from bmlab.session import Session
 
 from . import data
 from . import extraction

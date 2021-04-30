@@ -47,7 +47,7 @@
          <property name="minimumSize">
           <size>
            <width>400</width>
-           <height>50</height>
+           <height>54</height>
           </size>
          </property>
          <property name="maximumSize">
@@ -84,11 +84,11 @@
           </item>
           <item>
            <widget class="QComboBox" name="combobox_calibration">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
             </property>
            </widget>
           </item>
@@ -99,6 +99,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="QPushButton" name="button_prev_frame">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>&lt;</string>
            </property>
@@ -106,6 +109,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="button_next_frame">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>&gt;</string>
            </property>
@@ -116,7 +122,7 @@
        <item>
         <widget class="QWidget" name="widget_Brillouin" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -133,7 +139,7 @@
            <height>16777215</height>
           </size>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -147,25 +153,32 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_Brillouin">
-            <property name="text">
-             <string>Brillouin peaks:</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <item>
+             <widget class="QLabel" name="label_Brillouin">
+              <property name="text">
+               <string>Brillouin peaks:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_brillouin_clear">
+              <property name="text">
+               <string>Clear</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_brillouin_select_done">
+              <property name="text">
+               <string>Select</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="button_brillouin_clear">
-            <property name="text">
-             <string>Clear</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="button_brillouin_select_done">
-            <property name="text">
-             <string>Select</string>
-            </property>
-           </widget>
+           <widget class="QTableWidget" name="table_Brillouin_regions"/>
           </item>
          </layout>
         </widget>
@@ -173,7 +186,7 @@
        <item>
         <widget class="QWidget" name="widget_Rayleigh" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -190,7 +203,7 @@
            <height>16777215</height>
           </size>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -204,25 +217,32 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_Rayleigh">
-            <property name="text">
-             <string>Rayleigh peaks:</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <item>
+             <widget class="QLabel" name="label_Rayleigh">
+              <property name="text">
+               <string>Rayleigh peaks:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_rayleigh_clear">
+              <property name="text">
+               <string>Clear</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_rayleigh_select_done">
+              <property name="text">
+               <string>Select</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="button_rayleigh_clear">
-            <property name="text">
-             <string>Clear</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="button_rayleigh_select_done">
-            <property name="text">
-             <string>Select</string>
-            </property>
-           </widget>
+           <widget class="QTableWidget" name="table_Rayleigh_regions"/>
           </item>
          </layout>
         </widget>
@@ -247,7 +267,7 @@
            <height>16777215</height>
           </size>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <layout class="QVBoxLayout" name="verticalLayout_5">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -261,25 +281,39 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_fit">
-            <property name="text">
-             <string>Fit:</string>
+           <widget class="QProgressBar" name="calibration_progress">
+            <property name="value">
+             <number>0</number>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="button_fit_clear">
-            <property name="text">
-             <string>Clear</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="button_calibrate">
-            <property name="text">
-             <string>Calibrate</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_fit">
+              <property name="text">
+               <string>Fit:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_fit_clear">
+              <property name="text">
+               <string>Clear</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="button_calibrate">
+              <property name="text">
+               <string>Calibrate</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>

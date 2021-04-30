@@ -4,10 +4,10 @@ import logging
 from PyQt5 import uic, QtWidgets
 import matplotlib
 
-from bmlab.model import AVAILABLE_SETUPS
+from bmlab.models.setup import AVAILABLE_SETUPS
+from bmlab.session import Session
 
 from bmicro.gui.mpl import MplCanvas
-from bmicro.session import Session
 
 
 import os
@@ -47,6 +47,9 @@ class DataView(QtWidgets.QWidget):
         self.combobox_setup.addItems([s.name for s in AVAILABLE_SETUPS])
         self.combobox_setup.currentIndexChanged.connect(
             self.on_select_setup)
+
+        # Initialize current setup to first entry
+        Session.get_instance().set_setup(AVAILABLE_SETUPS[0])
 
         self.update_ui()
 
@@ -186,4 +189,4 @@ class DataView(QtWidgets.QWidget):
             if s.name == name:
                 setup = s
                 break
-        session.setup = setup
+        session.set_setup(setup)

@@ -1,4 +1,5 @@
 0.1.3
+ - setup: use "pytest" command instead of deprecated "setup.py test"
  - ui: add app icon (#9)
  - ui: data tab (#11)
  - build: add Windows and macOS build pipeline (#1)

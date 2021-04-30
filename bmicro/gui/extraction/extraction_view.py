@@ -7,8 +7,8 @@ from matplotlib.patches import Circle as MPLCircle
 import matplotlib
 
 from bmlab.geometry import Circle, discretize_arc
+from bmlab.session import Session
 
-from bmicro.session import Session
 from bmicro.gui.mpl import MplCanvas
 
 
@@ -51,11 +51,13 @@ class ExtractionView(QtWidgets.QWidget):
         self.button_next_frame.clicked.connect(self.next_frame)
 
         self.update_ui()
+        self.checkFrameNavigationButtons()
 
     def prev_frame(self):
         if self.current_frame > 0:
             self.current_frame -= 1
         self.refresh_image_plot()
+        self.checkFrameNavigationButtons()
 
     def next_frame(self):
         session = Session.get_instance()
@@ -64,6 +66,7 @@ class ExtractionView(QtWidgets.QWidget):
         if self.current_frame < len(imgs) - 1:
             self.current_frame += 1
         self.refresh_image_plot()
+        self.checkFrameNavigationButtons()
 
     def update_ui(self):
         session = Session.get_instance()
@@ -74,10 +77,26 @@ class ExtractionView(QtWidgets.QWidget):
         calib_keys = session.current_repetition().calibration.image_keys()
         self.combobox_datasets.addItems(calib_keys)
 
+    def checkFrameNavigationButtons(self):
+        if self.current_frame > 0:
+            self.button_prev_frame.setEnabled(True)
+        else:
+            self.button_prev_frame.setEnabled(False)
+
+        session = Session.get_instance()
+        cal_key = self.combobox_datasets.currentText()
+        if cal_key:
+            imgs = session.current_repetition().calibration.get_image(cal_key)
+            if self.current_frame < len(imgs) - 1:
+                self.button_next_frame.setEnabled(True)
+            else:
+                self.button_next_frame.setEnabled(False)
+
     def on_select_dataset(self):
         """
         Action triggered when user selects a calibration dataset.
         """
+        self.checkFrameNavigationButtons()
         self.refresh_image_plot()
 
     def on_click_image(self, event):
@@ -96,7 +115,8 @@ class ExtractionView(QtWidgets.QWidget):
         logger.debug('Adding point (%f, %f) for calibration key %s' % (
             event.xdata, event.ydata, calib_key
         ))
-        session.extraction_model().add_point(calib_key, event.xdata,
+        time = self._get_image_time(calib_key)
+        session.extraction_model().add_point(calib_key, time, event.xdata,
                                              event.ydata)
         self.refresh_image_plot()
 
@@ -132,21 +152,15 @@ class ExtractionView(QtWidgets.QWidget):
 
             session.extraction_model().set_extraction_angles(calib_key, phis)
 
-            self._plot_extraction_lines(circle, phis, length=3)
+            arcs = session.extraction_model().get_arc_by_calib_key(calib_key)
+            for arc in arcs:
+                dr = arc[-1] - arc[0]
+                line = matplotlib.patches.FancyArrow(
+                    *arc[0], dr[0], dr[1], head_width=0,
+                    head_length=0, color='Yellow')
+                self.image_plot.add_patch(line)
 
         self.mplcanvas.draw()
-
-    def _plot_extraction_lines(self, circle, phis, length):
-        r = circle.radius
-        for phi in phis:
-            e_r = circle.e_r(phi)
-            start = (r-length) * e_r + circle.center
-            end = (r+length) * e_r + circle.center
-            dr = (end - start)
-            line = matplotlib.patches.FancyArrow(
-                *start, dr[0], dr[1], head_width=0,
-                head_length=0, color='Yellow')
-            self.image_plot.add_patch(line)
 
     def _plot_points(self, points):
         for p in points:
@@ -161,6 +175,12 @@ class ExtractionView(QtWidgets.QWidget):
         img = img[index, ...]
 
         return session.orientation.apply(img)
+
+    def _get_image_time(self, calib_key):
+
+        session = Session.get_instance()
+
+        return session.current_repetition().calibration.get_time(calib_key)
 
     def toggle_mode(self):
         """

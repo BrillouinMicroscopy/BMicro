@@ -130,3 +130,6 @@ dmypy.json
 _version_save.py
 .idea
 tests/data/Water.bms
+
+.DS_Store
+tmp*.h5
