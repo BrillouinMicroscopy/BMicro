@@ -16,7 +16,7 @@ from bmicro.BGThread import BGThread
 from bmicro.gui.mpl import MplCanvas
 
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 MODE_DEFAULT = 'default'
 MODE_SELECT_BRILLOUIN = 'select_brillouin_peaks'
@@ -269,6 +269,7 @@ class CalibrationView(QtWidgets.QWidget):
                                 spectrum), colors=['black'])
 
         except Exception as e:
+            logger = logging.getLogger(__name__)
             logger.error('Exception occurred in calibration: %s' % e)
         finally:
             self.mplcanvas.draw()

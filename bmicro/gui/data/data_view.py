@@ -1,5 +1,5 @@
 import pkg_resources
-import logging
+# import logging
 
 from PyQt5 import uic, QtWidgets
 import matplotlib
@@ -13,7 +13,7 @@ from bmicro.gui.mpl import MplCanvas
 import os
 
 matplotlib.use('Qt5Agg')
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 class DataView(QtWidgets.QWidget):

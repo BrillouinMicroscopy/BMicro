@@ -15,7 +15,7 @@ from bmicro.gui.mpl import MplCanvas
 MODE_DEFAULT = 0
 MODE_SELECT = 1
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 class ExtractionView(QtWidgets.QWidget):
@@ -112,6 +112,7 @@ class ExtractionView(QtWidgets.QWidget):
             return
         session = Session.get_instance()
         calib_key = self.combobox_datasets.currentText()
+        logger = logging.getLogger(__name__)
         logger.debug('Adding point (%f, %f) for calibration key %s' % (
             event.xdata, event.ydata, calib_key
         ))

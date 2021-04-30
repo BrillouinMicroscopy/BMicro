@@ -1,5 +1,5 @@
 import pkg_resources
-import logging
+# import logging
 import numpy as np
 
 from PyQt5 import QtWidgets, uic
@@ -13,7 +13,7 @@ from bmicro.gui.mpl import MplCanvas
 
 from bmlab.controllers.evaluation_controller import EvaluationController
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 class EvaluationView(QtWidgets.QWidget):

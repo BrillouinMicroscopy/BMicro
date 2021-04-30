@@ -10,7 +10,7 @@ from bmlab.session import Session
 
 from bmicro.gui.mpl import MplCanvas
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 MODE_DEFAULT = 'default'
 MODE_SELECT_BRILLOUIN = 'select_brillouin_peaks'
@@ -158,6 +158,7 @@ class PeakSelectionView(QtWidgets.QWidget):
                     spectrum, regions, table, 'm', frequencies)
 
         except Exception as e:
+            logger = logging.getLogger(__name__)
             logger.error('Exception occurred in peak selection: %s' % e)
         finally:
             self.mplcanvas.draw()
