@@ -50,7 +50,7 @@ jobs:
         # Display must be available globally for linux to know where xvfb is
         QT_DEBUG_PLUGINS: 1
       run: |
-        python -m dcoraid --version
+        python -m bmicro --version
     - name: Test with pytest
       run: |
         coverage run --source=bmicro setup.py test
