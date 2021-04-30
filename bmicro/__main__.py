@@ -28,14 +28,6 @@ def main():
     mw = BMicro()
     mw.show()
 
-    # print version and exit
-    if "--version" in sys.argv:
-        print(__version__)
-        mw.close()
-        QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents,
-                                             1000)
-        sys.exit(0)
-
     # set log level
     for arg in sys.argv:
         if arg.startswith('--log='):

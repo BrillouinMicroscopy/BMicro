@@ -1,9 +1,12 @@
 import pkg_resources
+import sys
 
 from PyQt5 import QtWidgets, uic, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 from bmlab.session import Session
+
+from .._version import version
 
 from . import data
 from . import extraction
@@ -38,6 +41,13 @@ class BMicro(QtWidgets.QMainWindow):
         ui_file = pkg_resources.resource_filename('bmicro.gui', 'main.ui')
         uic.loadUi(ui_file, self)
         QtCore.QCoreApplication.setApplicationName('BMicro')
+
+        # print version and exit
+        if "--version" in sys.argv:
+            print(version)
+            QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents,
+                                                 1000)
+            sys.exit(0)
 
         self.tabWidget.currentChanged.connect(self.update_ui)
         self.build_tabs()
