@@ -45,9 +45,12 @@ jobs:
         pip install -e .
         # show installed packages
         pip freeze
+    - name: Start application and print version
+      run: |
+        QT_DEBUG_PLUGINS=1 python -m dcoraid --version
     - name: Test with pytest
       run: |
-        coverage run --source=bmicro setup.py test
+        coverage run --source=bmicro -m pytest tests
     - name: Lint with flake8
       run: |
         flake8 .
