@@ -94,11 +94,7 @@ class BMicro(QtWidgets.QMainWindow):
 
         session = Session.get_instance()
         try:
-            bms_file_name = str(file_name)[:-3] + '.bms'
-            if os.path.exists(bms_file_name):
-                session.load(bms_file_name)
-            else:
-                session.set_file(file_name)
+            session.set_file(file_name)
         except Exception:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
