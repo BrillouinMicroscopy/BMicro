@@ -3,10 +3,9 @@ import pkg_resources
 import sys
 import logging
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtGui, QtWidgets
 
 from bmicro.gui.main import BMicro
-from bmicro._version import version as __version__
 
 import ctypes
 try:
