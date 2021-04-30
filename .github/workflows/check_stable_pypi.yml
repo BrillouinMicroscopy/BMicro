@@ -48,16 +48,16 @@ jobs:
     - name: Start application and print version
       run: |
         QT_DEBUG_PLUGINS=1 python -m bmicro --version
-    - name: Test with pytest
-      run: |
-        coverage run --source=bmicro -m pytest tests
-    - name: Lint with flake8
-      run: |
-        flake8 .
-    - name: Submit code coverage
-      run: |
-        coverage report -m
-        codecov
+#    - name: Test with pytest
+#      run: |
+#        coverage run --source=bmicro -m pytest tests
+#    - name: Lint with flake8
+#      run: |
+#        flake8 .
+#    - name: Submit code coverage
+#      run: |
+#        coverage report -m
+#        codecov
     - name: Create app and check if it runs (macOS)
       # For now, we disable this step for Python 3.9, because there is no
       # scipy wheel matching build-recipes/requirements.txt (this is the
