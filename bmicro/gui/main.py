@@ -1,5 +1,4 @@
 import pkg_resources
-import os
 
 from PyQt5 import QtWidgets, uic, QtCore
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
