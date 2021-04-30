@@ -3,5 +3,7 @@ pyinstaller>=4.2
 # Got the following error with matplotlib 3.4.1 on appveyor:
 # FileNotFoundError: [Errno 2] No such file or directory: 'C:\\projects\\bmicro\\build-recipes\\dist\\BMicro\\matplotlib\\mpl-data\\matplotlibrc'
 matplotlib==3.3.4
+# https://github.com/pyinstaller/pyinstaller/issues/5631
+pyqt5==5.15.3
 # pyinstaller is missing a hook for the latest release of scipy
 scipy<1.5.0

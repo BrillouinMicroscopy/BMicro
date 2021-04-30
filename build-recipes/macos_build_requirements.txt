@@ -1,5 +1,7 @@
 # Any additional requirements for building the application
 pyinstaller>=4.2
+# https://github.com/pyinstaller/pyinstaller/issues/5631
+pyqt5==5.15.3
 # pyinstaller is missing a hook for the latest release of scipy
 scipy<1.5.0
 
