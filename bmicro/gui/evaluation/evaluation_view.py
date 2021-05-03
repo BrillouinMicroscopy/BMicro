@@ -199,23 +199,36 @@ class EvaluationView(QtWidgets.QWidget):
         dimensionality, ns_dimensions = self.get_dimensionality(resolution)
 
         try:
-            # Average all non spatial dimensions
-            data = np.nanmean(data, axis=tuple(range(2, data.ndim)))
-
-            if self.image_map is None:
-                self.image_map = self.plot.imshow(
-                    data, interpolation='nearest'
+            # Average all non spatial dimensions and squeeze it
+            data = np.squeeze(
+                np.nanmean(
+                    data,
+                    axis=tuple(range(2, data.ndim))
                 )
-                self.colorbar =\
-                    self.mplcanvas.get_figure().colorbar(self.image_map)
-            else:
-                self.image_map.set_data(data)
+            )
+            if dimensionality == 0:
+                return
+            if dimensionality == 1:
+                return
+            if dimensionality == 2:
+                if self.image_map is None:
+                    self.image_map = self.plot.imshow(
+                        data, interpolation='nearest'
+                    )
+                    self.colorbar =\
+                        self.mplcanvas.get_figure().colorbar(self.image_map)
+                else:
+                    self.image_map.set_data(data)
 
-            self.image_map.set_clim(np.nanmin(data), np.nanmax(data))
-            self.plot.set_title(self.parameters[parameter_key]['label'])
-            cb_label = self.parameters[parameter_key]['symbol'] +\
-                ' [' + self.parameters[parameter_key]['unit'] + ']'
-            self.colorbar.ax.set_title(cb_label)
+                self.image_map.set_clim(np.nanmin(data), np.nanmax(data))
+                self.plot.set_title(self.parameters[parameter_key]['label'])
+                self.plot.set_xlabel(r'$' + ns_dimensions[0] + '$ [$\\mu$m]')
+                self.plot.set_ylabel(r'$' + ns_dimensions[1] + '$ [$\\mu$m]')
+                cb_label = self.parameters[parameter_key]['symbol'] +\
+                    ' [' + self.parameters[parameter_key]['unit'] + ']'
+                self.colorbar.ax.set_title(cb_label)
+            if dimensionality == 3:
+                return
             self.mplcanvas.draw()
         except Exception:
             pass
