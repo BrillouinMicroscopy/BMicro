@@ -32,6 +32,7 @@ class EvaluationView(QtWidgets.QWidget):
                                    toolbar=('Home', 'Pan', 'Zoom'))
         self.plot = self.mplcanvas.get_figure().add_subplot(111)
         self.image_map = None
+        self.colorbar = None
 
         self.button_evaluate.released.connect(self.evaluate)
 
@@ -201,10 +202,15 @@ class EvaluationView(QtWidgets.QWidget):
                 self.image_map = self.plot.imshow(
                     data, interpolation='nearest'
                 )
+                self.colorbar =\
+                    self.mplcanvas.get_figure().colorbar(self.image_map)
             else:
                 self.image_map.set_data(data)
             self.image_map.set_clim(np.nanmin(data), np.nanmax(data))
             self.plot.set_title(self.parameters[parameter_key]['label'])
+            cb_label = self.parameters[parameter_key]['symbol'] +\
+                ' [' + self.parameters[parameter_key]['unit'] + ']'
+            self.colorbar.ax.set_title(cb_label)
             self.mplcanvas.draw()
         except Exception:
             pass
