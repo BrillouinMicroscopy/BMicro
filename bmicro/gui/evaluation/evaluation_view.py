@@ -194,8 +194,12 @@ class EvaluationView(QtWidgets.QWidget):
         # TODO Adjust that for measurements of arbitrary orientations
         #  (currently assumes x-y-measurement)
         data = evm.results[parameter_key]
-        # Average all non spatial dimensions
+
+        resolution = session.current_repetition().payload.resolution
+        dimensionality, ns_dimensions = self.get_dimensionality(resolution)
+
         try:
+            # Average all non spatial dimensions
             data = np.nanmean(data, axis=tuple(range(2, data.ndim)))
 
             if self.image_map is None:
@@ -206,6 +210,7 @@ class EvaluationView(QtWidgets.QWidget):
                     self.mplcanvas.get_figure().colorbar(self.image_map)
             else:
                 self.image_map.set_data(data)
+
             self.image_map.set_clim(np.nanmin(data), np.nanmax(data))
             self.plot.set_title(self.parameters[parameter_key]['label'])
             cb_label = self.parameters[parameter_key]['symbol'] +\
@@ -214,3 +219,15 @@ class EvaluationView(QtWidgets.QWidget):
             self.mplcanvas.draw()
         except Exception:
             pass
+
+    @staticmethod
+    def get_dimensionality(resolution):
+        dimensionality = sum(np.array(resolution) > 1)
+        dimension_labels = ['x', 'y', 'z']
+
+        ns_dimensions = []
+        for ind, dim in enumerate(resolution):
+            if dim > 1:
+                ns_dimensions.append(dimension_labels[ind])
+
+        return dimensionality, ns_dimensions
