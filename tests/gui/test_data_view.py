@@ -30,7 +30,7 @@ def window(mocker):
 def test_clicking_rotate_updates_session(qtbot, window):
 
     session = Session.get_instance()
-    assert session.orientation.rotation == 1
+    assert session.orientation.rotation == 0
     qtbot.mouseClick(
         window.widget_data_view.radio_rotation_90_cw, QtCore.Qt.LeftButton)
     assert session.orientation.rotation == 3
