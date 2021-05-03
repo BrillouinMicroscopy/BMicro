@@ -97,7 +97,7 @@ def test_save_and_load_session():
     assert session.file is None
     assert session.extraction_models == {}
 
-    session.load(data_file_path('Water.session.h5'))
+    session.set_file(data_file_path('Water.h5'))
 
     assert session.file is not None
     assert len(session.extraction_models) == 1
