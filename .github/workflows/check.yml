@@ -35,8 +35,8 @@ jobs:
         python -m pip install --upgrade pip wheel
         python -m pip install codecov coverage flake8
         python -m pip install -r tests/requirements.txt
-        # install bmlab from same branch
-        pip install git+https://github.com/BrillouinMicroscopy/bmlab.git@${GITHUB_REF##*/}
+        # install bmlab from main branch
+        pip install git+https://github.com/BrillouinMicroscopy/bmlab.git@main
         # install dependencies
         pip install -e .
         # show installed packages
@@ -47,8 +47,8 @@ jobs:
         # prerequisites
         python -m pip install --upgrade pip wheel
         python -m pip install codecov coverage flake8 pytest
-        # install bmlab from same branch
-        pip install ("git+https://github.com/BrillouinMicroscopy/bmlab.git@" + $env:GITHUB_REF.replace('refs/heads/', ''))
+        # install bmlab from main branch
+        pip install ("git+https://github.com/BrillouinMicroscopy/bmlab.git@main")
         # install dependencies
         pip install -e .
         # show installed packages
