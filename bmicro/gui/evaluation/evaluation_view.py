@@ -123,7 +123,14 @@ class EvaluationView(QtWidgets.QWidget):
         return
 
     def reset_ui(self):
-        return
+        self.evaluation_progress.setValue(0)
+        self.plot.cla()
+        # This currently creates problems when opening another
+        # measurement afterwards, since the colorbar is not present.
+
+        # if self.colorbar is not None:
+        #     self.colorbar.remove()
+        self.mplcanvas.draw()
 
     def setup_parameter_selection_combobox(self):
 

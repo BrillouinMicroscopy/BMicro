@@ -63,7 +63,10 @@ class PeakSelectionView(QtWidgets.QWidget):
         self.refresh_plot()
 
     def reset_ui(self):
-        return
+        self.table_Brillouin_regions.setRowCount(0)
+        self.table_Rayleigh_regions.setRowCount(0)
+        self.plot.cla()
+        self.mplcanvas.draw()
 
     def on_select_brillouin_clicked(self):
         if self.mode == MODE_SELECT_BRILLOUIN:
