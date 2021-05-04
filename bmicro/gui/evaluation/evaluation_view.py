@@ -206,6 +206,12 @@ class EvaluationView(QtWidgets.QWidget):
                     axis=tuple(range(3, data.ndim))
                 )
             )
+            # Get the positions, subtract mean value, squeeze them
+            positions = session.current_repetition().payload.positions
+            for dim in {'x', 'y', 'z'}:
+                positions[dim] = np.squeeze(
+                    positions[dim] - np.nanmean(positions[dim])
+                )
             if dimensionality == 0:
                 return
             if dimensionality == 1:
@@ -214,14 +220,20 @@ class EvaluationView(QtWidgets.QWidget):
                 # We rotate the array so the x axis is shown as the
                 # horizontal axis
                 data = np.rot90(data)
+                pos_h = positions[ns_dimensions[0]]
+                pos_v = positions[ns_dimensions[1]]
+                extent = np.nanmin(pos_h), np.nanmax(pos_h),\
+                    np.nanmin(pos_v), np.nanmax(pos_v)
                 if self.image_map is None:
                     self.image_map = self.plot.imshow(
-                        data, interpolation='nearest'
+                        data, interpolation='nearest',
+                        extent=extent
                     )
                     self.colorbar =\
                         self.mplcanvas.get_figure().colorbar(self.image_map)
                 else:
                     self.image_map.set_data(data)
+                    self.image_map.set_extent(extent)
 
                 self.image_map.set_clim(np.nanmin(data), np.nanmax(data))
                 self.plot.set_title(self.parameters[parameter_key]['label'])
