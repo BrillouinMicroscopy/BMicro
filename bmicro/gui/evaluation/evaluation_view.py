@@ -214,7 +214,11 @@ class EvaluationView(QtWidgets.QWidget):
                     positions[dim] - np.nanmean(positions[dim])
                 )
             if dimensionality == 0:
-                return
+                if not isinstance(self.image_map, list):
+                    self.image_map = self.plot.plot(data)
+                else:
+                    self.image_map[0].set_data(data)
+                self.plot.set_title(self.parameters[parameter_key]['label'])
             if dimensionality == 1:
                 pos = positions[ns_dimensions[0]]
                 if not isinstance(self.image_map, list):
