@@ -211,6 +211,9 @@ class EvaluationView(QtWidgets.QWidget):
             if dimensionality == 1:
                 return
             if dimensionality == 2:
+                # We rotate the array so the x axis is shown as the
+                # horizontal axis
+                data = np.rot90(data)
                 if self.image_map is None:
                     self.image_map = self.plot.imshow(
                         data, interpolation='nearest'
