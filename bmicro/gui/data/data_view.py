@@ -54,11 +54,6 @@ class DataView(QtWidgets.QWidget):
         self.update_ui()
 
     def update_ui(self):
-        """
-        When a new file is selected, update the UI accordingly.
-        """
-        self.reset_ui()
-
         session = Session.get_instance()
         if not session.file:
             return
@@ -68,7 +63,12 @@ class DataView(QtWidgets.QWidget):
         self.label_selected_file.setToolTip(str(session.file.path))
         self.label_selected_file.adjustSize()
         rep_keys = session.file.repetition_keys()
-        self.comboBox_repetition.addItems(rep_keys)
+        # Update repetition keys if they have changed
+        current_keys = [self.comboBox_repetition.itemText(i)
+                        for i in range(self.comboBox_repetition.count())]
+        if current_keys != rep_keys:
+            self.comboBox_repetition.clear()
+            self.comboBox_repetition.addItems(rep_keys)
 
         if rep_keys and self.comboBox_repetition.currentText():
             repetition = session.current_repetition()
@@ -106,6 +106,9 @@ class DataView(QtWidgets.QWidget):
         self.label_resolution_z.setText('')
         self.label_calibration.setText('')
         self.textedit_comment.setText('')
+        self.radio_rotation_none.setChecked(True)
+        self.checkbox_reflect_vertically.setChecked(False)
+        self.checkbox_reflect_horizontally.setChecked(False)
         self.update_preview()
 
     def on_rotation_clicked(self):

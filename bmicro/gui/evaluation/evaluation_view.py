@@ -119,6 +119,19 @@ class EvaluationView(QtWidgets.QWidget):
         # Might not be necessary anymore once the plot is fast enough.
         self.plot_count = 0
 
+    def update_ui(self):
+        return
+
+    def reset_ui(self):
+        self.evaluation_progress.setValue(0)
+        self.plot.cla()
+        # This currently creates problems when opening another
+        # measurement afterwards, since the colorbar is not present.
+
+        # if self.colorbar is not None:
+        #     self.colorbar.remove()
+        self.mplcanvas.draw()
+
     def setup_parameter_selection_combobox(self):
 
         param_labels = []
