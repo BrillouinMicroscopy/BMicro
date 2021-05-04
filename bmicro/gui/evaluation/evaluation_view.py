@@ -203,7 +203,7 @@ class EvaluationView(QtWidgets.QWidget):
             data = np.squeeze(
                 np.nanmean(
                     data,
-                    axis=tuple(range(2, data.ndim))
+                    axis=tuple(range(3, data.ndim))
                 )
             )
             if dimensionality == 0:
