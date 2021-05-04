@@ -85,9 +85,15 @@ class CalibrationView(QtWidgets.QWidget):
 
         calib_keys = session.current_repetition().calibration.image_keys()
         self.combobox_calibration.addItems(calib_keys)
+        self.refresh_plot()
 
     def reset_ui(self):
-        return
+        self.table_Brillouin_regions.setRowCount(0)
+        self.table_Rayleigh_regions.setRowCount(0)
+        self.combobox_calibration.clear()
+        self.calibration_progress.setValue(0)
+        self.plot.cla()
+        self.mplcanvas.draw()
 
     def prev_frame(self):
         if self.current_frame > 0:

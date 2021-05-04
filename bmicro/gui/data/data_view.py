@@ -106,6 +106,9 @@ class DataView(QtWidgets.QWidget):
         self.label_resolution_z.setText('')
         self.label_calibration.setText('')
         self.textedit_comment.setText('')
+        self.radio_rotation_none.setChecked(True)
+        self.checkbox_reflect_vertically.setChecked(False)
+        self.checkbox_reflect_horizontally.setChecked(False)
         self.update_preview()
 
     def on_rotation_clicked(self):

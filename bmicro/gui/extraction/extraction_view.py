@@ -63,7 +63,8 @@ class ExtractionView(QtWidgets.QWidget):
         self.combobox_datasets.addItems(calib_keys)
 
     def reset_ui(self):
-        return
+        self.combobox_datasets.clear()
+        self.refresh_image_plot()
 
     def prev_frame(self):
         if self.current_frame > 0:
