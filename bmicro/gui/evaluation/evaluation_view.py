@@ -1,6 +1,7 @@
 import pkg_resources
 import logging
 import numpy as np
+import matplotlib
 
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QTimer
@@ -194,23 +195,83 @@ class EvaluationView(QtWidgets.QWidget):
         # TODO Adjust that for measurements of arbitrary orientations
         #  (currently assumes x-y-measurement)
         data = evm.results[parameter_key]
-        # Average all non spatial dimensions
-        try:
-            data = np.nanmean(data, axis=tuple(range(2, data.ndim)))
 
-            if self.image_map is None:
-                self.image_map = self.plot.imshow(
-                    data, interpolation='nearest'
+        resolution = session.current_repetition().payload.resolution
+        dimensionality, ns_dimensions = self.get_dimensionality(resolution)
+
+        try:
+            # Average all non spatial dimensions and squeeze it
+            data = np.squeeze(
+                np.nanmean(
+                    data,
+                    axis=tuple(range(3, data.ndim))
                 )
-                self.colorbar =\
-                    self.mplcanvas.get_figure().colorbar(self.image_map)
-            else:
-                self.image_map.set_data(data)
-            self.image_map.set_clim(np.nanmin(data), np.nanmax(data))
-            self.plot.set_title(self.parameters[parameter_key]['label'])
-            cb_label = self.parameters[parameter_key]['symbol'] +\
-                ' [' + self.parameters[parameter_key]['unit'] + ']'
-            self.colorbar.ax.set_title(cb_label)
+            )
+            # Get the positions, subtract mean value, squeeze them
+            positions = session.current_repetition().payload.positions
+            for dim in {'x', 'y', 'z'}:
+                positions[dim] = np.squeeze(
+                    positions[dim] - np.nanmean(positions[dim])
+                )
+            if dimensionality == 0:
+                if not isinstance(self.image_map, list):
+                    self.image_map = self.plot.plot(data)
+                else:
+                    self.image_map[0].set_data(data)
+                self.plot.set_title(self.parameters[parameter_key]['label'])
+            if dimensionality == 1:
+                pos = positions[ns_dimensions[0]]
+                if not isinstance(self.image_map, list):
+                    self.image_map = self.plot.plot(pos, data)
+                else:
+                    self.image_map[0].set_data(pos, data)
+                self.plot.set_title(self.parameters[parameter_key]['label'])
+                self.plot.set_xlabel(r'$' + ns_dimensions[0] + '$ [$\\mu$m]')
+                ylabel = self.parameters[parameter_key]['symbol'] +\
+                    ' [' + self.parameters[parameter_key]['unit'] + ']'
+                self.plot.set_ylabel(ylabel)
+                self.plot.set_xlim((np.nanmin(pos), np.nanmax(pos)))
+                self.plot.set_ylim((np.nanmin(data), np.nanmax(data)))
+            if dimensionality == 2:
+                # We rotate the array so the x axis is shown as the
+                # horizontal axis
+                data = np.rot90(data)
+                pos_h = positions[ns_dimensions[0]]
+                pos_v = positions[ns_dimensions[1]]
+                extent = np.nanmin(pos_h), np.nanmax(pos_h),\
+                    np.nanmin(pos_v), np.nanmax(pos_v)
+                if not isinstance(self.image_map, matplotlib.image.AxesImage):
+                    self.image_map = self.plot.imshow(
+                        data, interpolation='nearest',
+                        extent=extent
+                    )
+                    self.colorbar =\
+                        self.mplcanvas.get_figure().colorbar(self.image_map)
+                else:
+                    self.image_map.set_data(data)
+                    self.image_map.set_extent(extent)
+
+                self.image_map.set_clim(np.nanmin(data), np.nanmax(data))
+                self.plot.set_title(self.parameters[parameter_key]['label'])
+                self.plot.set_xlabel(r'$' + ns_dimensions[0] + '$ [$\\mu$m]')
+                self.plot.set_ylabel(r'$' + ns_dimensions[1] + '$ [$\\mu$m]')
+                cb_label = self.parameters[parameter_key]['symbol'] +\
+                    ' [' + self.parameters[parameter_key]['unit'] + ']'
+                self.colorbar.ax.set_title(cb_label)
+            if dimensionality == 3:
+                return
             self.mplcanvas.draw()
         except Exception:
             pass
+
+    @staticmethod
+    def get_dimensionality(resolution):
+        dimensionality = sum(np.array(resolution) > 1)
+        dimension_labels = ['x', 'y', 'z']
+
+        ns_dimensions = []
+        for ind, dim in enumerate(resolution):
+            if dim > 1:
+                ns_dimensions.append(dimension_labels[ind])
+
+        return dimensionality, ns_dimensions
