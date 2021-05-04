@@ -119,6 +119,12 @@ class EvaluationView(QtWidgets.QWidget):
         # Might not be necessary anymore once the plot is fast enough.
         self.plot_count = 0
 
+    def update_ui(self):
+        return
+
+    def reset_ui(self):
+        return
+
     def setup_parameter_selection_combobox(self):
 
         param_labels = []

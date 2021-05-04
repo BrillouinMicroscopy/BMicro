@@ -48,6 +48,8 @@ class BMicro(QtWidgets.QMainWindow):
 
         self.setAcceptDrops(True)
 
+        self.reset_ui()
+
     def build_tabs(self):
         self.widget_data_view = data.DataView(self)
         self.layout_data = QtWidgets.QVBoxLayout()
@@ -106,12 +108,38 @@ class BMicro(QtWidgets.QMainWindow):
 
     def close_file(self):
         Session.get_instance().clear()
-        self.update_ui()
+        self.reset_ui()
 
-    def update_ui(self):
-        self.widget_data_view.update_ui()
-        self.widget_extraction_view.update_ui()
-        self.widget_calibration_view.update_ui()
+    def reset_ui(self):
+        """
+        Resets the UI if a file is closed.
+        """
+        self.widget_data_view.reset_ui()
+        self.widget_extraction_view.reset_ui()
+        self.widget_calibration_view.reset_ui()
+        self.widget_peak_selection_view.reset_ui()
+        self.widget_evaluation_view.reset_ui()
+
+    def update_ui(self, new_tab_index=-1):
+        # If no tab index is specified, we update all tabs
+        # (e.g. when a new file is opened).
+        # Otherwise, we only update the newly selected tab.
+        if new_tab_index == -1:
+            self.widget_data_view.update_ui()
+            self.widget_extraction_view.update_ui()
+            self.widget_calibration_view.update_ui()
+            self.widget_peak_selection_view.update_ui()
+            self.widget_evaluation_view.update_ui()
+        elif new_tab_index == 0:
+            self.widget_data_view.update_ui()
+        elif new_tab_index == 1:
+            self.widget_extraction_view.update_ui()
+        elif new_tab_index == 2:
+            self.widget_calibration_view.update_ui()
+        elif new_tab_index == 3:
+            self.widget_peak_selection_view.update_ui()
+        elif new_tab_index == 4:
+            self.widget_evaluation_view.update_ui()
 
     def drag_enter_event(self, event):
         """ Handles dragging a file over the GUI """

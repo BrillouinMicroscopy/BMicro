@@ -57,7 +57,13 @@ class PeakSelectionView(QtWidgets.QWidget):
 
         self.setupTables()
 
+        self.update_ui()
+
+    def update_ui(self):
         self.refresh_plot()
+
+    def reset_ui(self):
+        return
 
     def on_select_brillouin_clicked(self):
         if self.mode == MODE_SELECT_BRILLOUIN:
