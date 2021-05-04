@@ -42,61 +42,73 @@ class EvaluationView(QtWidgets.QWidget):
                 'unit': 'GHz',
                 'symbol': r'$\nu_\mathrm{B}$',
                 'label': 'Brillouin frequency shift',
+                'scaling': 1e-9,
             },
             'brillouin_shift': {            # [pix] Brillouin frequency shift
                 'unit': 'pix',
                 'symbol': r'$\nu_\mathrm{B}$',
-                'label': 'Brillouin frequency shift'
+                'label': 'Brillouin frequency shift',
+                'scaling': 1,
             },
             'brillouin_peak_fwhm_f': {      # [GHz] Brillouin peak FWHM
                 'unit': 'GHz',
                 'symbol': r'$\Delta_\mathrm{B}$',
                 'label': 'Brillouin peak width',
+                'scaling': 1e-9,
             },
             'brillouin_peak_fwhm': {        # [pix] Brillouin peak FWHM
                 'unit': 'pix',
                 'symbol': r'$\Delta_\mathrm{B}$',
                 'label': 'Brillouin peak width',
+                'scaling': 1,
             },
             'brillouin_peak_position': {    # [pix] Brillouin peak position
                 'unit': 'pix',
                 'symbol': r'$s_\mathrm{B}$',
                 'label': 'Brillouin peak position',
+                'scaling': 1,
             },
             'brillouin_peak_intensity': {   # [a.u.] Brillouin peak intensity
                 'unit': 'a.u.',
                 'symbol': r'$I_\mathrm{B}$',
                 'label': 'Brillouin peak intensity',
+                'scaling': 1,
             },
             'rayleigh_peak_fwhm_f': {       # [GHz] Rayleigh peak FWHM
                 'unit': 'GHz',
                 'symbol': r'$\Delta_\mathrm{R}$',
-                'label': 'Rayleigh peak width'
+                'label': 'Rayleigh peak width',
+                'scaling': 1e-9,
             },
             'rayleigh_peak_fwhm': {         # [pix] Rayleigh peak FWHM
                 'unit': 'pix',
                 'symbol': r'$\Delta_\mathrm{R}$',
-                'label': 'Rayleigh peak width'
+                'label': 'Rayleigh peak width',
+                'scaling': 1,
             },
             'rayleigh_peak_position': {     # [pix] Rayleigh peak position
                 'unit': 'pix',
                 'symbol': r'$s_\mathrm{R}$',
-                'label': 'Rayleigh peak position'
+                'label': 'Rayleigh peak position',
+                'scaling': 1,
             },
             'rayleigh_peak_intensity': {    # [a.u.] Rayleigh peak intensity
                 'unit': 'a.u.',
                 'symbol': r'$I_\mathrm{R}$',
-                'label': 'Rayleigh peak intensity'
+                'label': 'Rayleigh peak intensity',
+                'scaling': 1,
             },
             'intensity': {                  # [a.u.] Overall intensity of image
                 'unit': 'a.u.',
                 'symbol': r'$I_\mathrm{total}$',
-                'label': 'Intensity'
+                'label': 'Intensity',
+                'scaling': 1,
             },
             'time': {                       # [s] The time the measurement
                 'unit': 's',                # point was taken at
                 'symbol': r'$t$',
-                'label': 'Time'
+                'label': 'Time',
+                'scaling': 1,
             },
         }
 
@@ -220,6 +232,8 @@ class EvaluationView(QtWidgets.QWidget):
                     axis=tuple(range(3, data.ndim))
                 )
             )
+            # Scale the date in case of GHz
+            data = self.parameters[parameter_key]['scaling'] * data
             # Get the positions, subtract mean value, squeeze them
             positions = session.current_repetition().payload.positions
             for dim in {'x', 'y', 'z'}:
