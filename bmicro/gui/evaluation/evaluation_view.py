@@ -1,6 +1,7 @@
 import pkg_resources
 import logging
 import numpy as np
+import matplotlib
 
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QTimer
@@ -215,7 +216,18 @@ class EvaluationView(QtWidgets.QWidget):
             if dimensionality == 0:
                 return
             if dimensionality == 1:
-                return
+                pos = positions[ns_dimensions[0]]
+                if not isinstance(self.image_map, list):
+                    self.image_map = self.plot.plot(pos, data)
+                else:
+                    self.image_map[0].set_data(pos, data)
+                self.plot.set_title(self.parameters[parameter_key]['label'])
+                self.plot.set_xlabel(r'$' + ns_dimensions[0] + '$ [$\\mu$m]')
+                ylabel = self.parameters[parameter_key]['symbol'] +\
+                    ' [' + self.parameters[parameter_key]['unit'] + ']'
+                self.plot.set_ylabel(ylabel)
+                self.plot.set_xlim((np.nanmin(pos), np.nanmax(pos)))
+                self.plot.set_ylim((np.nanmin(data), np.nanmax(data)))
             if dimensionality == 2:
                 # We rotate the array so the x axis is shown as the
                 # horizontal axis
@@ -224,7 +236,7 @@ class EvaluationView(QtWidgets.QWidget):
                 pos_v = positions[ns_dimensions[1]]
                 extent = np.nanmin(pos_h), np.nanmax(pos_h),\
                     np.nanmin(pos_v), np.nanmax(pos_v)
-                if self.image_map is None:
+                if not isinstance(self.image_map, matplotlib.image.AxesImage):
                     self.image_map = self.plot.imshow(
                         data, interpolation='nearest',
                         extent=extent
