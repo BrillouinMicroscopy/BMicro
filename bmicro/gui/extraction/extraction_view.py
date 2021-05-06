@@ -216,7 +216,6 @@ class ExtractionView(QtWidgets.QWidget):
         maximum values.
         """
         calib_key = self.combobox_datasets.currentText()
-        img = self._get_image_data(calib_key)
         ec = ExtractionController()
-        ec.optimize_points(calib_key, img)
+        ec.optimize_points(calib_key)
         self.refresh_image_plot()
