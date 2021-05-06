@@ -10,7 +10,7 @@ import time
 
 from bmlab.session import Session
 
-from bmlab.controllers.calibration_controller import CalibrationController
+from bmlab.controllers import CalibrationController, ExtractionController
 
 from bmicro.BGThread import BGThread
 from bmicro.gui.mpl import MplCanvas
@@ -212,7 +212,8 @@ class CalibrationView(QtWidgets.QWidget):
             return
 
         try:
-            spectrum = session.extract_calibration_spectrum(
+            ec = ExtractionController()
+            spectrum = ec.extract_calibration_spectrum(
                 calib_key,
                 frame_num=self.current_frame
             )

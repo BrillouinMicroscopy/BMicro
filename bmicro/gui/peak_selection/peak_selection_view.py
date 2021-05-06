@@ -7,6 +7,7 @@ from matplotlib.widgets import SpanSelector
 import numpy as np
 
 from bmlab.session import Session
+from bmlab.controllers import EvaluationController
 
 from bmicro.gui.mpl import MplCanvas
 
@@ -124,10 +125,11 @@ class PeakSelectionView(QtWidgets.QWidget):
     def refresh_plot(self):
         self.plot.cla()
         session = Session.get_instance()
+        evc = EvaluationController()
 
         try:
             image_key = '0'
-            spectrum, times, _ = session.extract_payload_spectrum(
+            spectrum, times, _ = evc.extract_payload_spectrum(
                 image_key
             )
             if spectrum is None:

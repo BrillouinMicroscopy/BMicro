@@ -12,7 +12,7 @@ from bmlab.session import Session
 from bmicro.BGThread import BGThread
 from bmicro.gui.mpl import MplCanvas
 
-from bmlab.controllers.evaluation_controller import EvaluationController
+from bmlab.controllers import EvaluationController
 
 logger = logging.getLogger(__name__)
 
