@@ -8,6 +8,7 @@ import matplotlib
 
 from bmlab.geometry import Circle, discretize_arc
 from bmlab.session import Session
+from bmlab.controllers import ExtractionController
 
 from bmicro.gui.mpl import MplCanvas
 
@@ -217,5 +218,6 @@ class ExtractionView(QtWidgets.QWidget):
         calib_key = self.combobox_datasets.currentText()
         session = Session.get_instance()
         img = self._get_image_data(calib_key)
-        session.extraction_model().optimize_points(calib_key, img)
+        ec = ExtractionController()
+        ec.optimize_points(calib_key, img)
         self.refresh_image_plot()
