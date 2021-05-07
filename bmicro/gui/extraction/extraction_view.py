@@ -6,7 +6,6 @@ from matplotlib.patches import Circle as MPLCircle
 
 import matplotlib
 
-from bmlab.geometry import Circle, discretize_arc
 from bmlab.session import Session
 from bmlab.controllers import ExtractionController
 
@@ -115,14 +114,13 @@ class ExtractionView(QtWidgets.QWidget):
         """
         if self.mode != MODE_SELECT:
             return
-        session = Session.get_instance()
+        ec = ExtractionController()
         calib_key = self.combobox_datasets.currentText()
         logger.debug('Adding point (%f, %f) for calibration key %s' % (
             event.xdata, event.ydata, calib_key
         ))
-        time = self._get_image_time(calib_key)
-        session.extraction_model().add_point(calib_key, time, event.xdata,
-                                             event.ydata)
+        ec.add_point(calib_key,
+                     (event.xdata, event.ydata))
         self.refresh_image_plot()
 
     def refresh_image_plot(self):
@@ -136,7 +134,8 @@ class ExtractionView(QtWidgets.QWidget):
             self.mplcanvas.draw()
             return
 
-        img = self._get_image_data(calib_key, index=self.current_frame)
+        em = session.extraction_model()
+        img = session.get_calibration_image(calib_key, self.current_frame)
 
         # imshow should always get the transposed image such that
         # the horizontal axis of the plot coincides with the
@@ -144,20 +143,14 @@ class ExtractionView(QtWidgets.QWidget):
         self.image_plot.imshow(img.T, origin='lower', vmin=100, vmax=300)
         self.image_plot.set_title('Frame %d' % (self.current_frame+1))
 
-        self._plot_points(session.extraction_model().get_points(calib_key))
+        self._plot_points(em.get_points(calib_key))
 
-        circle_fit = session.extraction_model().get_circle_fit(calib_key)
+        circle_fit = em.get_circle_fit(calib_key)
 
         if circle_fit:
-            center, radius = circle_fit
-            self.image_plot.add_patch(
-                MPLCircle(center, radius, color='yellow', fill=False))
-            circle = Circle(center, radius)
-            phis = discretize_arc(circle, img.shape, num_points=500)
+            em.set_image_shape(img.shape)
 
-            session.extraction_model().set_extraction_angles(calib_key, phis)
-
-            arcs = session.extraction_model().get_arc_by_calib_key(calib_key)
+            arcs = em.get_arc_by_calib_key(calib_key)
             for arc in arcs:
                 dr = arc[-1] - arc[0]
                 line = matplotlib.patches.FancyArrow(
@@ -171,21 +164,6 @@ class ExtractionView(QtWidgets.QWidget):
         for p in points:
             circle = MPLCircle(p, radius=3, color='red')
             self.image_plot.add_patch(circle)
-
-    def _get_image_data(self, calib_key, index=0):
-
-        session = Session.get_instance()
-
-        img = session.current_repetition().calibration.get_image(calib_key)
-        img = img[index, ...]
-
-        return session.orientation.apply(img)
-
-    def _get_image_time(self, calib_key):
-
-        session = Session.get_instance()
-
-        return session.current_repetition().calibration.get_time(calib_key)
 
     def toggle_mode(self):
         """
@@ -216,7 +194,6 @@ class ExtractionView(QtWidgets.QWidget):
         maximum values.
         """
         calib_key = self.combobox_datasets.currentText()
-        img = self._get_image_data(calib_key)
         ec = ExtractionController()
-        ec.optimize_points(calib_key, img)
+        ec.optimize_points(calib_key)
         self.refresh_image_plot()
