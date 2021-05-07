@@ -154,10 +154,8 @@ class DataView(QtWidgets.QWidget):
 
         if rep and rep.payload.image_keys():
             first_key = rep.payload.image_keys()[0]
-            images = rep.payload.get_image(first_key)
+            images = session.get_payload_image(first_key)
             img = images[0, ...]
-
-            img = session.orientation.apply(img)
 
             self.preview.clear()
 

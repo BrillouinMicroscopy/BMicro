@@ -176,10 +176,8 @@ class ExtractionView(QtWidgets.QWidget):
 
         session = Session.get_instance()
 
-        img = session.current_repetition().calibration.get_image(calib_key)
-        img = img[index, ...]
-
-        return session.orientation.apply(img)
+        img = session.get_calibration_image(calib_key)
+        return img[index, ...]
 
     def _get_image_time(self, calib_key):
 
