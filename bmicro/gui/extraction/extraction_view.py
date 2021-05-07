@@ -135,8 +135,7 @@ class ExtractionView(QtWidgets.QWidget):
             self.mplcanvas.draw()
             return
 
-        imgs = session.get_calibration_image(calib_key)
-        img = imgs[self.current_frame, ...]
+        img = session.get_calibration_image(calib_key, self.current_frame)
 
         # imshow should always get the transposed image such that
         # the horizontal axis of the plot coincides with the
