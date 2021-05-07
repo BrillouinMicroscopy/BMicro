@@ -115,14 +115,13 @@ class ExtractionView(QtWidgets.QWidget):
         """
         if self.mode != MODE_SELECT:
             return
-        session = Session.get_instance()
+        ec = ExtractionController()
         calib_key = self.combobox_datasets.currentText()
         logger.debug('Adding point (%f, %f) for calibration key %s' % (
             event.xdata, event.ydata, calib_key
         ))
-        time = self._get_image_time(calib_key)
-        session.extraction_model().add_point(calib_key, time, event.xdata,
-                                             event.ydata)
+        ec.add_point(calib_key,
+                     (event.xdata, event.ydata))
         self.refresh_image_plot()
 
     def refresh_image_plot(self):
@@ -136,7 +135,8 @@ class ExtractionView(QtWidgets.QWidget):
             self.mplcanvas.draw()
             return
 
-        img = self._get_image_data(calib_key, index=self.current_frame)
+        imgs = session.get_calibration_image(calib_key)
+        img = imgs[self.current_frame, ...]
 
         # imshow should always get the transposed image such that
         # the horizontal axis of the plot coincides with the
@@ -171,19 +171,6 @@ class ExtractionView(QtWidgets.QWidget):
         for p in points:
             circle = MPLCircle(p, radius=3, color='red')
             self.image_plot.add_patch(circle)
-
-    def _get_image_data(self, calib_key, index=0):
-
-        session = Session.get_instance()
-
-        img = session.get_calibration_image(calib_key)
-        return img[index, ...]
-
-    def _get_image_time(self, calib_key):
-
-        session = Session.get_instance()
-
-        return session.current_repetition().calibration.get_time(calib_key)
 
     def toggle_mode(self):
         """
