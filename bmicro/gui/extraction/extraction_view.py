@@ -6,7 +6,6 @@ from matplotlib.patches import Circle as MPLCircle
 
 import matplotlib
 
-from bmlab.geometry import Circle, discretize_arc
 from bmlab.session import Session
 from bmlab.controllers import ExtractionController
 
@@ -135,6 +134,7 @@ class ExtractionView(QtWidgets.QWidget):
             self.mplcanvas.draw()
             return
 
+        em = session.extraction_model()
         img = session.get_calibration_image(calib_key, self.current_frame)
 
         # imshow should always get the transposed image such that
@@ -143,20 +143,14 @@ class ExtractionView(QtWidgets.QWidget):
         self.image_plot.imshow(img.T, origin='lower', vmin=100, vmax=300)
         self.image_plot.set_title('Frame %d' % (self.current_frame+1))
 
-        self._plot_points(session.extraction_model().get_points(calib_key))
+        self._plot_points(em.get_points(calib_key))
 
-        circle_fit = session.extraction_model().get_circle_fit(calib_key)
+        circle_fit = em.get_circle_fit(calib_key)
 
         if circle_fit:
-            center, radius = circle_fit
-            self.image_plot.add_patch(
-                MPLCircle(center, radius, color='yellow', fill=False))
-            circle = Circle(center, radius)
-            phis = discretize_arc(circle, img.shape, num_points=500)
+            em.set_image_shape(img.shape)
 
-            session.extraction_model().set_extraction_angles(calib_key, phis)
-
-            arcs = session.extraction_model().get_arc_by_calib_key(calib_key)
+            arcs = em.get_arc_by_calib_key(calib_key)
             for arc in arcs:
                 dr = arc[-1] - arc[0]
                 line = matplotlib.patches.FancyArrow(
