@@ -86,7 +86,7 @@ def test_save_and_load_session():
         os.remove(data_file_path('Water.session.h5'))
     session = Session.get_instance()
     session.set_file(data_file_path('Water.h5'))
-    session.orientation.set_reflection(vertically=True)
+    session.set_reflection(vertically=True)
     session.extraction_models['0'].add_point('0', 10, 30, 30)
     session.save()
 
