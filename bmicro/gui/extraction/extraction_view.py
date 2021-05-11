@@ -5,6 +5,7 @@ from PyQt5 import QtWidgets, uic
 from matplotlib.patches import Circle as MPLCircle
 
 import matplotlib
+import numpy as np
 
 from bmlab.session import Session
 from bmlab.controllers import ExtractionController
@@ -43,6 +44,11 @@ class ExtractionView(QtWidgets.QWidget):
         self.combobox_datasets.currentIndexChanged.connect(
             self.on_select_dataset)
 
+        self.table_selected_points.itemChanged.connect(
+            lambda item: self.on_points_changed(item))
+
+        self.setupTable()
+
         self.button_select_done.clicked.connect(self.toggle_mode)
         self.button_clear.clicked.connect(self.clear_points)
         self.button_optimize.clicked.connect(self.optimize_points)
@@ -64,6 +70,7 @@ class ExtractionView(QtWidgets.QWidget):
 
     def reset_ui(self):
         self.combobox_datasets.clear()
+        self.table_selected_points.setRowCount(0)
         self.refresh_image_plot()
 
     def prev_frame(self):
@@ -159,6 +166,52 @@ class ExtractionView(QtWidgets.QWidget):
                 self.image_plot.add_patch(line)
 
         self.mplcanvas.draw()
+        self.refresh_points()
+
+    def setupTable(self):
+        self.table_selected_points.setColumnCount(2)
+        self.table_selected_points\
+            .setHorizontalHeaderLabels(["x", "y"])
+        header = self.table_selected_points.horizontalHeader()
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+
+    def refresh_points(self):
+        session = Session.get_instance()
+        em = session.extraction_model()
+        calib_key = self.combobox_datasets.currentText()
+        if not calib_key:
+            return
+        if em:
+            points = em.get_points(calib_key)
+            self.table_selected_points.setRowCount(len(points))
+            for rowIdx, point in enumerate(points):
+                # Add regions to table
+                # Block signals, so the itemChanged signal is not
+                # emitted during table creation
+                self.table_selected_points.blockSignals(True)
+                for columnIdx, value in enumerate(point):
+                    item = QtWidgets.QTableWidgetItem(str(value))
+                    self.table_selected_points.setItem(rowIdx, columnIdx, item)
+                self.table_selected_points.blockSignals(False)
+
+    def on_points_changed(self, item):
+        row = item.row()
+        column = item.column()
+        value = float(item.text())
+
+        session = Session.get_instance()
+        calib_key = self.combobox_datasets.currentText()
+
+        em = session.extraction_model()
+        ec = ExtractionController()
+        if em:
+            points = em.get_points(calib_key)
+            current_point = np.asarray(points[row])
+            current_point[column] = value
+            current_point = tuple(current_point)
+            ec.set_point(calib_key, row, current_point)
+            self.refresh_image_plot()
 
     def _plot_points(self, points):
         for p in points:

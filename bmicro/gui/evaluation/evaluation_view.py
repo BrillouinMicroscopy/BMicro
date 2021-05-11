@@ -171,7 +171,7 @@ class EvaluationView(QtWidgets.QWidget):
         self.evaluation_abort.value = False
         self.evaluation_running = True
         self.button_evaluate.setText('Cancel')
-        self.evaluation_timer.start(200)
+        self.evaluation_timer.start(500)
 
         self.plot_count = 0
         self.count = mp.Value('I', 0, lock=True)
