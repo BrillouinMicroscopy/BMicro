@@ -133,7 +133,7 @@ class EvaluationView(QtWidgets.QWidget):
         self.plot_count = 0
 
     def update_ui(self):
-        return
+        self.refresh_plot()
 
     def reset_ui(self):
         self.evaluation_progress.setValue(0)
