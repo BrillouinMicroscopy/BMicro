@@ -2,6 +2,7 @@ import pkg_resources
 import logging
 import numpy as np
 import matplotlib
+import warnings
 
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QTimer
@@ -226,12 +227,18 @@ class EvaluationView(QtWidgets.QWidget):
 
         try:
             # Average all non spatial dimensions and squeeze it
-            data = np.squeeze(
-                np.nanmean(
-                    data,
-                    axis=tuple(range(3, data.ndim))
+            # Don't show warning which occurs when a slice contains only NaNs
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    action='ignore',
+                    message='Mean of empty slice'
                 )
-            )
+                data = np.squeeze(
+                    np.nanmean(
+                        data,
+                        axis=tuple(range(3, data.ndim))
+                    )
+                )
             # Scale the date in case of GHz
             data = self.parameters[parameter_key]['scaling'] * data
             # Get the positions, subtract mean value, squeeze them
