@@ -163,10 +163,8 @@ class EvaluationView(QtWidgets.QWidget):
         # If the evaluation is already running, we abort it and reset
         #  the button label
         if self.evaluation_running:
-            self.evaluation_timer.stop()
             self.evaluation_abort.value = True
-            self.evaluation_running = False
-            self.button_evaluate.setText('Evaluate')
+            self.refresh_ui()
             return
 
         self.evaluation_abort.value = False
