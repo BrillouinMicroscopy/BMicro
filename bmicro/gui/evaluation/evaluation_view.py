@@ -285,7 +285,15 @@ class EvaluationView(QtWidgets.QWidget):
                     self.image_map.set_data(data)
                     self.image_map.set_extent(extent)
 
-                self.image_map.set_clim(np.nanmin(data), np.nanmax(data))
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        action='ignore',
+                        message='All-NaN slice encountered'
+                    )
+                    value_min = np.nanmin(data)
+                    value_max = np.nanmax(data)
+                    if value_min < value_max:
+                        self.image_map.set_clim(value_min, value_max)
                 self.plot.set_title(self.parameters[parameter_key]['label'])
                 self.plot.set_xlabel(r'$' + ns_dimensions[0] + '$ [$\\mu$m]')
                 self.plot.set_ylabel(r'$' + ns_dimensions[1] + '$ [$\\mu$m]')
