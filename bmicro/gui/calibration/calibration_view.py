@@ -243,12 +243,12 @@ class CalibrationView(QtWidgets.QWidget):
                 if frequencies:
                     frequency = 1e-9*frequencies[self.current_frame]
                     self.plot.plot(frequency, spectrum)
-                    self.plot.set_xlabel('f [GHz]')
+                    self.plot.set_xlabel('$f$ [GHz]')
                     self.plot.set_xlim(1e-9*np.min(frequencies),
                                        1e-9*np.max(frequencies))
                 else:
                     self.plot.plot(spectrum)
-                    self.plot.set_xlabel('pixels')
+                    self.plot.set_xlabel('$f$ [pix]')
                     self.plot.set_xlim(0, len(spectrum))
                 self.plot.set_ylim(bottom=0)
                 self.plot.set_title('Frame %d' %

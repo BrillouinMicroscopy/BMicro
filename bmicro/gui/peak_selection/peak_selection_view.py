@@ -149,12 +149,12 @@ class PeakSelectionView(QtWidgets.QWidget):
                 frequencies = cm.get_frequencies_by_time(time)
                 if frequencies is not None:
                     self.plot.plot(1e-9*frequencies, spectrum)
-                    self.plot.set_xlabel('f [GHz]')
+                    self.plot.set_xlabel('$f$ [GHz]')
                     self.plot.set_xlim(1e-9*np.min(frequencies),
                                        1e-9*np.max(frequencies))
                 else:
                     self.plot.plot(spectrum)
-                    self.plot.set_xlabel('pixels')
+                    self.plot.set_xlabel('$f$ [pix]')
                     self.plot.set_xlim(0, len(spectrum))
                 self.plot.set_ylim(bottom=0)
 
