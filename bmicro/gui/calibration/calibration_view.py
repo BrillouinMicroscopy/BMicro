@@ -99,14 +99,31 @@ class CalibrationView(QtWidgets.QWidget):
         if self.current_frame > 0:
             self.current_frame -= 1
             self.refresh_plot()
+            self.checkFrameNavigationButtons()
 
     def next_frame(self):
-        calib_key = self.combobox_calibration.currentText()
         session = Session.get_instance()
-        imgs = session.current_repetition().calibration.get_image(calib_key)
+        calib_key = self.combobox_calibration.currentText()
+        imgs = session.get_calibration_image(calib_key)
         if self.current_frame < len(imgs) - 1:
             self.current_frame += 1
             self.refresh_plot()
+            self.checkFrameNavigationButtons()
+
+    def checkFrameNavigationButtons(self):
+        if self.current_frame > 0:
+            self.button_prev_frame.setEnabled(True)
+        else:
+            self.button_prev_frame.setEnabled(False)
+
+        session = Session.get_instance()
+        calib_key = self.combobox_calibration.currentText()
+        if calib_key:
+            imgs = session.get_calibration_image(calib_key)
+            if self.current_frame < len(imgs) - 1:
+                self.button_next_frame.setEnabled(True)
+            else:
+                self.button_next_frame.setEnabled(False)
 
     def clear_fits(self):
         session = Session.get_instance()
@@ -176,6 +193,7 @@ class CalibrationView(QtWidgets.QWidget):
         self.refresh_plot()
 
     def on_select_calibration(self):
+        self.checkFrameNavigationButtons()
         self.refresh_plot()
 
     def calibrate(self):

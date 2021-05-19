@@ -76,17 +76,17 @@ class ExtractionView(QtWidgets.QWidget):
     def prev_frame(self):
         if self.current_frame > 0:
             self.current_frame -= 1
-        self.refresh_image_plot()
-        self.checkFrameNavigationButtons()
+            self.refresh_image_plot()
+            self.checkFrameNavigationButtons()
 
     def next_frame(self):
         session = Session.get_instance()
-        cal_key = self.combobox_datasets.currentText()
-        imgs = session.current_repetition().calibration.get_image(cal_key)
+        calib_key = self.combobox_datasets.currentText()
+        imgs = session.get_calibration_image(calib_key)
         if self.current_frame < len(imgs) - 1:
             self.current_frame += 1
-        self.refresh_image_plot()
-        self.checkFrameNavigationButtons()
+            self.refresh_image_plot()
+            self.checkFrameNavigationButtons()
 
     def checkFrameNavigationButtons(self):
         if self.current_frame > 0:
@@ -95,9 +95,9 @@ class ExtractionView(QtWidgets.QWidget):
             self.button_prev_frame.setEnabled(False)
 
         session = Session.get_instance()
-        cal_key = self.combobox_datasets.currentText()
-        if cal_key:
-            imgs = session.current_repetition().calibration.get_image(cal_key)
+        calib_key = self.combobox_datasets.currentText()
+        if calib_key:
+            imgs = session.get_calibration_image(calib_key)
             if self.current_frame < len(imgs) - 1:
                 self.button_next_frame.setEnabled(True)
             else:
