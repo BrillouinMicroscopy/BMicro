@@ -197,6 +197,7 @@ class EvaluationView(QtWidgets.QWidget):
             self.evaluation_timer.stop()
             self.evaluation_running = False
             self.button_evaluate.setText('Evaluate')
+            self.refresh_plot()
 
         if self.max_count.value >= 0:
             self.evaluation_progress.setMaximum(self.max_count.value)
