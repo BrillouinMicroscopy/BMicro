@@ -10,12 +10,26 @@ import multiprocessing as mp
 
 from bmlab.session import Session
 
-from bmicro.BGThread import BGThread
 from bmicro.gui.mpl import MplCanvas
 
 from bmlab.controllers import EvaluationController
 
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
+
 logger = logging.getLogger(__name__)
+
+
+class Worker(QObject):
+    finished = pyqtSignal()
+
+    def __init__(self, fkw):
+        super().__init__()
+        self.evaluation_controller = EvaluationController()
+        self.fkw = fkw
+
+    def run(self):
+        self.evaluation_controller.evaluate(**self.fkw)
+        self.finished.emit()
 
 
 class EvaluationView(QtWidgets.QWidget):
@@ -123,11 +137,14 @@ class EvaluationView(QtWidgets.QWidget):
         self.evaluation_abort = mp.Value('I', False, lock=True)
         self.evaluation_running = False
 
+        self.session = Session.get_instance()
+
         self.evaluation_timer = QTimer()
         self.evaluation_timer.timeout.connect(self.refresh_ui)
         self.count = None
         self.max_count = None
         self.thread = None
+        self.worker = None
         # Currently used to determine if we should update the plot
         # Might not be necessary anymore once the plot is fast enough.
         self.plot_count = 0
@@ -182,9 +199,14 @@ class EvaluationView(QtWidgets.QWidget):
             "abort": self.evaluation_abort,
         }
 
-        self.thread = BGThread(
-            func=self.evaluation_controller.evaluate, fkw=dnkw
-        )
+        self.thread = QThread()
+        self.worker = Worker(fkw=dnkw)
+        self.worker.moveToThread(self.thread)
+        self.thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.worker.finished.connect(self.refresh_ui)
+        self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
 
     def refresh_ui(self):
