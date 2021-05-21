@@ -10,6 +10,7 @@ from bmlab.session import Session
 from bmlab.controllers import EvaluationController
 
 from bmicro.gui.mpl import MplCanvas
+import warnings
 
 logger = logging.getLogger(__name__)
 
@@ -144,7 +145,12 @@ class PeakSelectionView(QtWidgets.QWidget):
                 return
 
             if len(spectrum) > 0:
-                spectrum = np.nanmean(spectrum, 0)
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        action='ignore',
+                        message='Mean of empty slice'
+                    )
+                    spectrum = np.nanmean(spectrum, 0)
                 time = times[0]
                 frequencies = cm.get_frequencies_by_time(time)
                 if frequencies is not None:
