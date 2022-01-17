@@ -38,12 +38,15 @@ setup(
     long_description=open('README.rst').read() if exists('README.rst') else '',
     install_requires=["bmlab",
                       "h5py>=2.10.0",
+                      "matplotlib",
                       "numpy>=1.17.0",
-                      "scikit-image",
-                      "scipy>=0.14.0",
                       "pyqt5",
                       "pyqtgraph",
-                      "matplotlib"
+                      "pytest",
+                      "pytest-qt",
+                      "pytest_mock",
+                      "scikit-image",
+                      "scipy>=0.14.0"
                       ],
     python_requires=">=3.6",
     keywords=["Brillouin Microscopy"],
