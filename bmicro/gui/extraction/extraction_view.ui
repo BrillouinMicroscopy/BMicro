@@ -185,6 +185,13 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="button_find_points">
+            <property name="text">
+             <string>Find Peaks</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
