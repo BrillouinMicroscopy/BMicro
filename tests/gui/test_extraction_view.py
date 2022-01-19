@@ -84,3 +84,14 @@ def test_clicking_clear_deletes_points(qtbot, window):
     assert session.extraction_model().get_points('1') == [(50, 50)]
     ev.clear_points()
     assert session.extraction_model().get_points('1') == []
+
+
+def test_clicking_find_points_finds_points(qtbot, window):
+    ev = window.widget_extraction_view
+    ev.clear_points()
+
+    session = Session.get_instance()
+    assert session.extraction_model().get_points('1') == []
+
+    ev.find_points()
+    assert len(session.extraction_model().get_points('1')) > 0
