@@ -103,7 +103,7 @@ class PeakSelectionView(QtWidgets.QWidget):
         self.refresh_plot()
 
     def on_select_data_region(self, xmin, xmax):
-        if not self.plot.lines[0]:
+        if not self.plot.lines or not self.plot.lines[0]:
             return
         # Since we might operate on a frequency axis,
         # we need the indices instead of the values.
