@@ -239,6 +239,9 @@ class ExtractionView(QtWidgets.QWidget):
         """
         calib_key = self.combobox_datasets.currentText()
         session = Session.get_instance()
+
+        if not session.extraction_model():
+            return
         session.extraction_model().clear_points(calib_key)
         self.refresh_image_plot()
 
