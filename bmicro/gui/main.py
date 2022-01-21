@@ -82,6 +82,7 @@ class BMicro(QtWidgets.QMainWindow):
         self.action_open.triggered.connect(self.open_file)
         self.action_close.triggered.connect(self.close_file)
         self.action_save.triggered.connect(self.save_session)
+        self.action_exit.triggered.connect(self.exit_app)
 
     def open_file(self, file_name=None):
         """ Show open file dialog and load file. """
@@ -157,3 +158,6 @@ class BMicro(QtWidgets.QMainWindow):
     def save_session(self):
         """ Save the session data to file with ending '.bms' """
         Session.get_instance().save()
+
+    def exit_app(self):
+        QtCore.QCoreApplication.quit()
