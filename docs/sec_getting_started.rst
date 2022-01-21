@@ -19,6 +19,6 @@ If you use BMicro in a scientific publication, please cite it with:
 
 .. pull-quote::
 
-   BMicro developers (2021), BMicro version X.X.X: Python library for the
-   post-measurement analysis of real-time deformability cytometry data sets
+   BMicro developers (2022), BMicro version X.X.X: Python library for the
+   post-measurement analysis of Brillouin microscopy data sets
    [Software]. Available at https://github.com/BrillouinMicroscopy/BMicro.

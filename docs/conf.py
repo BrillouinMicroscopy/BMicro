@@ -81,7 +81,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'BMicro'
 github_project = 'BrillouinMicroscopy/' + project
-copyright = '2021, BMicro developers'
+copyright = '2022, BMicro developers'
 author = 'BMicro developers'
 
 # The version info for the project you're documenting, acts as replacement for
