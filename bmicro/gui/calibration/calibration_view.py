@@ -45,6 +45,8 @@ class CalibrationView(QtWidgets.QWidget):
             useblit=True,
             direction='horizontal', rectprops=rectprops)
 
+        self.button_find_peaks.clicked.connect(self.find_peaks)
+
         self.button_brillouin_select_done.clicked.connect(
             self.on_select_brillouin_clicked)
         self.button_rayleigh_select_done.clicked.connect(
@@ -351,3 +353,12 @@ class CalibrationView(QtWidgets.QWidget):
                 current_region = tuple(current_region)
                 cm.set_rayleigh_region(calib_key, row, current_region)
             self.refresh_plot()
+
+    def find_peaks(self):
+        """
+        Automatically finds the Rayleigh and Brillouin peaks.
+        """
+        calib_key = self.combobox_calibration.currentText()
+        cc = CalibrationController()
+        cc.find_peaks(calib_key)
+        self.refresh_plot()
