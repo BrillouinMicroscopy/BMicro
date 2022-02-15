@@ -53,6 +53,7 @@ class ExtractionView(QtWidgets.QWidget):
         self.button_clear.clicked.connect(self.clear_points)
         self.button_optimize.clicked.connect(self.optimize_points)
         self.button_find_points.clicked.connect(self.find_points)
+        self.button_find_points_all.clicked.connect(self.find_points_all)
 
         self.button_prev_frame.clicked.connect(self.prev_frame)
         self.button_next_frame.clicked.connect(self.next_frame)
@@ -262,4 +263,13 @@ class ExtractionView(QtWidgets.QWidget):
         calib_key = self.combobox_datasets.currentText()
         ec = ExtractionController()
         ec.find_points(calib_key)
+        self.refresh_image_plot()
+
+    def find_points_all(self):
+        """
+        Automatically finds the Rayleigh and Brillouin peaks of interest
+        for all calibrations existing.
+        """
+        ec = ExtractionController()
+        ec.find_points_all()
         self.refresh_image_plot()
