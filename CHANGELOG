@@ -1,11 +1,57 @@
-0.1.3
- - setup: use "pytest" command instead of deprecated "setup.py test"
- - ui: add app icon (#9)
- - ui: data tab (#11)
- - build: add Windows and macOS build pipeline (#1)
-0.1.2
- - CI automation
-0.1.1
- - Test CI automation
-0.1.0
- - dummy release
+## 0.1.4 - 2022-02-16
+
+### Added
+- Add keyboard shortcuts for file actions #117
+- Allow finding peaks in extraction view for all calibrations #111
+- Implement automatic peak finding in calibration view #110
+- Implement automatically finding peaks #99
+- Allow to browse through calibration spectra #89
+- Show selected extraction points in table, allow editing #85
+- Show colorbar with labels in evaluation view #70
+- Automatically load session if it exists #67
+
+### Changed
+- Add action to exit app #107
+- Deploy with python-3.9 #105
+- Update pyinstaller version #104
+- Require python >= 3.7 #103
+- Add more package requirements #98
+- Suppress mean of empty slice warning #95
+- Suppress useless warning #88
+- Automatically set image shape on orientation change #84
+- Adjust to streamlined bmlab interface #83
+- Adjust to changes in bmlab #82
+- Refactor use of session #81
+- Only check bmlab main branch in workflows #72
+
+### Fixed
+- Fix rotation labels and make rotations more generic #114
+- Fix matplotlib deprecation warnings #115
+- Fix build on appveyor and for MacOS #116
+- Correctly show evaluation plot after closing a file #102
+- Fix crash when clicking if no file is loaded #101
+- Try to fix slow evaluation plot update #97
+- Recalculate derived values when calibration changes #90
+- Correctly scale the data if the unit is GHz #77
+- Only update necessary tab when switching tabs #76
+- Show measurement of arbitrary dimensionality correctly #74
+- Actually run pytest in checks #73
+
+## 0.1.3
+
+- setup: use "pytest" command instead of deprecated "setup.py test"
+- ui: add app icon (#9)
+- ui: data tab (#11)
+- build: add Windows and macOS build pipeline (#1)
+
+## 0.1.2
+
+- CI automation
+
+## 0.1.1
+
+- Test CI automation
+
+## 0.1.0
+
+- dummy release
