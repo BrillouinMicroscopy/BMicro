@@ -39,11 +39,11 @@ class CalibrationView(QtWidgets.QWidget):
                                    toolbar=('Home', 'Pan', 'Zoom'))
         self.plot = self.mplcanvas.get_figure().add_subplot(111)
 
-        rectprops = dict(facecolor='green', alpha=0.5)
+        props = dict(facecolor='green', alpha=0.5)
         self.span_selector = SpanSelector(
             self.plot, onselect=self.on_select_data_region,
             useblit=True,
-            direction='horizontal', rectprops=rectprops)
+            direction='horizontal', props=props)
 
         self.button_find_peaks.clicked.connect(self.find_peaks)
 
