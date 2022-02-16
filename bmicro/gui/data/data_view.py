@@ -88,10 +88,12 @@ class DataView(QtWidgets.QWidget):
         self.checkbox_reflect_horizontally.setChecked(
             session.orientation.reflection['horizontally'])
 
-        self.radio_rotation_none.setChecked(session.orientation.rotation == 0)
-        self.radio_rotation_90_cw.setChecked(session.orientation.rotation == 3)
+        self.radio_rotation_none.setChecked(
+            session.orientation.rotation % 4 == 0)
+        self.radio_rotation_90_cw.setChecked(
+            session.orientation.rotation % 4 == 1)
         self.radio_rotation_90_ccw.setChecked(
-            session.orientation.rotation == 1)
+            session.orientation.rotation % 4 == 3)
 
     def reset_ui(self):
         """
@@ -125,9 +127,9 @@ class DataView(QtWidgets.QWidget):
         if radio_button == self.radio_rotation_none:
             session.set_rotation(0)
         elif radio_button == self.radio_rotation_90_cw:
-            session.set_rotation(3)
-        elif radio_button == self.radio_rotation_90_ccw:
             session.set_rotation(1)
+        elif radio_button == self.radio_rotation_90_ccw:
+            session.set_rotation(3)
 
         self.update_preview()
 
