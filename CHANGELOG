@@ -1,3 +1,8 @@
+## 0.1.5 - 2022-02-16
+
+### Fixed
+- Adjust release pipeline to properly build and upload release artifacts #118 9347bce74f7bf1fb40ab823967f4be8490af47b9 eb5d7e7d2bcb4cf590e967a01a71d00aefced3b5
+
 ## 0.1.4 - 2022-02-16
 
 ### Added
