@@ -26,8 +26,8 @@ fi
 
 SPEC="./macos_${NAME}.spec"
 APP="./dist/${NAME}.app"
-DMG="./dist/${NAMEVERSION}.dmg"
-PKG="./dist/${NAME}.pkg"
+DMG="./dist/${NAMEVERSION}_macosx.dmg"
+PKG="./dist/${NAMEVERSION}_linux.pkg"
 TMP="./dist/pack.temp.dmg"
 
 # cleanup from previous builds
