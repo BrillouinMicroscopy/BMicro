@@ -72,7 +72,7 @@ artifacts:
 
 deploy:
   provider: GitHub
-  release: BMicro $(APPVEYOR_BUILD_VERSION)
+  release: BMicro $(APPVEYOR_REPO_TAG_NAME)
   auth_token:
     secure: UkbQSgOs1GhRJsNZmMxwZ8xDhA/kbu7KYiKUJ9xozcILn2ATfhT0OeZYllT/0ro1
   artifact: /.*\.exe/
