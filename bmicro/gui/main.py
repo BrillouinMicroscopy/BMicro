@@ -11,6 +11,8 @@ from . import calibration
 from . import peak_selection
 from . import evaluation
 
+from .._version import version
+
 
 def check_event_mime_data(event):
     """ Returns the path to local file if h5 file """
@@ -83,6 +85,8 @@ class BMicro(QtWidgets.QMainWindow):
         self.action_close.triggered.connect(self.close_file)
         self.action_save.triggered.connect(self.save_session)
         self.action_exit.triggered.connect(self.exit_app)
+
+        self.action_about.triggered.connect(self.on_action_about)
 
     def open_file(self, file_name=None):
         """ Show open file dialog and load file. """
@@ -161,3 +165,15 @@ class BMicro(QtWidgets.QMainWindow):
 
     def exit_app(self):
         QtCore.QCoreApplication.quit()
+
+    def on_action_about(self):
+        gh = "BrillouinMicroscopy/BMicro"
+        rtd = "bmicro.readthedocs.io"
+        about_text = "BMicro is a graphical user interface " \
+            + "for the analysis of Brillouin microscopy data.<br><br>" \
+            + "Author: Raimund Schlüßler and others<br>" \
+            + "GitHub: " \
+            + "<a href='https://github.com/{gh}'>{gh}</a><br>".format(gh=gh) \
+            + "Documentation: " \
+            + "<a href='https://{rtd}'>{rtd}</a><br>".format(rtd=rtd)
+        QtWidgets.QMessageBox.about(self, f"BMicro {version}", about_text)
