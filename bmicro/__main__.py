@@ -3,7 +3,7 @@ import pkg_resources
 import sys
 import logging
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt6 import QtGui, QtWidgets
 
 from bmicro.gui.main import BMicro
 from bmicro._version import version as __version__
@@ -40,7 +40,7 @@ def main():
     if sys.argv[-1].endswith('.h5'):
         main.open_file(sys.argv[-1])
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ == '__main__':

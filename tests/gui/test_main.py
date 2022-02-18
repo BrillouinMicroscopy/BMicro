@@ -1,8 +1,8 @@
 import pathlib
 import os
 
-from PyQt5.QtWidgets import QWidget
-from PyQt5 import QtCore
+from PyQt6.QtWidgets import QWidget
+from PyQt6 import QtCore
 
 from bmlab.session import Session
 
@@ -25,7 +25,7 @@ def test_main_window_can_activate_all_tabs(qtbot):
     for idx, (tab_text, tab_name) in enumerate(zip(tab_texts, tab_names)):
         current_tab = window.tabWidget.findChild(QWidget, tab_name)
         assert current_tab
-        qtbot.mouseClick(current_tab, QtCore.Qt.LeftButton)
+        qtbot.mouseClick(current_tab, QtCore.Qt.MouseButton.LeftButton)
         assert window.tabWidget.tabText(idx) == tab_text
 
     window.close()
@@ -39,7 +39,7 @@ def test_open_file_shows_metadata(qtbot, mocker):
     def mock_getOpenFileName(self, *args, **kwargs):
         return file_path, None
 
-    mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
+    mocker.patch('PyQt6.QtWidgets.QFileDialog.getOpenFileName',
                  mock_getOpenFileName)
 
     window.open_file()

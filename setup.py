@@ -40,7 +40,7 @@ setup(
                       "h5py>=2.10.0",
                       "matplotlib",
                       "numpy>=1.17.0",
-                      "pyqt5",
+                      "pyqt6",
                       "pyqtgraph",
                       "pytest",
                       "pytest-qt",

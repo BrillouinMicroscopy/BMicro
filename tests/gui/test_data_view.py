@@ -1,6 +1,6 @@
 import pathlib
 
-from PyQt5 import QtCore
+from PyQt6 import QtCore
 import pytest
 
 from bmlab.session import Session
@@ -20,7 +20,7 @@ def window(mocker):
     def mock_getOpenFileName(self, *args, **kwargs):
         return file_name, None
 
-    mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
+    mocker.patch('PyQt6.QtWidgets.QFileDialog.getOpenFileName',
                  mock_getOpenFileName)
     window.open_file()
     yield window
@@ -32,10 +32,12 @@ def test_clicking_rotate_updates_session(qtbot, window):
     session = Session.get_instance()
     assert session.orientation.rotation == 0
     qtbot.mouseClick(
-        window.widget_data_view.radio_rotation_90_cw, QtCore.Qt.LeftButton)
+        window.widget_data_view.radio_rotation_90_cw,
+        QtCore.Qt.MouseButton.LeftButton)
     assert session.orientation.rotation == 1
     qtbot.mouseClick(
-        window.widget_data_view.radio_rotation_90_ccw, QtCore.Qt.LeftButton)
+        window.widget_data_view.radio_rotation_90_ccw,
+        QtCore.Qt.MouseButton.LeftButton)
     assert session.orientation.rotation == 3
 
     # For some reason, the following code three lines of code do not trigger
@@ -58,19 +60,19 @@ def test_clicking_reflect_updates_session(qtbot, window):
 
     qtbot.mouseClick(
         window.widget_data_view.checkbox_reflect_horizontally,
-        QtCore.Qt.LeftButton)
+        QtCore.Qt.MouseButton.LeftButton)
     assert session.orientation.reflection == {
         'vertically': False, 'horizontally': True}
 
     qtbot.mouseClick(
         window.widget_data_view.checkbox_reflect_vertically,
-        QtCore.Qt.LeftButton)
+        QtCore.Qt.MouseButton.LeftButton)
     assert session.orientation.reflection == {
         'vertically': True, 'horizontally': True}
 
     qtbot.mouseClick(
         window.widget_data_view.checkbox_reflect_horizontally,
-        QtCore.Qt.LeftButton)
+        QtCore.Qt.MouseButton.LeftButton)
     assert session.orientation.reflection == {
         'vertically': True, 'horizontally': False}
 
