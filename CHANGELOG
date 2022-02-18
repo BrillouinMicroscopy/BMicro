@@ -1,3 +1,15 @@
+## 0.1.6 - 2022-02-18
+
+### Added
+- Add an about menu #119
+
+### Changed
+- Update to PyQt6 to support M1 Macs #124
+
+### Fixed
+- Request minimum required bmlab version #122
+- Pin Shapely to 1.8.0 #120 #121
+
 ## 0.1.5 - 2022-02-16
 
 ### Fixed
