@@ -1,7 +1,7 @@
 import pkg_resources
 import logging
 
-from PyQt5 import QtWidgets, uic
+from PyQt6 import QtWidgets, uic
 from matplotlib.patches import Circle as MPLCircle
 
 import matplotlib
@@ -175,8 +175,10 @@ class ExtractionView(QtWidgets.QWidget):
         self.table_selected_points\
             .setHorizontalHeaderLabels(["x", "y"])
         header = self.table_selected_points.horizontalHeader()
-        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(0,
+                                    QtWidgets.QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1,
+                                    QtWidgets.QHeaderView.ResizeMode.Stretch)
 
     def refresh_points(self):
         session = Session.get_instance()

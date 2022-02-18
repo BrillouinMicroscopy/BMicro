@@ -1,7 +1,7 @@
 import pkg_resources
 
-from PyQt5 import QtWidgets, uic, QtCore
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from PyQt6 import QtWidgets, uic, QtCore
+from PyQt6.QtWidgets import QFileDialog, QMessageBox
 
 from bmlab.session import Session
 

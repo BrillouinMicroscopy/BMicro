@@ -24,7 +24,7 @@ def window(mocker):
     def mock_getOpenFileName(self, *args, **kwargs):
         return file_name, None
 
-    mocker.patch('PyQt5.QtWidgets.QFileDialog.getOpenFileName',
+    mocker.patch('PyQt6.QtWidgets.QFileDialog.getOpenFileName',
                  mock_getOpenFileName)
     window.open_file()
     yield window

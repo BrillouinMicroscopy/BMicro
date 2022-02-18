@@ -1,8 +1,8 @@
 import pkg_resources
 import logging
 
-from PyQt5 import QtWidgets, QtCore, uic
-# from PyQt5.QtWidgets import QMessageBox
+from PyQt6 import QtWidgets, QtCore, uic
+# from PyQt6.QtWidgets import QMessageBox
 from matplotlib.widgets import SpanSelector
 import numpy as np
 import multiprocessing as mp
@@ -302,15 +302,19 @@ class CalibrationView(QtWidgets.QWidget):
         self.table_Brillouin_regions\
             .setHorizontalHeaderLabels(["start", "end"])
         header = self.table_Brillouin_regions.horizontalHeader()
-        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(0,
+                                    QtWidgets.QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1,
+                                    QtWidgets.QHeaderView.ResizeMode.Stretch)
 
         self.table_Rayleigh_regions.setColumnCount(2)
         self.table_Rayleigh_regions\
             .setHorizontalHeaderLabels(["start", "end"])
         header = self.table_Rayleigh_regions.horizontalHeader()
-        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(0,
+                                    QtWidgets.QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1,
+                                    QtWidgets.QHeaderView.ResizeMode.Stretch)
 
     def refresh_regions(self, spectrum, regions, table, color,
                         frequencies=None):

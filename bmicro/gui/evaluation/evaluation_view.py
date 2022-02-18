@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib
 import warnings
 
-from PyQt5 import QtWidgets, uic
-from PyQt5.QtCore import QTimer
+from PyQt6 import QtWidgets, uic
+from PyQt6.QtCore import QObject, QTimer, QThread, pyqtSignal
 import multiprocessing as mp
 
 from bmlab.session import Session
@@ -13,8 +13,6 @@ from bmlab.session import Session
 from bmicro.gui.mpl import MplCanvas
 
 from bmlab.controllers import EvaluationController
-
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
 
 logger = logging.getLogger(__name__)
 

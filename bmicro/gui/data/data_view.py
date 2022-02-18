@@ -1,7 +1,7 @@
 import pkg_resources
 import logging
 
-from PyQt5 import uic, QtWidgets
+from PyQt6 import uic, QtWidgets
 import matplotlib
 
 from bmlab.models.setup import AVAILABLE_SETUPS
