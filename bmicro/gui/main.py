@@ -11,7 +11,8 @@ from . import calibration
 from . import peak_selection
 from . import evaluation
 
-from .._version import version
+from bmicro import __version__ as bmicroversion
+from bmlab import __version__ as bmlabversion
 
 
 def check_event_mime_data(event):
@@ -171,9 +172,11 @@ class BMicro(QtWidgets.QMainWindow):
         rtd = "bmicro.readthedocs.io"
         about_text = "BMicro is a graphical user interface " \
             + "for the analysis of Brillouin microscopy data.<br><br>" \
+            + f"Using bmlab {bmlabversion}<br><br>" \
             + "Author: Raimund Schlüßler and others<br>" \
             + "GitHub: " \
             + "<a href='https://github.com/{gh}'>{gh}</a><br>".format(gh=gh) \
             + "Documentation: " \
             + "<a href='https://{rtd}'>{rtd}</a><br>".format(rtd=rtd)
-        QtWidgets.QMessageBox.about(self, f"BMicro {version}", about_text)
+        QtWidgets.QMessageBox.about(self,
+                                    f"BMicro {bmicroversion}", about_text)
