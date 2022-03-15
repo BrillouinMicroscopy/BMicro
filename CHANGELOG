@@ -1,3 +1,13 @@
+## 0.2.0 - 2022-03-15
+
+### Added
+- Implement showing 3D data #128
+- Remember last used folder #132
+
+### Fixed
+- Fix warning when file could not be opened #129
+- Fix build #131
+
 ## 0.1.6 - 2022-02-18
 
 ### Added
