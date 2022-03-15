@@ -1,3 +1,4 @@
+import pathlib
 import pkg_resources
 
 from PyQt6 import QtWidgets, uic, QtCore
@@ -36,6 +37,18 @@ class BMicro(QtWidgets.QMainWindow):
     """
 
     def __init__(self, *args, **kwargs):
+        # Settings are stored in the .ini file format. Even though
+        # `self.settings` may return integer/bool in the same session,
+        # in the next session, it will reliably return strings. Lists
+        # of strings (comma-separated) work nicely though.
+        QtCore.QCoreApplication.setOrganizationName("BMicro")
+        QtCore.QCoreApplication.setOrganizationDomain(
+            "bmicro.readthedocs.io")
+        QtCore.QCoreApplication.setApplicationName("BMicro")
+        QtCore.QSettings.setDefaultFormat(QtCore.QSettings.Format.IniFormat)
+        # Some promoted widgets may need the above constants set in order
+        # to access the settings upon initialization.
+
         """ Initializes BMicro."""
         super(BMicro, self).__init__(*args, **kwargs)
         ui_file = pkg_resources.resource_filename('bmicro.gui', 'main.ui')
@@ -52,6 +65,8 @@ class BMicro(QtWidgets.QMainWindow):
         self.setAcceptDrops(True)
 
         self.reset_ui()
+
+        self.settings = QtCore.QSettings()
 
     def build_tabs(self):
         self.widget_data_view = data.DataView(self)
@@ -92,12 +107,17 @@ class BMicro(QtWidgets.QMainWindow):
     def open_file(self, file_name=None):
         """ Show open file dialog and load file. """
         if not file_name:
-            file_name, _ = QFileDialog.getOpenFileName(self, 'Open File...',
-                                                       filter='*.h5')
+            file_name, _ = QFileDialog.getOpenFileName(
+                self, 'Open File...',
+                directory=self.settings.value("path/last-used"),
+                filter='*.h5')
 
         """ file_name is empty if user selects 'Cancel' in FileDialog """
         if not file_name:
             return
+        else:
+            self.settings.setValue("path/last-used",
+                                   str(pathlib.Path(file_name).parent))
 
         session = Session.get_instance()
         try:
