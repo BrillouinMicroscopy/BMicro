@@ -90,16 +90,6 @@
               <height>0</height>
              </size>
             </property>
-            <item>
-             <property name="text">
-              <string>Brillouin shift [pix]</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Brillouin shift [GHz]</string>
-             </property>
-            </item>
            </widget>
           </item>
           <item>
