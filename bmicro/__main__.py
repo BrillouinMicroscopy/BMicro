@@ -1,21 +1,13 @@
-import os
-import pkg_resources
-import sys
-import logging
-
-from PyQt6 import QtGui, QtWidgets
-
-from bmicro.gui.main import BMicro
-from bmicro._version import version as __version__
-
-import ctypes
-try:
-    ctypes.windll.shcore.SetProcessDpiAwareness(True)
-except:  # noqa E722
-    pass
-
-
 def main():
+    import os
+    import pkg_resources
+    import sys
+    import logging
+
+    from PyQt6 import QtGui, QtWidgets
+
+    from bmicro.gui.main import BMicro
+    from bmicro._version import version as __version__
     """
     Starts the BMicro application and handles its life cycle.
     """
@@ -25,8 +17,8 @@ def main():
     icon_path = os.path.join(imdir, "icon.png")
     app.setWindowIcon(QtGui.QIcon(icon_path))
 
-    main = BMicro()
-    main.show()
+    window = BMicro()
+    window.show()
 
     for arg in sys.argv:
         if arg == '--version':
@@ -38,7 +30,7 @@ def main():
             logging.basicConfig(level=log_level)
 
     if sys.argv[-1].endswith('.h5'):
-        main.open_file(sys.argv[-1])
+        window.open_file(sys.argv[-1])
 
     sys.exit(app.exec())
 
