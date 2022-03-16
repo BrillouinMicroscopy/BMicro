@@ -41,7 +41,6 @@ setup(
                       "matplotlib",
                       "numpy>=1.17.0",
                       "pyqt6",
-                      "pyqtgraph",
                       "pytest",
                       "pytest-qt",
                       "pytest_mock",
