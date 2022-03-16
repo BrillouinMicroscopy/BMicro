@@ -67,3 +67,10 @@ jobs:
       working-directory: ./build-recipes
       run: |
         bash ./macos_build_app.sh BMicro $(python -m bmicro --version)
+    - name: Upload build artifacts
+      if: runner.os == 'macOS'
+      uses: actions/upload-artifact@v3
+      with:
+        name: dmg-for-mac
+        path: |
+          ./build-recipes/dist/*.dmg
