@@ -68,9 +68,9 @@ jobs:
       run: |
         bash ./macos_build_app.sh BMicro $(python -m bmicro --version)
     - name: Upload build artifacts
-      if: runner.os == 'macOS'
+      if: (runner.os == 'macOS' && matrix.python-version == '3.9')
       uses: actions/upload-artifact@v3
       with:
-        name: dmg-for-mac
+        name: BMicro
         path: |
           ./build-recipes/dist/*.dmg
