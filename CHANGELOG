@@ -1,3 +1,12 @@
+## 0.2.1 - 2022-03-21
+
+### Changed
+- Code cleanup #135 #142
+
+### Fixed
+- Don't crash when extracted peaks are on a straight line #141
+- Don't crash when trying to evaluate #139
+
 ## 0.2.0 - 2022-03-15
 
 ### Added
