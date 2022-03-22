@@ -5,13 +5,13 @@ import warnings
 
 NAME = "BMicro"
 
-if not exists("./{}Launcher.py".format(NAME)):
-    warnings.warn("Cannot find {}Launcher.py'! ".format(NAME) +
+if not exists("../bmicro/__main__.py"):
+    warnings.warn("Cannot find ../bmicro/__main__.py'! " +
                   "Please run pyinstaller from the 'build-recipes' directory.")
 
 
-a = Analysis([NAME + "Launcher.py"],
-             pathex=["."],
+a = Analysis(['../bmicro/__main__.py'],
+             pathex=['.'],
              hookspath=["."],
              runtime_hooks=None)
 
