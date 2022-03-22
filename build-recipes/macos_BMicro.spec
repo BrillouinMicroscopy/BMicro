@@ -7,13 +7,13 @@ from bmicro._version import version
 NAME = "BMicro"
 
 
-if not exists("./{}Launcher.py".format(NAME)):
-    warnings.warn("Cannot find {}Launcher.py'! ".format(NAME) +
+if not exists("../bmicro/__main__.py"):
+    warnings.warn("Cannot find ../bmicro/__main__.py'! " +
                   "Please run pyinstaller from the 'build-recipes' directory.")
 
 block_cipher = None
 
-a = Analysis(['{}Launcher.py'.format(NAME)],
+a = Analysis(['../bmicro/__main__.py'],
              pathex=['.'],
              binaries=[],
              datas=[],
