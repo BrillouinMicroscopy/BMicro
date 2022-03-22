@@ -1,3 +1,13 @@
+## 0.2.2 - 2022-03-22
+
+### Changed
+- Code cleanup #145
+
+### Fixed
+- Bring back multiprocessing support #149
+- Don't open multiple instances on Win when evaluating #147
+- Don't open multiple instances on MacOS with DMG package #140
+
 ## 0.2.1 - 2022-03-21
 
 ### Changed
