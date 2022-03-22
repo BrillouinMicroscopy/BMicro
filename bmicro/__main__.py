@@ -36,4 +36,8 @@ def main():
 
 
 if __name__ == '__main__':
+    # Necessary to make multiprocessing work with pyinstaller
+    from multiprocessing import freeze_support
+    freeze_support()
+
     main()
