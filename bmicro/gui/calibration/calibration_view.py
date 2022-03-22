@@ -5,7 +5,6 @@ from PyQt6 import QtWidgets, QtCore, uic
 # from PyQt6.QtWidgets import QMessageBox
 from matplotlib.widgets import SpanSelector
 import numpy as np
-import multiprocessing as mp
 import time
 
 from bmlab.session import Session
@@ -195,23 +194,21 @@ class CalibrationView(QtWidgets.QWidget):
     def calibrate(self):
         calib_key = self.combobox_calibration.currentText()
 
-        count = mp.Value('I', 0, lock=True)
-        max_count = mp.Value('i', 0, lock=True)
+        count = 0
+        max_count = 0
 
         dnkw = {
             "calib_key": calib_key,
-            "count": count,
-            "max_count": max_count,
         }
 
         thread = BGThread(func=self.calibration_controller.calibrate, fkw=dnkw)
         thread.start()
         # Show a progress until computation is done
-        while max_count.value == 0 or count.value < max_count.value:
+        while max_count == 0 or count < max_count:
             time.sleep(.05)
-            self.calibration_progress.setValue(count.value)
-            if max_count.value >= 0:
-                self.calibration_progress.setMaximum(max_count.value)
+            self.calibration_progress.setValue(count)
+            if max_count >= 0:
+                self.calibration_progress.setMaximum(max_count)
             QtCore.QCoreApplication.instance().processEvents()
         # make sure the thread finishes
         thread.wait()

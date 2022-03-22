@@ -8,7 +8,6 @@ import warnings
 
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import QObject, QTimer, QThread, pyqtSignal
-import multiprocessing as mp
 
 from bmlab.session import Session
 
@@ -59,7 +58,7 @@ class EvaluationView(QtWidgets.QWidget):
 
         self.evaluation_controller = EvaluationController()
 
-        self.evaluation_abort = mp.Value('I', False, lock=True)
+        self.evaluation_abort = False
         self.evaluation_running = False
 
         self.session = Session.get_instance()
@@ -125,18 +124,18 @@ class EvaluationView(QtWidgets.QWidget):
         # If the evaluation is already running, we abort it and reset
         #  the button label
         if self.evaluation_running:
-            self.evaluation_abort.value = True
+            self.evaluation_abort = True
             self.refresh_ui()
             return
 
-        self.evaluation_abort.value = False
+        self.evaluation_abort = False
         self.evaluation_running = True
         self.button_evaluate.setText('Cancel')
         self.evaluation_timer.start(500)
 
         self.plot_count = 0
-        self.count = mp.Value('I', 0, lock=True)
-        self.max_count = mp.Value('i', 0, lock=True)
+        self.count = 0
+        self.max_count = 0
 
         dnkw = {
             "count": self.count,
@@ -158,21 +157,21 @@ class EvaluationView(QtWidgets.QWidget):
         # If evaluation is aborted by user,
         # couldn't start or is finished,
         # we stop the timer
-        if self.evaluation_abort.value or\
-           self.max_count.value < 0 or\
-           self.count.value >= self.max_count.value:
+        if self.evaluation_abort or\
+           self.max_count < 0 or\
+           self.count >= self.max_count:
             self.evaluation_timer.stop()
             self.evaluation_running = False
             self.button_evaluate.setText('Evaluate')
             self.refresh_plot()
 
-        if self.max_count.value >= 0:
-            self.evaluation_progress.setMaximum(self.max_count.value)
-        self.evaluation_progress.setValue(self.count.value)
+        if self.max_count >= 0:
+            self.evaluation_progress.setMaximum(self.max_count)
+        self.evaluation_progress.setValue(self.count)
 
         # We refresh the image every thirty points to not slow down to much
-        if (self.count.value - self.plot_count) > 30:
-            self.plot_count = self.count.value
+        if (self.count - self.plot_count) > 30:
+            self.plot_count = self.count
             self.refresh_plot()
 
     def refresh_plot(self):
