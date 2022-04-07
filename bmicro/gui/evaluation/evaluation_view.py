@@ -261,18 +261,19 @@ class EvaluationView(QtWidgets.QWidget):
             if dimensionality == 2:
                 # We rotate the array so the x axis is shown as the
                 # horizontal axis
-                data = np.rot90(data)
+                image_map = data[tuple(dslice)]
+                image_map = np.rot90(image_map)
                 extent = np.nanmin(positions[idx[0]][tuple(dslice)]),\
                     np.nanmax(positions[idx[0]][tuple(dslice)]),\
                     np.nanmin(positions[idx[1]][tuple(dslice)]),\
                     np.nanmax(positions[idx[1]][tuple(dslice)])
                 if isinstance(self.image_map, matplotlib.image.AxesImage):
-                    self.image_map.set_data(data[tuple(dslice)])
+                    self.image_map.set_data(image_map)
                     self.image_map.set_extent(extent)
                 else:
                     self.clear_plots()
                     self.image_map = self.plot.imshow(
-                        data[tuple(dslice)], interpolation='nearest',
+                        image_map, interpolation='nearest',
                         extent=extent
                     )
                     self.colorbar =\
