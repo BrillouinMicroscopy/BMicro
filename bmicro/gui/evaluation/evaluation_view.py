@@ -57,6 +57,13 @@ class EvaluationView(QtWidgets.QWidget):
         self.combobox_parameter.currentIndexChanged.connect(
             self.on_select_parameter)
 
+        self.autoscale.clicked.connect(
+            self.on_scale_changed)
+        self.value_min.valueChanged.connect(
+            self.on_scale_changed)
+        self.value_max.valueChanged.connect(
+            self.on_scale_changed)
+
         self.evaluation_controller = EvaluationController()
 
         self.evaluation_abort = mp.Value('I', False, lock=True)
@@ -119,6 +126,12 @@ class EvaluationView(QtWidgets.QWidget):
         self.combobox_parameter.blockSignals(False)
 
     def on_select_parameter(self):
+        self.refresh_plot()
+
+    def on_scale_changed(self):
+        autoscale = self.autoscale.isChecked()
+        self.value_min.setDisabled(autoscale)
+        self.value_max.setDisabled(autoscale)
         self.refresh_plot()
 
     def evaluate(self):
@@ -254,10 +267,34 @@ class EvaluationView(QtWidgets.QWidget):
                     np.nanmin(positions[idx[0]][tuple(dslice)]),
                     np.nanmax(positions[idx[0]][tuple(dslice)])
                 )
-                self.plot.set_ylim(
-                    np.nanmin(data),
-                    np.nanmax(data)
-                )
+                with warnings.catch_warnings():
+                    warnings.filterwarnings(
+                        action='ignore',
+                        message='All-NaN slice encountered'
+                    )
+                    if self.autoscale.isChecked():
+                        value_min = np.nanmin(data)
+                        value_max = np.nanmax(data)
+                        self.value_min.blockSignals(True)
+                        self.value_min.setValue(value_min)
+                        self.value_min.blockSignals(False)
+                        self.value_max.blockSignals(True)
+                        self.value_max.setValue(value_max)
+                        self.value_max.blockSignals(False)
+                    else:
+                        value_min = self.value_min.value()
+                        value_max = self.value_max.value()
+                    if value_min > value_max:
+                        value_min = np.nanmin(data)
+                        value_max = np.nanmax(data)
+                    # Adjust the double spin box step size
+                    single_step = (value_max - value_min)/15
+                    self.value_min.setSingleStep(single_step)
+                    self.value_max.setSingleStep(single_step)
+                    self.plot.set_ylim(
+                        value_min,
+                        value_max
+                    )
             if dimensionality == 2:
                 # We rotate the array so the x axis is shown as the
                 # horizontal axis
@@ -284,9 +321,23 @@ class EvaluationView(QtWidgets.QWidget):
                         action='ignore',
                         message='All-NaN slice encountered'
                     )
-                    value_min = np.nanmin(data[tuple(dslice)])
-                    value_max = np.nanmax(data[tuple(dslice)])
+                    if self.autoscale.isChecked():
+                        value_min = np.nanmin(data[tuple(dslice)])
+                        value_max = np.nanmax(data[tuple(dslice)])
+                        self.value_min.blockSignals(True)
+                        self.value_min.setValue(value_min)
+                        self.value_min.blockSignals(False)
+                        self.value_max.blockSignals(True)
+                        self.value_max.setValue(value_max)
+                        self.value_max.blockSignals(False)
+                    else:
+                        value_min = self.value_min.value()
+                        value_max = self.value_max.value()
                     if value_min < value_max:
+                        # Adjust the double spin box step size
+                        single_step = (value_max - value_min)/15
+                        self.value_min.setSingleStep(single_step)
+                        self.value_max.setSingleStep(single_step)
                         self.image_map.set_clim(value_min, value_max)
                         # For some reason we have to apply the color limits
                         # twice to make it work properly
@@ -307,8 +358,28 @@ class EvaluationView(QtWidgets.QWidget):
                     np.nanmax(positions[idx[1]][tuple(dslice)])
                 )
             if dimensionality == 3:
+                if self.autoscale.isChecked():
+                    value_min = np.nanmin(data)
+                    value_max = np.nanmax(data)
+                    self.value_min.blockSignals(True)
+                    self.value_min.setValue(value_min)
+                    self.value_min.blockSignals(False)
+                    self.value_max.blockSignals(True)
+                    self.value_max.setValue(value_max)
+                    self.value_max.blockSignals(False)
+                else:
+                    value_min = self.value_min.value()
+                    value_max = self.value_max.value()
+                    if value_min > value_max:
+                        value_min = np.nanmin(data)
+                        value_max = np.nanmax(data)
+                # Adjust the double spin box step size
+                single_step = (value_max - value_min)/15
+                self.value_min.setSingleStep(single_step)
+                self.value_max.setSingleStep(single_step)
+
                 scalar_map = matplotlib.cm.ScalarMappable(
-                    norm=Normalize(vmin=np.nanmin(data), vmax=np.nanmax(data)),
+                    norm=Normalize(vmin=value_min, vmax=value_max),
                     cmap=matplotlib.cm.viridis
                 )
 
