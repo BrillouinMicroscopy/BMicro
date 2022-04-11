@@ -152,8 +152,6 @@ class ExtractionView(QtWidgets.QWidget):
         self.image_plot.imshow(img.T, origin='lower', vmin=100, vmax=300)
         self.image_plot.set_title('Frame %d' % (self.current_frame+1))
 
-        self._plot_points(em.get_points(calib_key))
-
         circle_fit = em.get_circle_fit(calib_key)
 
         if circle_fit:
@@ -164,8 +162,10 @@ class ExtractionView(QtWidgets.QWidget):
                 dr = arc[-1] - arc[0]
                 line = matplotlib.patches.FancyArrow(
                     *arc[0], dr[0], dr[1], head_width=0,
-                    head_length=0, color='Yellow')
+                    head_length=0, color='Yellow', alpha=0.5)
                 self.image_plot.add_patch(line)
+
+        self._plot_points(em.get_points(calib_key))
 
         self.mplcanvas.draw()
         self.refresh_points()
