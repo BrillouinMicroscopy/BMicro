@@ -288,6 +288,9 @@ class EvaluationView(QtWidgets.QWidget):
                     value_max = np.nanmax(data[tuple(dslice)])
                     if value_min < value_max:
                         self.image_map.set_clim(value_min, value_max)
+                        # For some reason we have to apply the color limits
+                        # twice to make it work properly
+                        self.image_map.set_clim(value_min, value_max)
                 self.plot.set_title(parameters[parameter_key]['label'])
                 self.plot.set_xlabel(labels[idx[0]])
                 self.plot.set_ylabel(labels[idx[1]])
