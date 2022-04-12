@@ -64,6 +64,11 @@ class CalibrationView(QtWidgets.QWidget):
         self.button_prev_frame.clicked.connect(self.prev_frame)
         self.button_next_frame.clicked.connect(self.next_frame)
 
+        self.options_dialog = None
+        self.mplcanvas_options = None
+        self.plot_options = None
+        self.calibration_options.clicked.connect(self.show_options)
+
         self.mode = MODE_DEFAULT
 
         self.combobox_calibration.currentIndexChanged.connect(
@@ -294,6 +299,12 @@ class CalibrationView(QtWidgets.QWidget):
                             self.plot.vlines(w0, 0, np.nanmax(
                                 spectrum), colors=['black'])
 
+                expected = cc.expected_frequencies(
+                    calib_key, self.current_frame)
+                if expected is not None:
+                    self.plot.vlines(1e-9 * expected, 0, np.nanmax(
+                        spectrum), colors=['green'])
+
         except Exception as e:
             logger.error('Exception occurred in calibration: %s' % e)
         finally:
@@ -368,3 +379,137 @@ class CalibrationView(QtWidgets.QWidget):
         cc = CalibrationController()
         cc.find_peaks(calib_key)
         self.refresh_plot()
+
+    def show_options(self):
+        ui_file = pkg_resources.resource_filename(
+            'bmicro.gui.calibration', 'calibration_options.ui')
+        self.options_dialog = QtWidgets.QDialog(
+            self,
+            QtCore.Qt.WindowType.WindowTitleHint |
+            QtCore.Qt.WindowType.WindowCloseButtonHint
+        )
+        uic.loadUi(ui_file, self.options_dialog)
+        self.options_dialog.setWindowTitle('Calibration options')
+        self.options_dialog.setWindowModality(
+            QtCore.Qt.WindowModality.ApplicationModal)
+        self.options_dialog.button_ok.clicked.connect(
+            self.apply_and_close_options
+        )
+        self.options_dialog.button_apply.clicked.connect(
+            self.apply_options
+        )
+        self.options_dialog.button_cancel.clicked.connect(
+            self.close_options
+        )
+        self.options_dialog.adjustSize()
+
+        self.mplcanvas_options = MplCanvas(self.options_dialog.widget_plot,
+                                           toolbar=('Home', 'Pan', 'Zoom'))
+        self.plot_options =\
+            self.mplcanvas_options.get_figure().add_subplot(111)
+
+        self.update_options_view()
+        self.options_dialog.exec()
+
+    def apply_and_close_options(self):
+        self.apply_options()
+        self.close_options()
+
+    def apply_options(self):
+        session = Session.get_instance()
+        cm = session.calibration_model()
+        if cm is None:
+            return
+
+        shift_0_old = session.setup.calibration.shift_methanol
+        shift_1_old = session.setup.calibration.shift_water
+        shift_0_new = 1e9 * self.options_dialog.shift_0.value()
+        shift_1_new = 1e9 * self.options_dialog.shift_1.value()
+
+        if (shift_0_old != shift_0_new) | (shift_1_old != shift_1_new):
+            # Set current calibration values
+            session.setup.calibration.set_shift_methanol(shift_0_new)
+            session.setup.calibration.set_shift_water(shift_1_new)
+
+            # Apply new calibration values
+            calib_keys = session.get_calib_keys()
+            for calib_key in calib_keys:
+                self.calibration_controller.calibrate(calib_key)
+
+            self.update_options_view()
+            self.refresh_plot()
+
+    def close_options(self):
+        self.options_dialog.close()
+
+    def update_options_view(self):
+        if self.options_dialog is None:
+            return
+
+        session = Session.get_instance()
+        cm = session.calibration_model()
+        if cm is None:
+            return
+
+        # Set current calibration values
+        self.options_dialog.shift_0.setValue(
+            1e-9 * session.setup.calibration.shift_methanol)
+        self.options_dialog.shift_1.setValue(
+            1e-9 * session.setup.calibration.shift_water)
+
+        # Get the sorted calibration keys
+        calib_keys = session.get_calib_keys(sort_by_time=True)
+        if calib_keys is None:
+            return
+
+        # Allocate the shifts array
+        shifts = np.empty((
+            len(calib_keys)
+            * session.get_calibration_image_count(calib_keys[0]),
+            session.setup.calibration.num_brillouin_samples * 2
+        ))
+        shifts[:] = np.nan
+
+        # Get the resulting fitted calibration frequencies
+        cal_image = 0
+        for calib_key in calib_keys:
+            frame_count = session.get_calibration_image_count(calib_key)
+            for frame in range(frame_count):
+                cal_image = cal_image + 1
+                w0s = cm.get_sorted_peaks(calib_key, frame)
+
+                if w0s is None or w0s.shape[0]\
+                        != session.setup.calibration.\
+                        num_brillouin_samples * 2 + 2:
+                    continue
+
+                w0s_f = cm.get_frequency_by_calib_key(w0s, calib_key)
+
+                if w0s_f is None:
+                    continue
+
+                for i in range(
+                        session.setup.calibration.num_brillouin_samples):
+                    shifts[cal_image - 1, i] =\
+                        1e-9 * abs(w0s_f[0] - w0s_f[i + 1])
+                    shifts[cal_image - 1, -1*i - 1] =\
+                        1e-9 * abs(w0s_f[-1] - w0s_f[-1*i - 2])
+
+        # Clear the calibration plot
+        self.plot_options.cla()
+        # Plot calibration reference frequency shifts
+        self.plot_options.hlines(
+            1e-9 * session.setup.calibration.shift_methanol,
+            0, len(shifts) - 1, colors=['black'])
+        if session.setup.calibration.num_brillouin_samples > 1:
+            self.plot_options.hlines(
+                1e-9 * session.setup.calibration.shift_water,
+                0, len(shifts) - 1, colors=['black'])
+
+        # Plot the fitted calibration frequency shifts
+        self.plot_options.plot(shifts)
+
+        # Set the axis labels
+        self.plot_options.set_ylabel('$\\nu_\\mathrm{B}$ [GHz]')
+        # Update the plot
+        self.mplcanvas_options.draw()
