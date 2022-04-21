@@ -261,19 +261,20 @@ class CalibrationView(QtWidgets.QWidget):
                 self.refresh_regions(spectrum, regions, table, 'r', frequency)
 
                 for region_key, region in enumerate(regions):
-                    avg_w0 = cm.brillouin_fits.average_fits(
-                        calib_key, region_key)
-                    if avg_w0 is not None:
-                        w0_f = cm.get_frequency_by_calib_key(avg_w0, calib_key)
-                        if w0_f is not None:
-                            self.plot.vlines(1e-9*w0_f[0], 0, np.nanmax(
+                    fit = cm.brillouin_fits\
+                        .get_fit(calib_key, region_key, self.current_frame)
+                    if fit is not None:
+                        w0s = fit.w0s
+                        w0s_f = cm.get_frequency_by_calib_key(w0s, calib_key)
+                        if w0s_f is not None:
+                            self.plot.vlines(1e-9*w0s_f[0], 0, np.nanmax(
                                 spectrum), colors=['black'])
-                            self.plot.vlines(1e-9*w0_f[1], 0, np.nanmax(
+                            self.plot.vlines(1e-9*w0s_f[1], 0, np.nanmax(
                                 spectrum), colors=['black'])
                         else:
-                            self.plot.vlines(avg_w0[0], 0, np.nanmax(
+                            self.plot.vlines(w0s[0], 0, np.nanmax(
                                 spectrum), colors=['black'])
-                            self.plot.vlines(avg_w0[1], 0, np.nanmax(
+                            self.plot.vlines(w0s[1], 0, np.nanmax(
                                 spectrum), colors=['black'])
 
                 regions = cm.get_rayleigh_regions(calib_key)
@@ -281,15 +282,16 @@ class CalibrationView(QtWidgets.QWidget):
                 self.refresh_regions(spectrum, regions, table, 'm', frequency)
 
                 for region_key, region in enumerate(regions):
-                    avg_w0 = cm.rayleigh_fits.average_fits(
-                        calib_key, region_key)
-                    if avg_w0 is not None:
-                        w0_f = cm.get_frequency_by_calib_key(avg_w0, calib_key)
+                    fit = cm.rayleigh_fits\
+                        .get_fit(calib_key, region_key, self.current_frame)
+                    if fit is not None:
+                        w0 = fit.w0
+                        w0_f = cm.get_frequency_by_calib_key(w0, calib_key)
                         if w0_f is not None:
                             self.plot.vlines(1e-9*w0_f, 0, np.nanmax(
                                 spectrum), colors=['black'])
                         else:
-                            self.plot.vlines(avg_w0, 0, np.nanmax(
+                            self.plot.vlines(w0, 0, np.nanmax(
                                 spectrum), colors=['black'])
 
         except Exception as e:
