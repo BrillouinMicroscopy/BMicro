@@ -67,7 +67,7 @@ class ExtractionView(QtWidgets.QWidget):
         if not session.current_repetition():
             return
 
-        calib_keys = session.current_repetition().calibration.image_keys()
+        calib_keys = session.get_calib_keys(sort_by_time=True)
         self.combobox_datasets.addItems(calib_keys)
 
     def reset_ui(self):

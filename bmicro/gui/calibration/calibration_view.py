@@ -85,7 +85,7 @@ class CalibrationView(QtWidgets.QWidget):
         if not session.file:
             return
 
-        calib_keys = session.current_repetition().calibration.image_keys()
+        calib_keys = session.get_calib_keys(sort_by_time=True)
         self.combobox_calibration.addItems(calib_keys)
         self.refresh_plot()
 
