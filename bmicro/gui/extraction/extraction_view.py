@@ -84,8 +84,8 @@ class ExtractionView(QtWidgets.QWidget):
     def next_frame(self):
         session = Session.get_instance()
         calib_key = self.combobox_datasets.currentText()
-        imgs = session.get_calibration_image(calib_key)
-        if self.current_frame < len(imgs) - 1:
+        frame_count = session.get_calibration_image_count(calib_key)
+        if self.current_frame < frame_count - 1:
             self.current_frame += 1
             self.refresh_image_plot()
             self.checkFrameNavigationButtons()
@@ -99,8 +99,8 @@ class ExtractionView(QtWidgets.QWidget):
         session = Session.get_instance()
         calib_key = self.combobox_datasets.currentText()
         if calib_key:
-            imgs = session.get_calibration_image(calib_key)
-            if self.current_frame < len(imgs) - 1:
+            frame_count = session.get_calibration_image_count(calib_key)
+            if self.current_frame < frame_count - 1:
                 self.button_next_frame.setEnabled(True)
             else:
                 self.button_next_frame.setEnabled(False)
