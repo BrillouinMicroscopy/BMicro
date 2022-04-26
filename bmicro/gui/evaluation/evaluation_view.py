@@ -56,6 +56,8 @@ class EvaluationView(QtWidgets.QWidget):
 
         self.combobox_parameter.currentIndexChanged.connect(
             self.on_select_parameter)
+        self.combobox_peak_number.currentIndexChanged.connect(
+            self.on_select_parameter)
 
         self.autoscale.clicked.connect(
             self.on_scale_changed)
@@ -81,9 +83,65 @@ class EvaluationView(QtWidgets.QWidget):
         # Might not be necessary anymore once the plot is fast enough.
         self.plot_count = 0
 
+        self.bounds_table.horizontalHeader().setSectionResizeMode(
+            QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.bounds_table.verticalHeader().setSectionResizeMode(
+            QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.bounds_table.cellChanged.connect(self.boundsChanged)
+
+        self.nrBrillouinPeaks_1.toggled.connect(
+            lambda: self.setNrBrillouinPeaks(1))
+        self.nrBrillouinPeaks_2.toggled.connect(
+            lambda: self.setNrBrillouinPeaks(2))
+
     def update_ui(self):
+        session = Session.get_instance()
+        evm = session.evaluation_model()
+        if evm is None:
+            return
+
+        if evm.nr_brillouin_peaks == 1:
+            self.nrBrillouinPeaks_1.setChecked(True)
+            self.bounds_table.setEnabled(False)
+        else:
+            self.nrBrillouinPeaks_2.setChecked(True)
+            self.bounds_table.setEnabled(True)
+
+        self.updateBoundsTable()
         self.setup_parameter_selection_combobox()
         self.refresh_plot()
+
+    def updateBoundsTable(self):
+        session = Session.get_instance()
+        evm = session.evaluation_model()
+        if evm is None:
+            return
+        bounds = evm.bounds
+        if bounds is not None:
+            self.bounds_table.setColumnCount(2)
+            self.bounds_table.setColumnCount(len(bounds))
+            for i, bound in enumerate(bounds):
+                self.bounds_table.item(i, 0).setText(bound[0])
+                self.bounds_table.item(i, 1).setText(bound[1])
+
+    def setNrBrillouinPeaks(self, nr_brillouin_peaks):
+        session = Session.get_instance()
+        evm = session.evaluation_model()
+        if evm is None:
+            return
+        evm.setNrBrillouinPeaks(nr_brillouin_peaks)
+        self.combobox_peak_number.setEnabled(nr_brillouin_peaks > 1)
+        self.bounds_table.setEnabled(nr_brillouin_peaks > 1)
+
+    def boundsChanged(self, row, column):
+        session = Session.get_instance()
+        evm = session.evaluation_model()
+        if evm is None:
+            return
+
+        if evm.bounds is not None:
+            evm.bounds[row][column] =\
+                self.bounds_table.item(row, column).text()
 
     def clear_plots(self):
         if isinstance(self.colorbar, matplotlib.colorbar.Colorbar):
@@ -197,10 +255,12 @@ class EvaluationView(QtWidgets.QWidget):
         parameters = evm.get_parameter_keys()
 
         parameter_index = self.combobox_parameter.currentIndex()
+        brillouin_peak_index = self.combobox_peak_number.currentIndex()
         parameter_key = list(parameters.keys())[parameter_index]
 
         data, positions, dimensionality, labels =\
-            self.evaluation_controller.get_data(parameter_key)
+            self.evaluation_controller.\
+            get_data(parameter_key, brillouin_peak_index)
 
         # Subtract the mean value of the positions,
         # so they are centered around zero
