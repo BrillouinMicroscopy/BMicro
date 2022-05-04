@@ -337,6 +337,16 @@
           </spacer>
          </item>
          <item>
+          <widget class="QCheckBox" name="aspect_ratio">
+           <property name="text">
+            <string>1:1 Aspect Ratio</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QCheckBox" name="autoscale">
            <property name="text">
             <string>Autoscale</string>
