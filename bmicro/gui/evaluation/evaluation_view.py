@@ -326,10 +326,10 @@ class EvaluationView(QtWidgets.QWidget):
                     ' [' + parameters[parameter_key]['unit'] + ']'
                 self.plot.set_ylabel(ylabel)
                 self.plot.axis('auto')
-                self.plot.set_xlim(
-                    np.nanmin(positions[idx[0]][tuple(dslice)]),
-                    np.nanmax(positions[idx[0]][tuple(dslice)])
-                )
+                minx = np.nanmin(positions[idx[0]][tuple(dslice)])
+                maxx = np.nanmax(positions[idx[0]][tuple(dslice)])
+                if minx < maxx:
+                    self.plot.set_xlim(minx, maxx)
                 with warnings.catch_warnings():
                     warnings.filterwarnings(
                         action='ignore',
