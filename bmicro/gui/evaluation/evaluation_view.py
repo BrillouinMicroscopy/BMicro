@@ -59,6 +59,9 @@ class EvaluationView(QtWidgets.QWidget):
         self.combobox_peak_number.currentIndexChanged.connect(
             self.on_select_parameter)
 
+        self.aspect_ratio.clicked.connect(
+            self.refresh_plot)
+
         self.autoscale.clicked.connect(
             self.on_scale_changed)
         self.value_min.valueChanged.connect(
@@ -408,7 +411,10 @@ class EvaluationView(QtWidgets.QWidget):
                 cb_label = parameters[parameter_key]['symbol'] +\
                     ' [' + parameters[parameter_key]['unit'] + ']'
                 self.colorbar.ax.set_title(cb_label)
-                self.plot.axis('scaled')
+                if self.aspect_ratio.isChecked():
+                    self.plot.axis('scaled')
+                else:
+                    self.plot.axis('auto')
                 self.plot.set_xlim(
                     np.nanmin(positions[idx[0]][tuple(dslice)]),
                     np.nanmax(positions[idx[0]][tuple(dslice)])
