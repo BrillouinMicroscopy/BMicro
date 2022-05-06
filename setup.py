@@ -37,7 +37,6 @@ setup(
     description=description,
     long_description=open('README.rst').read() if exists('README.rst') else '',
     install_requires=["bmlab>=0.1.8",
-                      "gitpython",
                       "h5py>=2.10.0",
                       "matplotlib",
                       "numpy>=1.17.0",
