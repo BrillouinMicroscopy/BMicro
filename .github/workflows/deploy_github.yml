@@ -8,13 +8,19 @@ on:
 jobs:
   build:
     name: Create Release
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: ['3.9']
+        os: [macos-latest, windows-latest]
     steps:
     - name: Set env
       run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: 3.9
     - name: Install dependencies
@@ -22,10 +28,20 @@ jobs:
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
         pip install -e .
-    - name: Build app
+    - name: Build app for Mac
+      if: runner.os == 'macOS'
       working-directory: ./build-recipes
       run: |
-        bash ./macos_build_app.sh BMicro ${{ env.RELEASE_VERSION }}
+        bash ./macos_build_app.sh BMicro $(python -m bmicro --version)
+    - name: Create app for Win
+      if: runner.os == 'windows'
+      working-directory: ./build-recipes
+      run: |
+        pip install -r win_build_requirements.txt
+        pyinstaller -y --log-level=WARN win_BMicro.spec
+        .\dist\BMicro\\BMicro.exe --version
+        python win_make_iss.py
+        iscc /Q win_bmicro.iss
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -40,6 +56,7 @@ jobs:
         draft: true
         prerelease: false
     - name: Upload Release Asset DMG
+      if: runner.os == 'macOS'
       id: upload-release-asset-dmg
       uses: actions/upload-release-asset@v1
       env:
@@ -50,6 +67,7 @@ jobs:
         asset_name: BMicro_${{ env.RELEASE_VERSION }}_macosx.dmg
         asset_content_type: application/zip
     - name: Upload Release Asset PGK
+      if: runner.os == 'macOS'
       id: upload-release-asset-pkg
       uses: actions/upload-release-asset@v1
       env:
@@ -58,4 +76,15 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
         asset_path: ./build-recipes/dist/BMicro_${{ env.RELEASE_VERSION }}_macosx.pkg
         asset_name: BMicro_${{ env.RELEASE_VERSION }}_macosx.pkg
+        asset_content_type: application/zip
+    - name: Upload Release Asset EXE
+      if: runner.os == 'windows'
+      id: upload-release-asset-exe
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        asset_path: ./build-recipes/dist/Output/BMicro_${{ env.RELEASE_VERSION }}_win_64bit_setup.exe
+        asset_name: BMicro_${{ env.RELEASE_VERSION }}_win_64bit_setup.exe
         asset_content_type: application/zip
