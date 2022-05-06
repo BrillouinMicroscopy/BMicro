@@ -22,11 +22,11 @@ jobs:
       # Display must be available globally for linux to know where xvfb is
       DISPLAY: :0
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
     - name: Setup xvfb (Linux)
@@ -62,6 +62,7 @@ jobs:
       run: |
         coverage report -m
         codecov
+
     - name: Create app and check if it runs (macOS)
       if: runner.os == 'macOS'
       working-directory: ./build-recipes
@@ -71,6 +72,23 @@ jobs:
       if: (runner.os == 'macOS' && matrix.python-version == '3.9')
       uses: actions/upload-artifact@v3
       with:
-        name: BMicro
+        name: BMicro_macosx
         path: |
           ./build-recipes/dist/*.dmg
+
+    - name: Create app and check if it runs (Win)
+      if: runner.os == 'windows'
+      working-directory: ./build-recipes
+      run: |
+        pip install -r win_build_requirements.txt
+        pyinstaller -y --log-level=WARN win_BMicro.spec
+        .\dist\BMicro\\BMicro.exe --version
+        python win_make_iss.py
+        iscc /Q win_bmicro.iss
+    - name: Upload build artifacts
+      if: (runner.os == 'windows' && matrix.python-version == '3.9')
+      uses: actions/upload-artifact@v3
+      with:
+        name: BMicro
+        path: |
+          ./build-recipes/Output/*.exe
