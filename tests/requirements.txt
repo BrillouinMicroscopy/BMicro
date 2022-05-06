@@ -1,3 +1,4 @@
+gitpython
 pytest
 pytest-mock
 pytest-qt
