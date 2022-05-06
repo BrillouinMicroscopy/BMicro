@@ -48,12 +48,12 @@ Changelog
 # `pragma: no cover` to ignore code coverage here.
 if True:  # pragma: no cover
     import os
-    from os.path import abspath, basename, dirname, join, split
-    import subprocess
+    from os.path import abspath, basename, dirname, join
     import sys
     import time
     import traceback
     import warnings
+    import git
 
     def git_describe():
         """
@@ -66,24 +66,6 @@ if True:  # pragma: no cover
         # repository.
         ourdir = dirname(abspath(__file__))
 
-        def _minimal_ext_cmd(cmd):
-            # Construct minimal environment
-            env = {}
-            for k in ['SYSTEMROOT', 'PATH']:
-                v = os.environ.get(k)
-                if v is not None:
-                    env[k] = v
-            # LANGUAGE is used on win32
-            env['LANGUAGE'] = 'C'
-            env['LANG'] = 'C'
-            env['LC_ALL'] = 'C'
-            pop = subprocess.Popen(cmd,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE,
-                                   env=env)
-            out = pop.communicate()[0]
-            return out.strip().decode('ascii', errors="ignore")
-
         # change directory
         olddir = abspath(os.curdir)
         os.chdir(ourdir)
@@ -93,19 +75,8 @@ if True:  # pragma: no cover
         # to be in the directory tree).
         git_revision = ""
         try:
-            # If this file is not under version control, "loc" will
-            # be empty.
-            loc = _minimal_ext_cmd(['git', 'ls-files', '--full-name',
-                                    __file__])
-            # If it is under version control, it should be located
-            # one hierarchy down from the repository root (either
-            # __file__ is "docs/conf.py" or "package_name/_version.py".
-            if len(split(loc)) == 2:
-                try:
-                    git_revision = _minimal_ext_cmd(['git', 'describe',
-                                                     '--tags', 'HEAD'])
-                except OSError:
-                    pass
+            repo = git.Repo(search_parent_directories=True)
+            git_revision = repo.git.describe()
         except OSError:
             pass
         # Go back to original directory

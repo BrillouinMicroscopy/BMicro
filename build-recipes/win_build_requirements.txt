@@ -1,2 +1,3 @@
 # Any additional requirements for building the application
 pyinstaller>=4.8
+bmicro
