@@ -1,7 +1,7 @@
 |BMicro|
 ========
 
-|PyPI Version| |Build Status Unix| |Build Status Win| |Coverage Status| |Docs Status|
+|PyPI Version| |Build Status Unix| |Coverage Status| |Docs Status|
 
 
 This is a Python library for the post-measurement analysis of
@@ -36,8 +36,6 @@ Please read our `information for developers
    :target: https://pypi.python.org/pypi/bmicro
 .. |Build Status Unix| image:: https://img.shields.io/github/workflow/status/BrillouinMicroscopy/bmicro/Checks
    :target: https://github.com/BrillouinMicroscopy/BMicro/actions?query=workflow%3AChecks
-.. |Build Status Win| image:: https://img.shields.io/appveyor/build/raimund-schluessler/BMicro?label=build_win
-   :target: https://ci.appveyor.com/project/raimund-schluessler/BMicro
 .. |Coverage Status| image:: https://img.shields.io/codecov/c/github/BrillouinMicroscopy/BMicro/main.svg
    :target: https://codecov.io/gh/BrillouinMicroscopy/BMicro
 .. |Docs Status| image:: https://readthedocs.org/projects/bmicro/badge/?version=latest
