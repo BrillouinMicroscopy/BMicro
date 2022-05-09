@@ -2,6 +2,6 @@
 # There seems to be an issue with the scipy wheels for 1.8.0:
 # https://github.com/scipy/scipy/issues/15552
 scipy<1.8.0
-pyinstaller>=5.0
+pyinstaller==5.0.0
 bmicro
 
