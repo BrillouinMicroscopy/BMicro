@@ -3,5 +3,6 @@
 # https://github.com/scipy/scipy/issues/15552
 scipy<1.8.0
 pyinstaller>=5.0
+shapely<1.8.1
 bmicro
 
