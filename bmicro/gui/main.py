@@ -122,12 +122,19 @@ class BMicro(QtWidgets.QMainWindow):
         session = Session.get_instance()
         try:
             session.set_file(file_name)
-        except Exception:
+        except FileNotFoundError as e:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Icon.Warning)
             msg.setText('Unable to load file:')
-            msg.setInformativeText(str(file_name))
-            msg.setWindowTitle('Invalid File Error')
+            msg.setInformativeText(e.strerror)
+            msg.setWindowTitle(type(e).__name__)
+            msg.exec()
+        except Exception as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.setText('An unknown error occured')
+            msg.setInformativeText(str(e))
+            msg.setWindowTitle('Unknown Error')
             msg.exec()
 
         self.update_ui()
