@@ -1,3 +1,24 @@
+## 0.2.6 - 2022-05-06
+
+### Added
+- Implement two-peak Brillouin fitting #167 #168
+- Allow to toggle aspect ratio for 2D data #171
+
+### Fixed
+- Check x-limits before setting to prevent warning #172
+
+## 0.2.5 - 2022-04-25
+
+### Added
+- Add calibration options dialog #162
+
+### Changed
+- Show calibrations in correct temporal order #164
+- Show non-averged fit for each calibration image #165
+
+### Fixed
+- Fix small layout glitch in extraction view #161
+
 ## 0.2.4 - 2022-04-12
 
 ### Added
