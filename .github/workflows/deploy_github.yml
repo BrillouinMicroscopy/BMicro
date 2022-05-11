@@ -48,7 +48,7 @@ jobs:
         draft: true
         prerelease: false
         body: |
-            ![](https://img.shields.io/github/downloads/BrillouinMicroscopy/BMicro/${{ github.ref }}/total.svg)
+            ![](https://img.shields.io/github/downloads/BrillouinMicroscopy/BMicro/${{ github.ref_name }}/total.svg)
         files: |
           ./build-recipes/dist/BMicro_${{ github.ref_name }}_macosx.dmg
           ./build-recipes/dist/BMicro_${{ github.ref_name }}_macosx.pkg
@@ -60,6 +60,6 @@ jobs:
         draft: true
         prerelease: false
         body: |
-            ![](https://img.shields.io/github/downloads/BrillouinMicroscopy/BMicro/${{ github.ref }}/total.svg)
+            ![](https://img.shields.io/github/downloads/BrillouinMicroscopy/BMicro/${{ github.ref_name }}/total.svg)
         files: |
           ./build-recipes/Output/BMicro_${{ github.ref_name }}_win_64bit_setup.exe
