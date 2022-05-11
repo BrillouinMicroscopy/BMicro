@@ -206,6 +206,10 @@ class EvaluationView(QtWidgets.QWidget):
         self.evaluation_abort.value = False
         self.evaluation_running = True
         self.button_evaluate.setText('Cancel')
+        # While the evaluation is running, we
+        # disable switching to multi-peak fit and adjusting bounds
+        self.nrBrillouinPeaksGroup.setEnabled(False)
+        self.bounds_table.setEnabled(False)
         self.evaluation_timer.start(500)
 
         self.plot_count = 0
@@ -238,6 +242,10 @@ class EvaluationView(QtWidgets.QWidget):
             self.evaluation_timer.stop()
             self.evaluation_running = False
             self.button_evaluate.setText('Evaluate')
+            self.nrBrillouinPeaksGroup.setEnabled(True)
+            session = Session.get_instance()
+            if session.evaluation_model().nr_brillouin_peaks > 1:
+                self.bounds_table.setEnabled(True)
             self.refresh_plot()
 
         if self.max_count.value >= 0:
