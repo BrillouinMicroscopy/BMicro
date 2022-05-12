@@ -1,3 +1,12 @@
+## 0.2.7 - 2022-05-12
+
+### Added
+- Properly handle bmlab exceptions #180
+
+### Fixed
+- Don't crash when switching to multi-peak fit during evaluation #181 #182
+- Fix DMG packages for macOS by locking shapely version #179
+
 ## 0.2.6 - 2022-05-06
 
 ### Added
