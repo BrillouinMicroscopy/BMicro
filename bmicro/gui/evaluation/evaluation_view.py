@@ -214,7 +214,13 @@ class EvaluationView(QtWidgets.QWidget):
 
         self.plot_count = 0
         self.count = mp.Value('I', 0, lock=True)
-        self.max_count = mp.Value('i', 0, lock=True)
+
+        # We have to initialize the value correctly here,
+        # otherwise the evaluation might abort immediately
+        # if max_count is set only after the evaluation_timer
+        # triggered for the first time
+        image_keys = self.session.get_image_keys()
+        self.max_count = mp.Value('i', len(image_keys), lock=True)
 
         dnkw = {
             "count": self.count,
