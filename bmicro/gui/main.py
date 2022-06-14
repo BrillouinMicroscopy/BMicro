@@ -6,6 +6,8 @@ from PyQt6.QtWidgets import QFileDialog, QMessageBox
 
 from bmlab.session import Session
 
+from bmlab.controllers import ExportController
+
 from . import data
 from . import extraction
 from . import calibration
@@ -97,6 +99,7 @@ class BMicro(QtWidgets.QMainWindow):
         self.action_open.triggered.connect(self.open_file)
         self.action_close.triggered.connect(self.close_file)
         self.action_save.triggered.connect(self.save_session)
+        self.action_export.triggered.connect(self.export_file)
         self.action_exit.triggered.connect(self.exit_app)
 
         self.action_about.triggered.connect(self.on_action_about)
@@ -139,6 +142,9 @@ class BMicro(QtWidgets.QMainWindow):
     def close_file(self):
         Session.get_instance().clear()
         self.reset_ui()
+
+    def export_file(self):
+        ExportController().export()
 
     def reset_ui(self):
         """
