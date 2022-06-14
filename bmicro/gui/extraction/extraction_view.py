@@ -157,9 +157,9 @@ class ExtractionView(QtWidgets.QWidget):
         self.image_plot.imshow(img.T, origin='lower', vmin=100, vmax=300)
         self.image_plot.set_title('Frame %d' % (self.current_frame+1))
 
-        circle_fit = em.get_circle_fit(calib_key)
+        points = em.get_points(calib_key)
 
-        if circle_fit:
+        if len(points) >= 3:
             em.set_image_shape(img.shape)
 
             arcs = em.get_arc_by_calib_key(calib_key)

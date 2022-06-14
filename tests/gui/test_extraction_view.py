@@ -2,6 +2,7 @@ import pathlib
 from collections import namedtuple
 
 import pytest
+import numpy as np
 
 from bmlab.session import Session
 
@@ -63,13 +64,18 @@ def test_selecting_three_points_creates_circle_fit(qtbot, window):
     event = Event(100, 0)
     ev.on_click_image(event)
     session = Session.get_instance()
-    assert session.extraction_model().get_circle_fit('1') is None
-    event = Event(141, 141)
+    np.testing.assert_array_equal(
+        session.extraction_model().get_arc_by_calib_key('1'),
+        np.empty(0)
+    )
+    event = Event(100/(2**0.5), 100/(2**0.5))
     ev.on_click_image(event)
-    fit = session.extraction_model().get_circle_fit('1')
-    center, radius = fit
-    assert center
-    assert radius
+    fit = session.extraction_model().get_arc_by_calib_key('1')
+    assert fit is not None
+    assert len(fit) == 500
+    np.testing.assert_array_almost_equal(fit[0, 2, :], [0, 100])
+    np.testing.assert_array_almost_equal(fit[0, 2, :], [0, 100])
+    np.testing.assert_array_almost_equal(fit[-1, 2, :], [100, 0])
 
 
 def test_clicking_clear_deletes_points(qtbot, window):
