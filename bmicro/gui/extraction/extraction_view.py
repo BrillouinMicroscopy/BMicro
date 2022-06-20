@@ -219,7 +219,7 @@ class ExtractionView(QtWidgets.QWidget):
 
     def _plot_points(self, points):
         for p in points:
-            circle = MPLCircle(p, radius=3, color='red')
+            circle = MPLCircle(p, radius=3, color='red', alpha=0.5)
             self.image_plot.add_patch(circle)
 
     def toggle_mode(self):
