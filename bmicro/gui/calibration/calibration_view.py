@@ -62,6 +62,13 @@ class CalibrationView(QtWidgets.QWidget):
 
         self.button_calibrate.released.connect(self.calibrate)
 
+        self.button_find_peaks_all.released.connect(
+            lambda: self.calibrate_all(do_not='calibrate'))
+        self.button_calibrate_all.released.connect(
+            lambda: self.calibrate_all(do_not='find_peaks'))
+        self.button_peaks_and_calibrate_all\
+            .released.connect(self.calibrate_all)
+
         self.current_frame = 0
         self.button_prev_frame.clicked.connect(self.prev_frame)
         self.button_next_frame.clicked.connect(self.next_frame)
@@ -226,7 +233,36 @@ class CalibrationView(QtWidgets.QWidget):
 
         self.refresh_plot()
 
-        self.refresh_plot()
+    def calibrate_all(self, do_not=None):
+        session = Session.get_instance()
+        calib_keys = session.get_calib_keys(sort_by_time=True)
+
+        if not calib_keys:
+            return
+
+        self.calibration_progress.setMaximum(len(calib_keys))
+
+        for i, calib_key in enumerate(calib_keys):
+            self.combobox_calibration.setCurrentText(calib_key)
+
+            dnkw = {
+                "calib_key": calib_key,
+            }
+
+            if do_not != 'find_peaks':
+                self.thread.set_task(
+                    func=self.calibration_controller.find_peaks, fkw=dnkw)
+                self.thread.start()
+                self.thread.wait()
+            if do_not != 'calibrate':
+                self.thread.set_task(
+                    func=self.calibration_controller.calibrate, fkw=dnkw)
+                self.thread.start()
+                self.thread.wait()
+            self.calibration_progress.setValue(i + 1)
+
+            self.refresh_plot()
+            QtCore.QCoreApplication.instance().processEvents()
 
     def refresh_plot(self):
         self.plot.cla()
