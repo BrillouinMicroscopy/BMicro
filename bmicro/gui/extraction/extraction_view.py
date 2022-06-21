@@ -1,7 +1,7 @@
 import pkg_resources
 import logging
 
-from PyQt6 import QtWidgets, uic
+from PyQt6 import QtWidgets, QtCore, uic
 from matplotlib.patches import Circle as MPLCircle
 
 import matplotlib
@@ -10,6 +10,7 @@ import numpy as np
 from bmlab.session import Session
 from bmlab.controllers import ExtractionController
 
+from bmicro.BGThread import BGThread
 from bmicro.gui.mpl import MplCanvas
 
 
@@ -41,6 +42,8 @@ class ExtractionView(QtWidgets.QWidget):
         self.mplcanvas.get_figure().canvas.mpl_connect(
             'button_press_event', self.on_click_image)
 
+        self.thread = BGThread()
+
         self.combobox_datasets.currentIndexChanged.connect(
             self.on_select_dataset)
 
@@ -60,6 +63,8 @@ class ExtractionView(QtWidgets.QWidget):
 
         self.update_ui()
         self.checkFrameNavigationButtons()
+
+        self.extraction_controller = ExtractionController()
 
     def update_ui(self):
         session = Session.get_instance()
@@ -272,6 +277,23 @@ class ExtractionView(QtWidgets.QWidget):
         Automatically finds the Rayleigh and Brillouin peaks of interest
         for all calibrations existing.
         """
-        ec = ExtractionController()
-        ec.find_points_all()
-        self.refresh_image_plot()
+        session = Session.get_instance()
+        calib_keys = session.get_calib_keys(sort_by_time=True)
+
+        if not calib_keys:
+            return
+
+        for i, calib_key in enumerate(calib_keys):
+            self.combobox_datasets.setCurrentText(calib_key)
+
+            dnkw = {
+                "calib_key": calib_key,
+            }
+
+            self.thread.set_task(
+                func=self.extraction_controller.find_points, fkw=dnkw)
+            self.thread.start()
+            self.thread.wait()
+
+            self.refresh_image_plot()
+            QtCore.QCoreApplication.instance().processEvents()
