@@ -1,10 +1,12 @@
 import pathlib
 import pkg_resources
+import hashlib
 
 from PyQt6 import QtWidgets, uic, QtCore
 from PyQt6.QtWidgets import QFileDialog, QMessageBox
 
 from bmlab.session import Session
+from bmlab.file import is_source_file
 
 from bmlab.controllers import ExportController
 
@@ -60,6 +62,7 @@ class BMicro(QtWidgets.QMainWindow):
         self.tabWidget.currentChanged.connect(self.update_ui)
 
         self.batch_dialog = None
+        self.batch_files = {}
 
         # Build tabs
         self.widget_data_view = data.DataView(self)
@@ -230,12 +233,13 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_dialog.setWindowTitle('Batch evaluation')
         self.batch_dialog.setWindowModality(
             QtCore.Qt.WindowModality.ApplicationModal)
-        self.batch_dialog.button_close.clicked.connect(
-            self.close_batch_dialog
-        )
-        self.batch_dialog.button_start.clicked.connect(
+        self.batch_dialog.button_start_cancel.clicked.connect(
             self.start_batch_evaluation
         )
+        self.batch_dialog.button_add_folder.clicked.connect(
+            self.batch_add_files
+        )
+        self.update_batch_file_table()
         self.batch_dialog.adjustSize()
 
         self.batch_dialog.exec()
@@ -245,3 +249,38 @@ class BMicro(QtWidgets.QMainWindow):
 
     def start_batch_evaluation(self):
         print('started')
+
+    def batch_add_files(self):
+        folder_name = QFileDialog.getExistingDirectory(
+            self, 'Select folder...',
+            directory=self.settings.value("path/last-used")
+        )
+
+        # Find all h5 files in the selected folder
+        h5_files = pathlib.Path(folder_name).glob('**/*.h5')
+
+        # Add source files to batch if not present yet
+        for h5_file in h5_files:
+            h5_file_md5 = hashlib.md5(str(h5_file).encode('utf-8')).hexdigest()
+            if is_source_file(h5_file)\
+                    and h5_file_md5 not in self.batch_files:
+                self.batch_files[h5_file_md5] = {
+                    'path': h5_file,
+                    'status': 'pending',
+                }
+
+        self.update_batch_file_table()
+
+        self.update_batch_file_table()
+
+    def update_batch_file_table(self):
+        table = self.batch_dialog.table_files
+        table.setTextElideMode(QtCore.Qt.TextElideMode.ElideRight)
+        table.setWordWrap(False)
+        table.setColumnCount(1)
+        table.setRowCount(len(self.batch_files))
+        table.blockSignals(True)
+        for rowIdx, (file_hash, file) in enumerate(self.batch_files.items()):
+            path = QtWidgets.QTableWidgetItem(str(file['path']))
+            table.setItem(rowIdx, 0, path)
+        table.blockSignals(False)
