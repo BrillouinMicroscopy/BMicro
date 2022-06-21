@@ -59,6 +59,8 @@ class BMicro(QtWidgets.QMainWindow):
 
         self.tabWidget.currentChanged.connect(self.update_ui)
 
+        self.batch_dialog = None
+
         # Build tabs
         self.widget_data_view = data.DataView(self)
         self.layout_data = QtWidgets.QVBoxLayout()
@@ -103,6 +105,8 @@ class BMicro(QtWidgets.QMainWindow):
         self.action_exit.triggered.connect(self.exit_app)
 
         self.action_about.triggered.connect(self.on_action_about)
+        self.action_batch_evaluation.triggered.connect(
+            self.on_action_batch_evaluation)
 
     def open_file(self, file_name=None):
         """ Show open file dialog and load file. """
@@ -213,3 +217,31 @@ class BMicro(QtWidgets.QMainWindow):
             + "<a href='https://{rtd}'>{rtd}</a><br>".format(rtd=rtd)
         QtWidgets.QMessageBox.about(self,
                                     f"BMicro {bmicroversion}", about_text)
+
+    def on_action_batch_evaluation(self):
+        ui_file = pkg_resources.resource_filename(
+            'bmicro.gui', 'batch_evaluation.ui')
+        self.batch_dialog = QtWidgets.QDialog(
+            self,
+            QtCore.Qt.WindowType.WindowTitleHint |
+            QtCore.Qt.WindowType.WindowCloseButtonHint
+        )
+        uic.loadUi(ui_file, self.batch_dialog)
+        self.batch_dialog.setWindowTitle('Batch evaluation')
+        self.batch_dialog.setWindowModality(
+            QtCore.Qt.WindowModality.ApplicationModal)
+        self.batch_dialog.button_close.clicked.connect(
+            self.close_batch_dialog
+        )
+        self.batch_dialog.button_start.clicked.connect(
+            self.start_batch_evaluation
+        )
+        self.batch_dialog.adjustSize()
+
+        self.batch_dialog.exec()
+
+    def close_batch_dialog(self):
+        self.batch_dialog.close()
+
+    def start_batch_evaluation(self):
+        print('started')

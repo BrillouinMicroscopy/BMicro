@@ -85,6 +85,8 @@
     <addaction name="action_export"/>
     <addaction name="action_save"/>
     <addaction name="separator"/>
+    <addaction name="action_batch_evaluation"/>
+    <addaction name="separator"/>
     <addaction name="action_exit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -152,6 +154,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="action_batch_evaluation">
+   <property name="text">
+    <string>Batch evaluation</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
    </property>
   </action>
  </widget>
