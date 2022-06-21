@@ -39,6 +39,8 @@ class CalibrationView(QtWidgets.QWidget):
                                    toolbar=('Home', 'Pan', 'Zoom'))
         self.plot = self.mplcanvas.get_figure().add_subplot(111)
 
+        self.thread = BGThread()
+
         props = dict(facecolor='green', alpha=0.5)
         self.span_selector = SpanSelector(
             self.plot, onselect=self.on_select_data_region,
@@ -209,8 +211,9 @@ class CalibrationView(QtWidgets.QWidget):
             "max_count": max_count,
         }
 
-        thread = BGThread(func=self.calibration_controller.calibrate, fkw=dnkw)
-        thread.start()
+        self.thread.set_task(
+            func=self.calibration_controller.calibrate, fkw=dnkw)
+        self.thread.start()
         # Show a progress until computation is done
         while max_count.value == 0 or count.value < max_count.value:
             time.sleep(.05)
@@ -219,7 +222,9 @@ class CalibrationView(QtWidgets.QWidget):
                 self.calibration_progress.setMaximum(max_count.value)
             QtCore.QCoreApplication.instance().processEvents()
         # make sure the thread finishes
-        thread.wait()
+        self.thread.wait()
+
+        self.refresh_plot()
 
         self.refresh_plot()
 
