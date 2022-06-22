@@ -239,6 +239,9 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_dialog.button_add_folder.clicked.connect(
             self.batch_add_files
         )
+        self.batch_dialog.button_remove_folder.clicked.connect(
+            self.batch_remove_files
+        )
         self.update_batch_file_table()
         self.batch_dialog.adjustSize()
 
@@ -271,6 +274,19 @@ class BMicro(QtWidgets.QMainWindow):
 
         self.update_batch_file_table()
 
+    def batch_remove_files(self):
+        table = self.batch_dialog.table_files
+        selected_ranges = table.selectedRanges()
+        hashes = list(self.batch_files.keys())
+        hashes_remove = []
+        for selected_range in selected_ranges:
+            start = selected_range.topRow()
+            end = selected_range.bottomRow()
+            for i in range(start, end + 1):
+                hashes_remove.append(hashes[i])
+        for hash_remove in hashes_remove:
+            self.batch_files.pop(hash_remove)
+        table.clearSelection()
         self.update_batch_file_table()
 
     def update_batch_file_table(self):
