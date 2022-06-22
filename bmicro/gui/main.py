@@ -2,7 +2,7 @@ import pathlib
 import pkg_resources
 import hashlib
 
-from PyQt6 import QtWidgets, uic, QtCore
+from PyQt6 import QtWidgets, uic, QtCore, QtGui
 from PyQt6.QtWidgets import QFileDialog, QMessageBox
 
 from bmlab.session import Session
@@ -58,6 +58,8 @@ class BMicro(QtWidgets.QMainWindow):
         ui_file = pkg_resources.resource_filename('bmicro.gui', 'main.ui')
         uic.loadUi(ui_file, self)
         QtCore.QCoreApplication.setApplicationName('BMicro')
+
+        self.imdir = pkg_resources.resource_filename("bmicro", "img")
 
         self.tabWidget.currentChanged.connect(self.update_ui)
 
@@ -293,10 +295,40 @@ class BMicro(QtWidgets.QMainWindow):
         table = self.batch_dialog.table_files
         table.setTextElideMode(QtCore.Qt.TextElideMode.ElideRight)
         table.setWordWrap(False)
-        table.setColumnCount(1)
+        table.setColumnCount(2)
         table.setRowCount(len(self.batch_files))
         table.blockSignals(True)
+
+        pending_icon_path = str(pathlib.Path(self.imdir) / "pending.svg")
+        inprocess_icon_path = str(pathlib.Path(self.imdir) / "in-process.svg")
+        success_icon_path =\
+            str(pathlib.Path(self.imdir) / "check_circle_outline.svg")
+        failed_icon_path = str(pathlib.Path(self.imdir) / "error.svg")
+        aborted_icon_path = str(pathlib.Path(self.imdir) / "cancel.svg")
+
         for rowIdx, (file_hash, file) in enumerate(self.batch_files.items()):
+            table.setIconSize(QtCore.QSize(20, 20))
+            status = file['status']
+            if status == 'in-process':
+                icon_path = inprocess_icon_path
+            elif status == 'success':
+                icon_path = success_icon_path
+            elif status == 'aborted':
+                icon_path = aborted_icon_path
+            elif status == 'failed':
+                icon_path = failed_icon_path
+            else:
+                icon_path = pending_icon_path
+            icon = QtGui.QIcon(icon_path)
+            entry = QtWidgets.QTableWidgetItem()
+            entry.setSizeHint(QtCore.QSize(20, 20))
+            entry.setIcon(icon)
+            table.setItem(rowIdx, 0, entry)
+
             path = QtWidgets.QTableWidgetItem(str(file['path']))
-            table.setItem(rowIdx, 0, path)
+            table.setItem(rowIdx, 1, path)
+        table.setColumnWidth(0, 18)
+        table.horizontalHeader().setStretchLastSection(True)
+        table.verticalHeader().setVisible(False)
+        table.horizontalHeader().setVisible(False)
         table.blockSignals(False)
