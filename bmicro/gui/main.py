@@ -56,19 +56,8 @@ class BMicro(QtWidgets.QMainWindow):
         QtCore.QCoreApplication.setApplicationName('BMicro')
 
         self.tabWidget.currentChanged.connect(self.update_ui)
-        self.build_tabs()
 
-        self.connect_menu()
-
-        self.connect_drag_drop()
-
-        self.setAcceptDrops(True)
-
-        self.reset_ui()
-
-        self.settings = QtCore.QSettings()
-
-    def build_tabs(self):
+        # Build tabs
         self.widget_data_view = data.DataView(self)
         self.layout_data = QtWidgets.QVBoxLayout()
         self.tab_data.setLayout(self.layout_data)
@@ -91,9 +80,17 @@ class BMicro(QtWidgets.QMainWindow):
         self.tab_evaluation.setLayout(self.layout_evaluation)
         self.layout_evaluation.addWidget(self.widget_evaluation_view)
 
-    def connect_drag_drop(self):
+        self.connect_menu()
+
+        # Connect drag and drop
         self.dragEnterEvent = self.drag_enter_event
         self.dropEvent = self.drop_event
+
+        self.setAcceptDrops(True)
+
+        self.reset_ui()
+
+        self.settings = QtCore.QSettings()
 
     def connect_menu(self):
         """ Registers the menu actions """
@@ -174,7 +171,8 @@ class BMicro(QtWidgets.QMainWindow):
         elif new_tab_index == 4:
             self.widget_evaluation_view.update_ui()
 
-    def drag_enter_event(self, event):
+    @staticmethod
+    def drag_enter_event(event):
         """ Handles dragging a file over the GUI """
         if check_event_mime_data(event):
             event.accept()
@@ -187,11 +185,13 @@ class BMicro(QtWidgets.QMainWindow):
         if path:
             self.open_file(path)
 
-    def save_session(self):
+    @staticmethod
+    def save_session():
         """ Save the session data to file with ending '.bms' """
         Session.get_instance().save()
 
-    def exit_app(self):
+    @staticmethod
+    def exit_app():
         QtCore.QCoreApplication.quit()
 
     def on_action_about(self):
