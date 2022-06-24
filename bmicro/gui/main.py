@@ -69,23 +69,23 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_files = {}
         self.batch_config = {
             'setup': {
-                'set': False,
+                'set': True,
                 'setup': AVAILABLE_SETUPS[0],
             },
             'orientation': {
-                'set': False,
+                'set': True,
                 'rotation': 0,
-                'reflection': {'vertically': False, 'horizontally': False},
+                'reflection': {'vertically': False, 'horizontally': True},
             },
             'extraction': {
-                'extract': False,
+                'extract': True,
             },
             'calibration': {
                 'find-peaks': True,
-                'calibrate': False,
+                'calibrate': True,
             },
             'peak-selection': {
-                'select': False,
+                'select': True,
                 'brillouin_regions': [(4.0e9, 6.0e9), (9.0e9, 11.0e9)],
                 'rayleigh_regions': [(-2.0e9, 2.0e9), (13.0e9, 17.0e9)],
             },
@@ -276,10 +276,180 @@ class BMicro(QtWidgets.QMainWindow):
         self.update_batch_file_table()
         self.batch_dialog.adjustSize()
 
+        self.update_batch_file_settings()
+
         self.batch_dialog.exec()
 
     def close_batch_dialog(self):
         self.batch_dialog.close()
+
+    def update_batch_file_settings(self):
+        # Setup
+        cfg_setup = self.batch_config['setup']
+        self.batch_dialog.checkBox_setup.setChecked(cfg_setup['set'])
+        self.batch_dialog.checkBox_setup.clicked.connect(self.on_setup_set)
+        self.batch_dialog.combobox_setup.addItems(
+            [s.name for s in AVAILABLE_SETUPS])
+        idx = AVAILABLE_SETUPS.index(cfg_setup['setup'])
+        if idx:
+            self.batch_dialog.combobox_setup.setCurrentIndex(idx)
+        self.batch_dialog.combobox_setup.setEnabled(cfg_setup['set'])
+        self.batch_dialog.combobox_setup.currentIndexChanged.connect(
+            self.on_setup_select)
+
+        # Orientation
+        cfg_orientation = self.batch_config['orientation']
+        self.batch_dialog.checkBox_orientation\
+            .setChecked(cfg_orientation['set'])
+        self.batch_dialog.checkBox_orientation\
+            .clicked.connect(self.on_orientation_set)
+        self.batch_dialog.groupBox_rotation\
+            .setEnabled(cfg_orientation['set'])
+        self.batch_dialog.groupBox_reflection\
+            .setEnabled(cfg_orientation['set'])
+
+        self.batch_dialog.checkbox_reflect_vertically.setChecked(
+            cfg_orientation['reflection']['vertically'])
+        self.batch_dialog.checkbox_reflect_horizontally.setChecked(
+            cfg_orientation['reflection']['horizontally'])
+
+        self.batch_dialog.radio_rotation_none.setChecked(
+            cfg_orientation['rotation'] % 4 == 0)
+        self.batch_dialog.radio_rotation_90_cw.setChecked(
+            cfg_orientation['rotation'] % 4 == 1)
+        self.batch_dialog.radio_rotation_90_ccw.setChecked(
+            cfg_orientation['rotation'] % 4 == 3)
+
+        self.batch_dialog.radio_rotation_none\
+            .clicked.connect(self.on_rotation_clicked)
+        self.batch_dialog.radio_rotation_90_cw\
+            .clicked.connect(self.on_rotation_clicked)
+        self.batch_dialog.radio_rotation_90_ccw\
+            .clicked.connect(self.on_rotation_clicked)
+
+        self.batch_dialog.checkbox_reflect_vertically.toggled.connect(
+            self.on_reflection_clicked)
+        self.batch_dialog.checkbox_reflect_horizontally.toggled.connect(
+            self.on_reflection_clicked)
+
+        # Extraction
+        cfg_extraction = self.batch_config['extraction']
+        self.batch_dialog.checkBox_extraction\
+            .setChecked(cfg_extraction['extract'])
+        self.batch_dialog.checkBox_extraction\
+            .clicked.connect(self.on_extraction_set)
+
+        # Calibration
+        cfg_calibration = self.batch_config['calibration']
+        self.batch_dialog.checkBox_find_peaks\
+            .setChecked(cfg_calibration['find-peaks'])
+        self.batch_dialog.checkBox_find_peaks\
+            .clicked.connect(self.on_calibration_find_peaks)
+        self.batch_dialog.checkBox_calibrate\
+            .setChecked(cfg_calibration['calibrate'])
+        self.batch_dialog.checkBox_calibrate\
+            .clicked.connect(self.on_calibration_calibrate)
+
+        # Peak selection
+        cfg_peak_selection = self.batch_config['peak-selection']
+        self.batch_dialog.checkBox_peak_selection\
+            .setChecked(cfg_peak_selection['select'])
+        self.batch_dialog.checkBox_peak_selection\
+            .clicked.connect(self.on_peak_selection_select)
+        self.batch_dialog.tableWidget_Brillouin\
+            .setEnabled(cfg_peak_selection['select'])
+        self.batch_dialog.tableWidget_Rayleigh\
+            .setEnabled(cfg_peak_selection['select'])
+
+        self.batch_dialog.tableWidget_Brillouin\
+            .verticalHeader().setVisible(False)
+        self.batch_dialog.tableWidget_Brillouin\
+            .horizontalHeader().setVisible(False)
+        self.batch_dialog.tableWidget_Rayleigh\
+            .verticalHeader().setVisible(False)
+        self.batch_dialog.tableWidget_Rayleigh\
+            .horizontalHeader().setVisible(False)
+
+        # Evaluation
+        cfg_evaluation = self.batch_config['evaluation']
+        self.batch_dialog.checkBox_evaluation\
+            .setChecked(cfg_evaluation['evaluate'])
+        self.batch_dialog.checkBox_evaluation\
+            .clicked.connect(self.on_evaluation_evaluate)
+
+    def on_setup_set(self):
+        self.batch_config['setup']['set'] = self.sender().isChecked()
+        self.batch_dialog.combobox_setup\
+            .setEnabled(self.batch_config['setup']['set'])
+
+    def on_orientation_set(self):
+        self.batch_config['orientation']['set'] = self.sender().isChecked()
+        self.batch_dialog.groupBox_rotation\
+            .setEnabled(self.batch_config['orientation']['set'])
+        self.batch_dialog.groupBox_reflection\
+            .setEnabled(self.batch_config['orientation']['set'])
+
+    def on_rotation_clicked(self):
+        """
+        Action triggered when user clicks one of the rotation radio buttons.
+        """
+
+        radio_button = self.sender()
+        if not radio_button.isChecked():
+            return
+
+        if radio_button == self.batch_dialog.radio_rotation_none:
+            self.batch_config['orientation']['rotation'] = 0
+        elif radio_button == self.batch_dialog.radio_rotation_90_cw:
+            self.batch_config['orientation']['rotation'] = 1
+        elif radio_button == self.batch_dialog.radio_rotation_90_ccw:
+            self.batch_config['orientation']['rotation'] = 3
+
+    def on_reflection_clicked(self):
+        """ Triggered when a reflection checkbox is clicked """
+
+        checkbox = self.sender()
+
+        if checkbox == self.batch_dialog.checkbox_reflect_vertically:
+            self.batch_config['orientation'][
+                'reflection']['vertically'] = checkbox.isChecked()
+        elif checkbox == self.batch_dialog.checkbox_reflect_horizontally:
+            self.batch_config['orientation'][
+                'reflection']['horizontally'] = checkbox.isChecked()
+
+    def on_extraction_set(self):
+        self.batch_config['extraction']['extract'] = self.sender().isChecked()
+
+    def on_calibration_find_peaks(self):
+        self.batch_config['calibration']['find-peaks']\
+            = self.sender().isChecked()
+
+    def on_calibration_calibrate(self):
+        self.batch_config['calibration']['calibrate']\
+            = self.sender().isChecked()
+
+    def on_peak_selection_select(self):
+        self.batch_config['peak-selection']['select']\
+            = self.sender().isChecked()
+        self.batch_dialog.tableWidget_Brillouin\
+            .setEnabled(self.batch_config['peak-selection']['select'])
+        self.batch_dialog.tableWidget_Rayleigh\
+            .setEnabled(self.batch_config['peak-selection']['select'])
+
+    def on_evaluation_evaluate(self):
+        self.batch_config['evaluation']['evaluate'] = self.sender().isChecked()
+
+    def on_setup_select(self):
+        """
+        Action triggered when the user selects a different setup.
+        """
+        name = self.batch_dialog.combobox_setup.currentText()
+        setup = None
+        for s in AVAILABLE_SETUPS:
+            if s.name == name:
+                setup = s
+                break
+        self.batch_config['setup']['setup'] = setup
 
     def start_batch_evaluation(self):
         self.batch_evaluation_running = not self.batch_evaluation_running
