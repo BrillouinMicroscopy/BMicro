@@ -39,6 +39,8 @@ class CalibrationView(QtWidgets.QWidget):
                                    toolbar=('Home', 'Pan', 'Zoom'))
         self.plot = self.mplcanvas.get_figure().add_subplot(111)
 
+        self.thread = BGThread()
+
         props = dict(facecolor='green', alpha=0.5)
         self.span_selector = SpanSelector(
             self.plot, onselect=self.on_select_data_region,
@@ -59,6 +61,13 @@ class CalibrationView(QtWidgets.QWidget):
         self.button_fit_clear.released.connect(self.clear_calibration)
 
         self.button_calibrate.released.connect(self.calibrate)
+
+        self.button_find_peaks_all.released.connect(
+            lambda: self.calibrate_all(do_not='calibrate'))
+        self.button_calibrate_all.released.connect(
+            lambda: self.calibrate_all(do_not='find_peaks'))
+        self.button_peaks_and_calibrate_all\
+            .released.connect(self.calibrate_all)
 
         self.current_frame = 0
         self.button_prev_frame.clicked.connect(self.prev_frame)
@@ -209,8 +218,9 @@ class CalibrationView(QtWidgets.QWidget):
             "max_count": max_count,
         }
 
-        thread = BGThread(func=self.calibration_controller.calibrate, fkw=dnkw)
-        thread.start()
+        self.thread.set_task(
+            func=self.calibration_controller.calibrate, fkw=dnkw)
+        self.thread.start()
         # Show a progress until computation is done
         while max_count.value == 0 or count.value < max_count.value:
             time.sleep(.05)
@@ -219,9 +229,40 @@ class CalibrationView(QtWidgets.QWidget):
                 self.calibration_progress.setMaximum(max_count.value)
             QtCore.QCoreApplication.instance().processEvents()
         # make sure the thread finishes
-        thread.wait()
+        self.thread.wait()
 
         self.refresh_plot()
+
+    def calibrate_all(self, do_not=None):
+        session = Session.get_instance()
+        calib_keys = session.get_calib_keys(sort_by_time=True)
+
+        if not calib_keys:
+            return
+
+        self.calibration_progress.setMaximum(len(calib_keys))
+
+        for i, calib_key in enumerate(calib_keys):
+            self.combobox_calibration.setCurrentText(calib_key)
+
+            dnkw = {
+                "calib_key": calib_key,
+            }
+
+            if do_not != 'find_peaks':
+                self.thread.set_task(
+                    func=self.calibration_controller.find_peaks, fkw=dnkw)
+                self.thread.start()
+                self.thread.wait()
+            if do_not != 'calibrate':
+                self.thread.set_task(
+                    func=self.calibration_controller.calibrate, fkw=dnkw)
+                self.thread.start()
+                self.thread.wait()
+            self.calibration_progress.setValue(i + 1)
+
+            self.refresh_plot()
+            QtCore.QCoreApplication.instance().processEvents()
 
     def refresh_plot(self):
         self.plot.cla()
