@@ -540,7 +540,7 @@
                       </sizepolicy>
                      </property>
                      <property name="text">
-                      <string>Brillouin regions:</string>
+                      <string>Brillouin regions [GHz]:</string>
                      </property>
                     </widget>
                    </item>
@@ -578,7 +578,7 @@
                       </sizepolicy>
                      </property>
                      <property name="text">
-                      <string>Rayleigh regions:</string>
+                      <string>Rayleigh regions [GHz]:</string>
                      </property>
                     </widget>
                    </item>

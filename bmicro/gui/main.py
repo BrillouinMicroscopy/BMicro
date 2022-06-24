@@ -1,6 +1,7 @@
 import pathlib
 import pkg_resources
 import hashlib
+import numpy as np
 
 from PyQt6 import QtWidgets, uic, QtCore, QtGui
 from PyQt6.QtWidgets import QFileDialog, QMessageBox
@@ -361,14 +362,63 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_dialog.tableWidget_Rayleigh\
             .setEnabled(cfg_peak_selection['select'])
 
+        brillouin_regions = cfg_peak_selection['brillouin_regions']
+        brillouin_table = self.batch_dialog.tableWidget_Brillouin
+        brillouin_table.setRowCount(len(brillouin_regions))
+        for rowIdx, region in enumerate(brillouin_regions):
+            # Add regions to table
+            # Block signals, so the itemChanged signal is not
+            # emitted during table creation
+            brillouin_table.blockSignals(True)
+            for columnIdx, value in enumerate(region):
+                region_item = QtWidgets.QTableWidgetItem(str(1e-9 * value))
+                brillouin_table.setItem(rowIdx, columnIdx, region_item)
+            brillouin_table.blockSignals(False)
+
+        self.batch_dialog.tableWidget_Brillouin.itemChanged.connect(
+            lambda item: self.on_region_changed(
+                self.batch_config['peak-selection']['brillouin_regions'],
+                item)
+        )
+
+        rayleigh_regions = cfg_peak_selection['rayleigh_regions']
+        rayleigh_table = self.batch_dialog.tableWidget_Rayleigh
+        rayleigh_table.setRowCount(len(rayleigh_regions))
+        for rowIdx, region in enumerate(rayleigh_regions):
+            # Add regions to table
+            # Block signals, so the itemChanged signal is not
+            # emitted during table creation
+            rayleigh_table.blockSignals(True)
+            for columnIdx, value in enumerate(region):
+                region_item = QtWidgets.QTableWidgetItem(str(1e-9 * value))
+                rayleigh_table.setItem(rowIdx, columnIdx, region_item)
+            rayleigh_table.blockSignals(False)
+
+        self.batch_dialog.tableWidget_Rayleigh.itemChanged.connect(
+            lambda item: self.on_region_changed(
+                self.batch_config['peak-selection']['rayleigh_regions'],
+                item)
+        )
+
+        header = self.batch_dialog.tableWidget_Brillouin.horizontalHeader()
+        header.setSectionResizeMode(0,
+                                    QtWidgets.QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1,
+                                    QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.batch_dialog.tableWidget_Brillouin\
             .verticalHeader().setVisible(False)
-        self.batch_dialog.tableWidget_Brillouin\
-            .horizontalHeader().setVisible(False)
+        self.batch_dialog.tableWidget_Brillouin \
+            .setHorizontalHeaderLabels(["start", "end"])
+
+        header = self.batch_dialog.tableWidget_Rayleigh.horizontalHeader()
+        header.setSectionResizeMode(0,
+                                    QtWidgets.QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(1,
+                                    QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.batch_dialog.tableWidget_Rayleigh\
             .verticalHeader().setVisible(False)
         self.batch_dialog.tableWidget_Rayleigh\
-            .horizontalHeader().setVisible(False)
+            .setHorizontalHeaderLabels(["start", "end"])
 
         # Evaluation
         cfg_evaluation = self.batch_config['evaluation']
@@ -435,6 +485,17 @@ class BMicro(QtWidgets.QMainWindow):
             .setEnabled(self.batch_config['peak-selection']['select'])
         self.batch_dialog.tableWidget_Rayleigh\
             .setEnabled(self.batch_config['peak-selection']['select'])
+
+    @staticmethod
+    def on_region_changed(region_table, item):
+        row = item.row()
+        column = item.column()
+        value = float(item.text())
+
+        current_region = np.asarray(region_table[row])
+        current_region[column] = 1e9 * value
+        current_region = tuple(current_region)
+        region_table[row] = current_region
 
     def on_evaluation_evaluate(self):
         self.batch_config['evaluation']['evaluate'] = self.sender().isChecked()
