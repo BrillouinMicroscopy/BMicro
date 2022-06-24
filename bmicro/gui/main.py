@@ -7,6 +7,8 @@ from PyQt6.QtWidgets import QFileDialog, QMessageBox
 
 from bmlab.session import Session
 from bmlab.file import is_source_file
+from bmlab.models.setup import AVAILABLE_SETUPS
+from bmlab.controllers import PeakSelectionController
 
 from bmlab.controllers import ExportController
 
@@ -68,6 +70,7 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_config = {
             'setup': {
                 'set': False,
+                'setup': AVAILABLE_SETUPS[0],
             },
             'orientation': {
                 'set': False,
@@ -90,6 +93,7 @@ class BMicro(QtWidgets.QMainWindow):
                 'evaluate': True,
             },
         }
+        self.batch_evaluation_running = False
 
         # Build tabs
         self.widget_data_view = data.DataView(self)
@@ -278,7 +282,132 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_dialog.close()
 
     def start_batch_evaluation(self):
-        print('started')
+        self.batch_evaluation_running = not self.batch_evaluation_running
+        if self.batch_evaluation_running:
+            self.run_batch_evaluation()
+
+    def run_batch_evaluation(self):
+        self.batch_dialog.button_start_cancel.setText('Cancel')
+        self.batch_dialog.progressBar.setMaximum(len(self.batch_files))
+        self.batch_dialog.progressBar.setValue(0)
+        for i, (file_hash, file) in enumerate(self.batch_files.items()):
+            try:
+                self.evaluate_batch_file(file)
+            except BaseException:
+                # Set the status as failed
+                file['status'] = 'failed'
+                self.update_batch_file_table()
+            if not self.batch_evaluation_running:
+                break
+            self.batch_dialog.progressBar.setValue(i + 1)
+        self.batch_dialog.button_start_cancel.setText('Start')
+        self.batch_evaluation_running = False
+        self.update_batch_file_table()
+
+    def evaluate_batch_file(self, file):
+        # Set the status as in process
+        file['status'] = 'in-process'
+        self.update_batch_file_table()
+
+        # Show the data tab and open the file
+        self.tabWidget.setCurrentIndex(0)
+        QtCore.QCoreApplication.instance().processEvents()
+        self.open_file(file['path'])
+        QtCore.QCoreApplication.instance().processEvents()
+
+        """
+        Evaluate the file
+        """
+        session = Session.get_instance()
+        # Setup
+        cfg_setup = self.batch_config['setup']
+        if cfg_setup['set']:
+            session.set_setup(cfg_setup['setup'])
+
+        # Orientation
+        cfg_orientation = self.batch_config['orientation']
+        if cfg_orientation['set']:
+            session.set_rotation(cfg_orientation['rotation'])
+            session.set_reflection(
+                vertically=cfg_orientation['reflection']['vertically'],
+                horizontally=cfg_orientation['reflection']['horizontally']
+            )
+
+        # Exctraction
+        cfg_extraction = self.batch_config['extraction']
+        if cfg_extraction['extract']:
+            self.tabWidget.setCurrentIndex(1)
+            if self.aborted(file):
+                return
+            QtCore.QCoreApplication.instance().processEvents()
+            self.widget_extraction_view.find_points_all()
+
+        # Calibration
+        cfg_calibration = self.batch_config['calibration']
+        if cfg_calibration['find-peaks'] or\
+                cfg_calibration['calibrate']:
+            self.tabWidget.setCurrentIndex(2)
+            if self.aborted(file):
+                return
+            QtCore.QCoreApplication.instance().processEvents()
+            if not cfg_calibration['find-peaks']:
+                self.widget_calibration_view.\
+                    calibrate_all(do_not='find_peaks')
+            elif not cfg_calibration['calibrate']:
+                self.widget_calibration_view.\
+                    calibrate_all(do_not='calibrate')
+            else:
+                self.widget_calibration_view.calibrate_all()
+
+        # PeakSelection
+        cfg_peak_selection = self.batch_config['peak-selection']
+        if cfg_peak_selection['select']:
+            self.tabWidget.setCurrentIndex(3)
+            if self.aborted(file):
+                return
+            QtCore.QCoreApplication.instance().processEvents()
+            psc = PeakSelectionController()
+            for brillouin_region in cfg_peak_selection['brillouin_regions']:
+                psc.add_brillouin_region_frequency(brillouin_region)
+            for rayleigh_region in cfg_peak_selection['rayleigh_regions']:
+                psc.add_rayleigh_region_frequency(rayleigh_region)
+            self.widget_peak_selection_view.update_ui()
+            QtCore.QCoreApplication.instance().processEvents()
+
+        # Evaluation
+        cfg_evaluation = self.batch_config['evaluation']
+        if cfg_evaluation['evaluate']:
+            self.tabWidget.setCurrentIndex(4)
+            if self.aborted(file):
+                return
+            QtCore.QCoreApplication.instance().processEvents()
+            # TODO: Make the evaluation work
+            #  (because evaluate() returns before evaluation is done)
+            # self.widget_evaluation_view.evaluate()
+
+        # Save the evaluated data
+        # self.save_session()
+        if self.aborted(file):
+            return
+        QtCore.QCoreApplication.instance().processEvents()
+
+        # Close the file
+        self.close_file()
+        QtCore.QCoreApplication.instance().processEvents()
+
+        # Set the status as done
+        file['status'] = 'success'
+        self.update_batch_file_table()
+
+    def aborted(self, file):
+        if not self.batch_evaluation_running:
+            file['status'] = 'aborted'
+            self.close_file()
+            self.batch_evaluation_running = False
+            self.update_batch_file_table()
+            self.batch_dialog.progressBar.setValue(0)
+            QtCore.QCoreApplication.instance().processEvents()
+            return True
 
     def batch_add_files(self):
         folder_name = QFileDialog.getExistingDirectory(
