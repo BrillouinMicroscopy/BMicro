@@ -65,6 +65,31 @@ class BMicro(QtWidgets.QMainWindow):
 
         self.batch_dialog = None
         self.batch_files = {}
+        self.batch_config = {
+            'setup': {
+                'set': False,
+            },
+            'orientation': {
+                'set': False,
+                'rotation': 0,
+                'reflection': {'vertically': False, 'horizontally': False},
+            },
+            'extraction': {
+                'extract': False,
+            },
+            'calibration': {
+                'find-peaks': True,
+                'calibrate': False,
+            },
+            'peak-selection': {
+                'select': False,
+                'brillouin_regions': [(4.0e9, 6.0e9), (9.0e9, 11.0e9)],
+                'rayleigh_regions': [(-2.0e9, 2.0e9), (13.0e9, 17.0e9)],
+            },
+            'evaluation': {
+                'evaluate': True,
+            },
+        }
 
         # Build tabs
         self.widget_data_view = data.DataView(self)
