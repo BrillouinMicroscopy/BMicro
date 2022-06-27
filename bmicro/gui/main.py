@@ -573,6 +573,8 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_evaluation_running = not self.batch_evaluation_running
         if self.batch_evaluation_running:
             self.run_batch_evaluation()
+        else:
+            self.widget_evaluation_view.evaluation_abort.value = True
 
     def run_batch_evaluation(self):
         self.batch_dialog.button_start_cancel.setText('Cancel')
@@ -669,12 +671,10 @@ class BMicro(QtWidgets.QMainWindow):
             if self.aborted(file):
                 return
             QtCore.QCoreApplication.instance().processEvents()
-            # TODO: Make the evaluation work
-            #  (because evaluate() returns before evaluation is done)
-            # self.widget_evaluation_view.evaluate()
+            self.widget_evaluation_view.evaluate(blocking=True)
 
         # Save the evaluated data
-        # self.save_session()
+        self.save_session()
         if self.aborted(file):
             return
         QtCore.QCoreApplication.instance().processEvents()
