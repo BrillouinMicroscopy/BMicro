@@ -361,38 +361,42 @@ class BMicro(QtWidgets.QMainWindow):
             .setEnabled(cfg_peak_selection['select'])
         self.batch_dialog.tableWidget_Rayleigh\
             .setEnabled(cfg_peak_selection['select'])
+        self.batch_dialog.button_region_brillouin_remove.clicked.connect(
+            lambda: self.remove_evaluation_regions(
+                self.batch_dialog.tableWidget_Brillouin,
+                self.batch_config[
+                    'peak-selection']['brillouin_regions']
+            )
+        )
+        self.batch_dialog.button_region_brillouin_add.clicked.connect(
+            lambda: self.add_evaluation_regions(
+                self.batch_dialog.tableWidget_Brillouin,
+                self.batch_config[
+                    'peak-selection']['brillouin_regions']
+            )
+        )
+        self.batch_dialog.button_region_rayleigh_remove.clicked.connect(
+            lambda: self.remove_evaluation_regions(
+                self.batch_dialog.tableWidget_Rayleigh,
+                self.batch_config[
+                    'peak-selection']['rayleigh_regions']
+            )
+        )
+        self.batch_dialog.button_region_rayleigh_add.clicked.connect(
+            lambda: self.add_evaluation_regions(
+                self.batch_dialog.tableWidget_Rayleigh,
+                self.batch_config[
+                    'peak-selection']['rayleigh_regions']
+            )
+        )
 
-        brillouin_regions = cfg_peak_selection['brillouin_regions']
-        brillouin_table = self.batch_dialog.tableWidget_Brillouin
-        brillouin_table.setRowCount(len(brillouin_regions))
-        for rowIdx, region in enumerate(brillouin_regions):
-            # Add regions to table
-            # Block signals, so the itemChanged signal is not
-            # emitted during table creation
-            brillouin_table.blockSignals(True)
-            for columnIdx, value in enumerate(region):
-                region_item = QtWidgets.QTableWidgetItem(str(1e-9 * value))
-                brillouin_table.setItem(rowIdx, columnIdx, region_item)
-            brillouin_table.blockSignals(False)
+        self.update_evaluation_regions_tables()
 
         self.batch_dialog.tableWidget_Brillouin.itemChanged.connect(
             lambda item: self.on_region_changed(
                 self.batch_config['peak-selection']['brillouin_regions'],
                 item)
         )
-
-        rayleigh_regions = cfg_peak_selection['rayleigh_regions']
-        rayleigh_table = self.batch_dialog.tableWidget_Rayleigh
-        rayleigh_table.setRowCount(len(rayleigh_regions))
-        for rowIdx, region in enumerate(rayleigh_regions):
-            # Add regions to table
-            # Block signals, so the itemChanged signal is not
-            # emitted during table creation
-            rayleigh_table.blockSignals(True)
-            for columnIdx, value in enumerate(region):
-                region_item = QtWidgets.QTableWidgetItem(str(1e-9 * value))
-                rayleigh_table.setItem(rowIdx, columnIdx, region_item)
-            rayleigh_table.blockSignals(False)
 
         self.batch_dialog.tableWidget_Rayleigh.itemChanged.connect(
             lambda item: self.on_region_changed(
@@ -426,6 +430,59 @@ class BMicro(QtWidgets.QMainWindow):
             .setChecked(cfg_evaluation['evaluate'])
         self.batch_dialog.checkBox_evaluation\
             .clicked.connect(self.on_evaluation_evaluate)
+
+    def add_evaluation_regions(self, region_table, region_list):
+        region_list.append((0., 0.))
+
+        self.update_evaluation_regions_tables()
+
+        region_table.setFocus()
+        region_table.setCurrentCell(len(region_list) - 1, 0)
+
+    def remove_evaluation_regions(self, region_table, region_list):
+        selected_ranges = region_table.selectedRanges()
+        sorted_ranges = sorted(
+            selected_ranges,
+            key=lambda item: item.topRow(),
+            reverse=True
+        )
+        for sorted_range in sorted_ranges:
+            start = sorted_range.topRow()
+            end = sorted_range.bottomRow()
+            for idx in reversed(range(start, end + 1)):
+                del region_list[idx]
+        region_table.clearSelection()
+
+        self.update_evaluation_regions_tables()
+
+    def update_evaluation_regions_tables(self):
+        cfg_peak_selection = self.batch_config['peak-selection']
+
+        brillouin_regions = cfg_peak_selection['brillouin_regions']
+        brillouin_table = self.batch_dialog.tableWidget_Brillouin
+        brillouin_table.setRowCount(len(brillouin_regions))
+        for rowIdx, region in enumerate(brillouin_regions):
+            # Add regions to table
+            # Block signals, so the itemChanged signal is not
+            # emitted during table creation
+            brillouin_table.blockSignals(True)
+            for columnIdx, value in enumerate(region):
+                region_item = QtWidgets.QTableWidgetItem(str(1e-9 * value))
+                brillouin_table.setItem(rowIdx, columnIdx, region_item)
+            brillouin_table.blockSignals(False)
+
+        rayleigh_regions = cfg_peak_selection['rayleigh_regions']
+        rayleigh_table = self.batch_dialog.tableWidget_Rayleigh
+        rayleigh_table.setRowCount(len(rayleigh_regions))
+        for rowIdx, region in enumerate(rayleigh_regions):
+            # Add regions to table
+            # Block signals, so the itemChanged signal is not
+            # emitted during table creation
+            rayleigh_table.blockSignals(True)
+            for columnIdx, value in enumerate(region):
+                region_item = QtWidgets.QTableWidgetItem(str(1e-9 * value))
+                rayleigh_table.setItem(rowIdx, columnIdx, region_item)
+            rayleigh_table.blockSignals(False)
 
     def on_setup_set(self):
         self.batch_config['setup']['set'] = self.sender().isChecked()
