@@ -609,69 +609,79 @@ class BMicro(QtWidgets.QMainWindow):
         Evaluate the file
         """
         session = Session.get_instance()
-        # Setup
-        cfg_setup = self.batch_config['setup']
-        if cfg_setup['set']:
-            session.set_setup(cfg_setup['setup'])
 
-        # Orientation
-        cfg_orientation = self.batch_config['orientation']
-        if cfg_orientation['set']:
-            session.set_rotation(cfg_orientation['rotation'])
-            session.set_reflection(
-                vertically=cfg_orientation['reflection']['vertically'],
-                horizontally=cfg_orientation['reflection']['horizontally']
-            )
+        rep_keys = session.file.repetition_keys()
 
-        # Exctraction
-        cfg_extraction = self.batch_config['extraction']
-        if cfg_extraction['extract']:
-            self.tabWidget.setCurrentIndex(1)
-            if self.aborted(file):
-                return
-            QtCore.QCoreApplication.instance().processEvents()
-            self.widget_extraction_view.find_points_all()
-
-        # Calibration
-        cfg_calibration = self.batch_config['calibration']
-        if cfg_calibration['find-peaks'] or\
-                cfg_calibration['calibrate']:
-            self.tabWidget.setCurrentIndex(2)
-            if self.aborted(file):
-                return
-            QtCore.QCoreApplication.instance().processEvents()
-            if not cfg_calibration['find-peaks']:
-                self.widget_calibration_view.\
-                    calibrate_all(do_not='find_peaks')
-            elif not cfg_calibration['calibrate']:
-                self.widget_calibration_view.\
-                    calibrate_all(do_not='calibrate')
-            else:
-                self.widget_calibration_view.calibrate_all()
-
-        # PeakSelection
-        cfg_peak_selection = self.batch_config['peak-selection']
-        if cfg_peak_selection['select']:
-            self.tabWidget.setCurrentIndex(3)
-            if self.aborted(file):
-                return
-            QtCore.QCoreApplication.instance().processEvents()
-            psc = PeakSelectionController()
-            for brillouin_region in cfg_peak_selection['brillouin_regions']:
-                psc.add_brillouin_region_frequency(brillouin_region)
-            for rayleigh_region in cfg_peak_selection['rayleigh_regions']:
-                psc.add_rayleigh_region_frequency(rayleigh_region)
-            self.widget_peak_selection_view.update_ui()
+        for rep_key in rep_keys:
+            # Load repetition
+            session.set_current_repetition(rep_key)
             QtCore.QCoreApplication.instance().processEvents()
 
-        # Evaluation
-        cfg_evaluation = self.batch_config['evaluation']
-        if cfg_evaluation['evaluate']:
-            self.tabWidget.setCurrentIndex(4)
-            if self.aborted(file):
-                return
-            QtCore.QCoreApplication.instance().processEvents()
-            self.widget_evaluation_view.evaluate(blocking=True)
+            # Setup
+            cfg_setup = self.batch_config['setup']
+            if cfg_setup['set']:
+                session.set_setup(cfg_setup['setup'])
+
+            # Orientation
+            cfg_orientation = self.batch_config['orientation']
+            if cfg_orientation['set']:
+                session.set_rotation(cfg_orientation['rotation'])
+                session.set_reflection(
+                    vertically=cfg_orientation['reflection']['vertically'],
+                    horizontally=cfg_orientation['reflection']['horizontally']
+                )
+
+            # Exctraction
+            cfg_extraction = self.batch_config['extraction']
+            if cfg_extraction['extract']:
+                self.tabWidget.setCurrentIndex(1)
+                if self.aborted(file):
+                    return
+                QtCore.QCoreApplication.instance().processEvents()
+                self.widget_extraction_view.find_points_all()
+
+            # Calibration
+            cfg_calibration = self.batch_config['calibration']
+            if cfg_calibration['find-peaks'] or\
+                    cfg_calibration['calibrate']:
+                self.tabWidget.setCurrentIndex(2)
+                if self.aborted(file):
+                    return
+                QtCore.QCoreApplication.instance().processEvents()
+                if not cfg_calibration['find-peaks']:
+                    self.widget_calibration_view.\
+                        calibrate_all(do_not='find_peaks')
+                elif not cfg_calibration['calibrate']:
+                    self.widget_calibration_view.\
+                        calibrate_all(do_not='calibrate')
+                else:
+                    self.widget_calibration_view.calibrate_all()
+
+            # PeakSelection
+            cfg_peak_selection = self.batch_config['peak-selection']
+            if cfg_peak_selection['select']:
+                self.tabWidget.setCurrentIndex(3)
+                if self.aborted(file):
+                    return
+                QtCore.QCoreApplication.instance().processEvents()
+                psc = PeakSelectionController()
+                for brillouin_region \
+                        in cfg_peak_selection['brillouin_regions']:
+                    psc.add_brillouin_region_frequency(brillouin_region)
+                for rayleigh_region \
+                        in cfg_peak_selection['rayleigh_regions']:
+                    psc.add_rayleigh_region_frequency(rayleigh_region)
+                self.widget_peak_selection_view.update_ui()
+                QtCore.QCoreApplication.instance().processEvents()
+
+            # Evaluation
+            cfg_evaluation = self.batch_config['evaluation']
+            if cfg_evaluation['evaluate']:
+                self.tabWidget.setCurrentIndex(4)
+                if self.aborted(file):
+                    return
+                QtCore.QCoreApplication.instance().processEvents()
+                self.widget_evaluation_view.evaluate(blocking=True)
 
         # Save the evaluated data
         self.save_session()
