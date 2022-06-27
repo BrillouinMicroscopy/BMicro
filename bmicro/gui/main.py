@@ -70,28 +70,28 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_files = {}
         self.batch_config = {
             'setup': {
-                'set': True,
+                'set': False,
                 'setup': AVAILABLE_SETUPS[0],
             },
             'orientation': {
-                'set': True,
+                'set': False,
                 'rotation': 0,
                 'reflection': {'vertically': False, 'horizontally': True},
             },
             'extraction': {
-                'extract': True,
+                'extract': False,
             },
             'calibration': {
-                'find-peaks': True,
-                'calibrate': True,
+                'find-peaks': False,
+                'calibrate': False,
             },
             'peak-selection': {
-                'select': True,
+                'select': False,
                 'brillouin_regions': [(4.0e9, 6.0e9), (9.0e9, 11.0e9)],
                 'rayleigh_regions': [(-2.0e9, 2.0e9), (13.0e9, 17.0e9)],
             },
             'evaluation': {
-                'evaluate': True,
+                'evaluate': False,
             },
         }
         self.batch_evaluation_running = False
