@@ -273,7 +273,7 @@ class CalibrationView(QtWidgets.QWidget):
 
         try:
             cc = CalibrationController()
-            spectrum = cc.extract_calibration_spectra(
+            spectrum, _, _ = cc.extract_spectra(
                 calib_key,
                 frame_num=self.current_frame
             )
