@@ -6,8 +6,10 @@ from matplotlib.colors import Normalize
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import warnings
 
+import time
+
 from PyQt6 import QtWidgets, uic
-from PyQt6.QtCore import QObject, QTimer, QThread, pyqtSignal
+from PyQt6.QtCore import QObject, QTimer, QThread, pyqtSignal, QCoreApplication
 import multiprocessing as mp
 
 from bmlab.session import Session
@@ -195,7 +197,7 @@ class EvaluationView(QtWidgets.QWidget):
         self.value_max.setDisabled(autoscale)
         self.refresh_plot()
 
-    def evaluate(self):
+    def evaluate(self, blocking=False):
         # If the evaluation is already running, we abort it and reset
         #  the button label
         if self.evaluation_running:
@@ -237,6 +239,11 @@ class EvaluationView(QtWidgets.QWidget):
         self.worker.finished.connect(self.refresh_ui)
         self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
+
+        if blocking:
+            while self.evaluation_running:
+                QCoreApplication.instance().processEvents()
+                time.sleep(0.1)
 
     def refresh_ui(self):
         # If evaluation is aborted by user,
