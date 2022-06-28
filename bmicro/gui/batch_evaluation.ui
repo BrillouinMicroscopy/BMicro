@@ -716,9 +716,9 @@
                 <item>
                  <widget class="QGroupBox" name="group_5_evaluation">
                   <property name="title">
-                   <string>Evaluation</string>
+                   <string>Evaluation &amp; Export</string>
                   </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_10">
+                  <layout class="QHBoxLayout" name="horizontalLayout_8">
                    <property name="topMargin">
                     <number>4</number>
                    </property>
@@ -732,6 +732,16 @@
                      </property>
                      <property name="text">
                       <string>Evaluate</string>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_export">
+                     <property name="text">
+                      <string>Export</string>
                      </property>
                      <property name="checked">
                       <bool>true</bool>

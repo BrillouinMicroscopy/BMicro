@@ -9,9 +9,7 @@ from PyQt6.QtWidgets import QFileDialog, QMessageBox
 from bmlab.session import Session
 from bmlab.file import is_source_file
 from bmlab.models.setup import AVAILABLE_SETUPS
-from bmlab.controllers import PeakSelectionController
-
-from bmlab.controllers import ExportController
+from bmlab.controllers import PeakSelectionController, ExportController
 
 from . import data
 from . import extraction
@@ -92,6 +90,9 @@ class BMicro(QtWidgets.QMainWindow):
             },
             'evaluation': {
                 'evaluate': False,
+            },
+            'export': {
+                'export': False,
             },
         }
         self.batch_evaluation_running = False
@@ -431,6 +432,13 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_dialog.checkBox_evaluation\
             .clicked.connect(self.on_evaluation_evaluate)
 
+        # Export
+        cfg_export = self.batch_config['export']
+        self.batch_dialog.checkBox_export\
+            .setChecked(cfg_export['export'])
+        self.batch_dialog.checkBox_export\
+            .clicked.connect(self.on_export_export)
+
     def add_evaluation_regions(self, region_table, region_list):
         region_list.append((0., 0.))
 
@@ -557,6 +565,9 @@ class BMicro(QtWidgets.QMainWindow):
     def on_evaluation_evaluate(self):
         self.batch_config['evaluation']['evaluate'] = self.sender().isChecked()
 
+    def on_export_export(self):
+        self.batch_config['export']['export'] = self.sender().isChecked()
+
     def on_setup_select(self):
         """
         Action triggered when the user selects a different setup.
@@ -682,6 +693,13 @@ class BMicro(QtWidgets.QMainWindow):
                     return
                 QtCore.QCoreApplication.instance().processEvents()
                 self.widget_evaluation_view.evaluate(blocking=True)
+
+            cfg_export = self.batch_config['export']
+            if cfg_export['export']:
+                if self.aborted(file):
+                    return
+                QtCore.QCoreApplication.instance().processEvents()
+                self.export_file()
 
         # Save the evaluated data
         self.save_session()
