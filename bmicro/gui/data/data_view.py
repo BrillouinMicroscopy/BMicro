@@ -95,6 +95,8 @@ class DataView(QtWidgets.QWidget):
         self.radio_rotation_90_ccw.setChecked(
             session.orientation.rotation % 4 == 3)
 
+        self.update_preview()
+
     def reset_ui(self):
         """
         Reset the tab to the state when no file is loaded.
