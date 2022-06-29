@@ -1,6 +1,10 @@
 import pathlib
 import pkg_resources
 import hashlib
+import signal
+import sys
+import traceback
+
 import numpy as np
 
 from PyQt6 import QtWidgets, uic, QtCore, QtGui
@@ -802,3 +806,42 @@ class BMicro(QtWidgets.QMainWindow):
         table.verticalHeader().setVisible(False)
         table.horizontalHeader().setVisible(False)
         table.blockSignals(False)
+
+
+def excepthook(etype, value, trace):
+    """
+    Handler for all unhandled exceptions.
+    Parameters
+    ----------
+    etype: Exception
+        the exception type (`SyntaxError`,
+        `ZeroDivisionError`, etc...)
+    value: str
+        the exception error message
+    trace: str
+        the traceback header, if any (otherwise, it
+        prints the standard Python header: ``Traceback (most recent
+        call last)``.
+    """
+    vinfo = "Unhandled exception in BMicro version {}:\n".format(
+        bmicroversion)
+    tmp = traceback.format_exception(etype, value, trace)
+    exception = "".join([vinfo]+tmp)
+
+    errorbox = QtWidgets.QMessageBox()
+    errorbox.addButton(QtWidgets.QPushButton('Close'),
+                       QtWidgets.QMessageBox.ButtonRole.YesRole)
+    errorbox.addButton(QtWidgets.QPushButton(
+        'Copy text && Close'), QtWidgets.QMessageBox.ButtonRole.NoRole)
+    errorbox.setText(exception)
+    ret = errorbox.exec()
+    if ret == 1:
+        cb = QtWidgets.QApplication.clipboard()
+        cb.clear(mode=cb.Mode.Clipboard)
+        cb.setText(exception)
+
+
+# Make Ctr+C close the app
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+# Display exception hook in separate dialog instead of crashing
+sys.excepthook = excepthook
