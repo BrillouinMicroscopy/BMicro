@@ -247,7 +247,8 @@ class BMicro(QtWidgets.QMainWindow):
     def on_action_about(self):
         gh = "BrillouinMicroscopy/BMicro"
         rtd = "bmicro.readthedocs.io"
-        about_text = "BMicro is a graphical user interface " \
+        about_text = f"BMicro {bmicroversion}<br><br>" \
+            + "BMicro is a graphical user interface " \
             + "for the analysis of Brillouin microscopy data.<br><br>" \
             + f"Using bmlab {bmlabversion}<br><br>" \
             + "Author: Raimund Schlüßler and others<br>" \
