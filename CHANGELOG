@@ -1,3 +1,22 @@
+## 0.3.2 - 2022-06-30
+
+### Changed
+- Show BMicro version in about text as well #205
+
+### Fixed
+- Don't search whole Mac on empty folder name #204
+
+## 0.3.1 - 2022-06-29
+
+### Added
+- Add global exception handler #199
+
+### Changed
+- Remove cron schedule from github actions workflows #202
+
+### Fixed
+- Don't crash on exporting #197 #201
+
 ## 0.3.0 - 2022-06-29
 
 ### Added
