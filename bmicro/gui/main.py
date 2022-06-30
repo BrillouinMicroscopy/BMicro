@@ -735,6 +735,9 @@ class BMicro(QtWidgets.QMainWindow):
             directory=self.settings.value("path/last-used")
         )
 
+        if not folder_name:
+            return
+
         # Find all h5 files in the selected folder
         h5_files = pathlib.Path(folder_name).glob('**/*.h5')
 
