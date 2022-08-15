@@ -68,6 +68,8 @@ class BMicro(QtWidgets.QMainWindow):
 
         self.tabWidget.currentChanged.connect(self.update_ui)
 
+        self.export_dialog = None
+
         self.batch_dialog = None
         self.batch_files = {}
         self.batch_config = {
@@ -141,7 +143,7 @@ class BMicro(QtWidgets.QMainWindow):
         self.action_open.triggered.connect(self.open_file)
         self.action_close.triggered.connect(self.close_file)
         self.action_save.triggered.connect(self.save_session)
-        self.action_export.triggered.connect(self.export_file)
+        self.action_export.triggered.connect(self.on_action_export_file)
         self.action_exit.triggered.connect(self.exit_app)
 
         self.action_about.triggered.connect(self.on_action_about)
@@ -186,6 +188,31 @@ class BMicro(QtWidgets.QMainWindow):
     def close_file(self):
         Session.get_instance().clear()
         self.reset_ui()
+
+    def on_action_export_file(self):
+        ui_file = pkg_resources.resource_filename(
+            'bmicro.gui', 'export_configuration.ui')
+        self.export_dialog = QtWidgets.QDialog(
+            self,
+            QtCore.Qt.WindowType.WindowTitleHint |
+            QtCore.Qt.WindowType.WindowCloseButtonHint
+        )
+        uic.loadUi(ui_file, self.export_dialog)
+        self.export_dialog.setWindowTitle('Export configuration')
+        self.export_dialog.setWindowModality(
+            QtCore.Qt.WindowModality.ApplicationModal)
+        self.export_dialog.button_export.clicked.connect(
+            self.export_file
+        )
+        self.export_dialog.button_cancel.clicked.connect(
+            self.close_export_dialog
+        )
+        self.export_dialog.adjustSize()
+
+        self.export_dialog.exec()
+
+    def close_export_dialog(self):
+        self.export_dialog.close()
 
     def export_file(self):
         ExportController().export()
