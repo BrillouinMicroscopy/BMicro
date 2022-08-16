@@ -8,11 +8,14 @@ import traceback
 import numpy as np
 
 from PyQt6 import QtWidgets, uic, QtCore, QtGui
-from PyQt6.QtWidgets import QFileDialog, QMessageBox
+from PyQt6.QtWidgets import QFileDialog, QMessageBox,\
+    QVBoxLayout, QWidget, QCheckBox, QHBoxLayout, QLabel, QLineEdit
+from PyQt6.QtCore import QSize
 
 from bmlab.session import Session
 from bmlab.file import is_source_file
 from bmlab.models.setup import AVAILABLE_SETUPS
+from bmlab.models import EvaluationModel
 from bmlab.controllers import PeakSelectionController, ExportController
 
 from . import data
@@ -69,6 +72,8 @@ class BMicro(QtWidgets.QMainWindow):
         self.tabWidget.currentChanged.connect(self.update_ui)
 
         self.export_dialog = None
+        # Initialize the export configuration
+        self.export_config = ExportController.get_configuration()
 
         self.batch_dialog = None
         self.batch_files = {}
@@ -207,15 +212,71 @@ class BMicro(QtWidgets.QMainWindow):
         self.export_dialog.button_cancel.clicked.connect(
             self.close_export_dialog
         )
-        self.export_dialog.adjustSize()
+        self.init_export_dialog()
 
-        self.export_dialog.exec()
+        self.export_dialog.open()
+
+    def on_export_checkbox(self, parameter):
+        if self.sender().isChecked():
+            self.export_config['brillouin']['parameters'].append(parameter)
+        else:
+            self.export_config['brillouin']['parameters'].remove(parameter)
+
+    def init_export_dialog(self):
+        v_layout = QVBoxLayout()
+
+        parameters = EvaluationModel.get_default_parameters()
+        for key, parameter in parameters.items():
+            h_layout = QHBoxLayout()
+
+            # Checkbox
+            checkbox = QCheckBox()
+            checkbox.setText(
+                parameter['label'] + ' [' + parameter['unit'] + ']')
+            checkbox.clicked.connect(
+                lambda checked, param=key: self.on_export_checkbox(param))
+            if key in self.export_config['brillouin']['parameters']:
+                checkbox.setChecked(True)
+            h_layout.addWidget(checkbox)
+            # Spacer
+            h_layout.addStretch()
+
+            # Min label and input box
+            min_label = QLabel()
+            min_label.setText('min')
+            h_layout.addWidget(min_label)
+            min_box = QLineEdit()
+            min_box.setEnabled(False)
+            min_box.setMaximumSize(QSize(50, 20))
+            min_box.setMinimumSize(QSize(50, 20))
+            h_layout.addWidget(min_box)
+
+            # Max label and input box
+            max_label = QLabel()
+            max_label.setText('max')
+            h_layout.addWidget(max_label)
+            max_box = QLineEdit()
+            max_box.setEnabled(False)
+            max_box.setMaximumSize(QSize(50, 20))
+            max_box.setMinimumSize(QSize(50, 20))
+            h_layout.addWidget(max_box)
+
+            # Widget to add the elements to
+            parameter_widget = QWidget()
+            parameter_widget.setLayout(h_layout)
+            v_layout.addWidget(parameter_widget)
+
+        # This only works if there is no layout set yet!
+        self.export_dialog.widget.setLayout(v_layout)
+        self.export_dialog.resize(QSize(500, 560))
+        self.export_dialog.scrollAreaWidgetContents.\
+            setMinimumSize(QSize(0, 40*len(parameters)))
 
     def close_export_dialog(self):
         self.export_dialog.close()
 
     def export_file(self):
-        ExportController().export()
+        ExportController().export(self.export_config)
 
     def reset_ui(self):
         """
