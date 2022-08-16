@@ -216,11 +216,20 @@ class BMicro(QtWidgets.QMainWindow):
 
         self.export_dialog.open()
 
-    def on_export_checkbox(self, parameter):
-        if self.sender().isChecked():
+    def on_export_checkbox(self, parameter, min_box, max_box):
+        checked = self.sender().isChecked()
+        if checked:
             self.export_config['brillouin']['parameters'].append(parameter)
         else:
             self.export_config['brillouin']['parameters'].remove(parameter)
+        min_box.setEnabled(checked)
+        max_box.setEnabled(checked)
+
+    def on_export_minbox(self, value, parameter):
+        print('set min of ' + parameter + ' to ' + value)
+
+    def on_export_maxbox(self, value, parameter):
+        print('set max of ' + parameter + ' to ' + value)
 
     def init_export_dialog(self):
         v_layout = QVBoxLayout()
@@ -233,8 +242,6 @@ class BMicro(QtWidgets.QMainWindow):
             checkbox = QCheckBox()
             checkbox.setText(
                 parameter['label'] + ' [' + parameter['unit'] + ']')
-            checkbox.clicked.connect(
-                lambda checked, param=key: self.on_export_checkbox(param))
             if key in self.export_config['brillouin']['parameters']:
                 checkbox.setChecked(True)
             h_layout.addWidget(checkbox)
@@ -246,7 +253,6 @@ class BMicro(QtWidgets.QMainWindow):
             min_label.setText('min')
             h_layout.addWidget(min_label)
             min_box = QLineEdit()
-            min_box.setEnabled(False)
             min_box.setMaximumSize(QSize(50, 20))
             min_box.setMinimumSize(QSize(50, 20))
             h_layout.addWidget(min_box)
@@ -256,7 +262,6 @@ class BMicro(QtWidgets.QMainWindow):
             max_label.setText('max')
             h_layout.addWidget(max_label)
             max_box = QLineEdit()
-            max_box.setEnabled(False)
             max_box.setMaximumSize(QSize(50, 20))
             max_box.setMinimumSize(QSize(50, 20))
             h_layout.addWidget(max_box)
@@ -265,6 +270,35 @@ class BMicro(QtWidgets.QMainWindow):
             parameter_widget = QWidget()
             parameter_widget.setLayout(h_layout)
             v_layout.addWidget(parameter_widget)
+
+            # Set the current config values
+            if key in self.export_config['brillouin']:
+                min_box.setText(self.export_config['brillouin'][key]['cax'][0])
+                max_box.setText(self.export_config['brillouin'][key]['cax'][1])
+            # Otherwise we set it to the default min/max
+            else:
+                min_box.setText('min')
+                max_box.setText('max')
+
+            if key in self.export_config['brillouin']['parameters']:
+                checkbox.setChecked(True)
+                min_box.setEnabled(True)
+                max_box.setEnabled(True)
+            else:
+                min_box.setEnabled(False)
+                max_box.setEnabled(False)
+
+            # Connect handlers
+            checkbox.clicked.connect(
+                lambda checked, param=key, minbox=min_box, maxbox=max_box:
+                self.on_export_checkbox(param, minbox, maxbox)
+            )
+            min_box.textChanged.connect(
+                lambda value, param=key: self.on_export_minbox(value, param)
+            )
+            max_box.textChanged.connect(
+                lambda value, param=key: self.on_export_maxbox(value, param)
+            )
 
         # This only works if there is no layout set yet!
         self.export_dialog.widget.setLayout(v_layout)
