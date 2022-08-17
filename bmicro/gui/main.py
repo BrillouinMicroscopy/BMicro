@@ -212,7 +212,8 @@ class BMicro(QtWidgets.QMainWindow):
         self.export_dialog.button_cancel.clicked.connect(
             self.close_export_dialog
         )
-        self.init_export_dialog()
+        self.init_export_dialog(self.export_dialog.widget)
+        self.export_dialog.resize(QSize(500, 560))
 
         self.export_dialog.open()
 
@@ -242,8 +243,10 @@ class BMicro(QtWidgets.QMainWindow):
             cax[0] = self.export_config['brillouin'][parameter]['cax'][0]
         self.export_config['brillouin'][parameter]['cax'] = tuple(cax)
 
-    def init_export_dialog(self):
+    def init_export_dialog(self, parent_widget):
         v_layout = QVBoxLayout()
+        v_layout.setContentsMargins(0, 6, 0, 6)
+        v_layout.setSpacing(0)
 
         parameters = EvaluationModel.get_default_parameters()
         for key, parameter in parameters.items():
@@ -279,6 +282,7 @@ class BMicro(QtWidgets.QMainWindow):
 
             # Widget to add the elements to
             parameter_widget = QWidget()
+            parameter_widget.setMaximumSize(QSize(5000, 35))
             parameter_widget.setLayout(h_layout)
             v_layout.addWidget(parameter_widget)
 
@@ -312,10 +316,9 @@ class BMicro(QtWidgets.QMainWindow):
             )
 
         # This only works if there is no layout set yet!
-        self.export_dialog.widget.setLayout(v_layout)
-        self.export_dialog.resize(QSize(500, 560))
-        self.export_dialog.scrollAreaWidgetContents.\
-            setMinimumSize(QSize(0, 40*len(parameters)))
+        parent_widget.setLayout(v_layout)
+        # self.export_dialog.scrollAreaWidgetContents.\
+        #     setMinimumSize(QSize(0, 40*len(parameters)))
 
     def close_export_dialog(self):
         self.export_dialog.close()
@@ -414,6 +417,7 @@ class BMicro(QtWidgets.QMainWindow):
             self.batch_remove_files
         )
         self.update_batch_file_table()
+        self.init_export_dialog(self.batch_dialog.widget_parameters)
         self.batch_dialog.adjustSize()
 
         self.update_batch_file_settings()
