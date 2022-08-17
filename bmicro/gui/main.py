@@ -8,11 +8,14 @@ import traceback
 import numpy as np
 
 from PyQt6 import QtWidgets, uic, QtCore, QtGui
-from PyQt6.QtWidgets import QFileDialog, QMessageBox
+from PyQt6.QtWidgets import QFileDialog, QMessageBox,\
+    QVBoxLayout, QWidget, QCheckBox, QHBoxLayout, QLabel, QLineEdit
+from PyQt6.QtCore import QSize
 
 from bmlab.session import Session
 from bmlab.file import is_source_file
 from bmlab.models.setup import AVAILABLE_SETUPS
+from bmlab.models import EvaluationModel
 from bmlab.controllers import PeakSelectionController, ExportController
 
 from . import data
@@ -67,6 +70,10 @@ class BMicro(QtWidgets.QMainWindow):
         self.imdir = pkg_resources.resource_filename("bmicro", "img")
 
         self.tabWidget.currentChanged.connect(self.update_ui)
+
+        self.export_dialog = None
+        # Initialize the export configuration
+        self.export_config = ExportController.get_configuration()
 
         self.batch_dialog = None
         self.batch_files = {}
@@ -141,7 +148,7 @@ class BMicro(QtWidgets.QMainWindow):
         self.action_open.triggered.connect(self.open_file)
         self.action_close.triggered.connect(self.close_file)
         self.action_save.triggered.connect(self.save_session)
-        self.action_export.triggered.connect(self.export_file)
+        self.action_export.triggered.connect(self.on_action_export_file)
         self.action_exit.triggered.connect(self.exit_app)
 
         self.action_about.triggered.connect(self.on_action_about)
@@ -187,8 +194,137 @@ class BMicro(QtWidgets.QMainWindow):
         Session.get_instance().clear()
         self.reset_ui()
 
+    def on_action_export_file(self):
+        ui_file = pkg_resources.resource_filename(
+            'bmicro.gui', 'export_configuration.ui')
+        self.export_dialog = QtWidgets.QDialog(
+            self,
+            QtCore.Qt.WindowType.WindowTitleHint |
+            QtCore.Qt.WindowType.WindowCloseButtonHint
+        )
+        uic.loadUi(ui_file, self.export_dialog)
+        self.export_dialog.setWindowTitle('Export configuration')
+        self.export_dialog.setWindowModality(
+            QtCore.Qt.WindowModality.ApplicationModal)
+        self.export_dialog.button_export.clicked.connect(
+            self.export_file
+        )
+        self.export_dialog.button_cancel.clicked.connect(
+            self.close_export_dialog
+        )
+        self.init_export_dialog(self.export_dialog.widget)
+        self.export_dialog.resize(QSize(500, 560))
+
+        self.export_dialog.open()
+
+    def on_export_checkbox(self, parameter, min_box, max_box):
+        checked = self.sender().isChecked()
+        if checked:
+            self.export_config['brillouin']['parameters'].append(parameter)
+        else:
+            self.export_config['brillouin']['parameters'].remove(parameter)
+        min_box.setEnabled(checked)
+        max_box.setEnabled(checked)
+
+        self.export_dialog.button_export.setEnabled(
+            len(self.export_config['brillouin']['parameters']) > 0)
+
+    def on_export_minbox(self, value, parameter):
+        cax = [value, 'max']
+        # We use the existing upper limit if available
+        if parameter in self.export_config['brillouin']:
+            cax[1] = self.export_config['brillouin'][parameter]['cax'][1]
+        self.export_config['brillouin'][parameter]['cax'] = tuple(cax)
+
+    def on_export_maxbox(self, value, parameter):
+        cax = ['min', value]
+        # We use the existing lower limit if available
+        if parameter in self.export_config['brillouin']:
+            cax[0] = self.export_config['brillouin'][parameter]['cax'][0]
+        self.export_config['brillouin'][parameter]['cax'] = tuple(cax)
+
+    def init_export_dialog(self, parent_widget):
+        v_layout = QVBoxLayout()
+        v_layout.setContentsMargins(0, 6, 0, 6)
+        v_layout.setSpacing(0)
+
+        parameters = EvaluationModel.get_default_parameters()
+        for key, parameter in parameters.items():
+            h_layout = QHBoxLayout()
+
+            # Checkbox
+            checkbox = QCheckBox()
+            checkbox.setText(
+                parameter['label'] + ' [' + parameter['unit'] + ']')
+            if key in self.export_config['brillouin']['parameters']:
+                checkbox.setChecked(True)
+            h_layout.addWidget(checkbox)
+            # Spacer
+            h_layout.addStretch()
+
+            # Min label and input box
+            min_label = QLabel()
+            min_label.setText('min')
+            h_layout.addWidget(min_label)
+            min_box = QLineEdit()
+            min_box.setMaximumSize(QSize(50, 20))
+            min_box.setMinimumSize(QSize(50, 20))
+            h_layout.addWidget(min_box)
+
+            # Max label and input box
+            max_label = QLabel()
+            max_label.setText('max')
+            h_layout.addWidget(max_label)
+            max_box = QLineEdit()
+            max_box.setMaximumSize(QSize(50, 20))
+            max_box.setMinimumSize(QSize(50, 20))
+            h_layout.addWidget(max_box)
+
+            # Widget to add the elements to
+            parameter_widget = QWidget()
+            parameter_widget.setMaximumSize(QSize(5000, 35))
+            parameter_widget.setLayout(h_layout)
+            v_layout.addWidget(parameter_widget)
+
+            # Set the current config values
+            if key in self.export_config['brillouin']:
+                min_box.setText(self.export_config['brillouin'][key]['cax'][0])
+                max_box.setText(self.export_config['brillouin'][key]['cax'][1])
+            # Otherwise we set it to the default min/max
+            else:
+                min_box.setText('min')
+                max_box.setText('max')
+
+            if key in self.export_config['brillouin']['parameters']:
+                checkbox.setChecked(True)
+                min_box.setEnabled(True)
+                max_box.setEnabled(True)
+            else:
+                min_box.setEnabled(False)
+                max_box.setEnabled(False)
+
+            # Connect handlers
+            checkbox.clicked.connect(
+                lambda checked, param=key, minbox=min_box, maxbox=max_box:
+                self.on_export_checkbox(param, minbox, maxbox)
+            )
+            min_box.textChanged.connect(
+                lambda value, param=key: self.on_export_minbox(value, param)
+            )
+            max_box.textChanged.connect(
+                lambda value, param=key: self.on_export_maxbox(value, param)
+            )
+
+        # This only works if there is no layout set yet!
+        parent_widget.setLayout(v_layout)
+        # self.export_dialog.scrollAreaWidgetContents.\
+        #     setMinimumSize(QSize(0, 40*len(parameters)))
+
+    def close_export_dialog(self):
+        self.export_dialog.close()
+
     def export_file(self):
-        ExportController().export()
+        ExportController().export(self.export_config)
 
     def reset_ui(self):
         """
@@ -281,6 +417,7 @@ class BMicro(QtWidgets.QMainWindow):
             self.batch_remove_files
         )
         self.update_batch_file_table()
+        self.init_export_dialog(self.batch_dialog.widget_parameters)
         self.batch_dialog.adjustSize()
 
         self.update_batch_file_settings()
