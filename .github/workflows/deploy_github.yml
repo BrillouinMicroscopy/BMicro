@@ -13,10 +13,6 @@ jobs:
       matrix:
         python-version: ['3.9']
         os: [macos-latest, windows-latest]
-        include:
-          # Build for Windows 7 with Python 3.8
-          - python-version: '3.8'
-            os: windows-latest
     steps:
     - uses: actions/checkout@v3
       with:
@@ -24,7 +20,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.9
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -44,10 +40,6 @@ jobs:
         .\dist\BMicro\\BMicro.exe --version
         python win_make_iss.py
         iscc /Q win_bmicro.iss
-    - name: Rename release asset for Python 3.8
-      if: (runner.os == 'windows' && matrix.python-version == '3.8')
-      run: |
-        mv ./build-recipes/Output/BMicro_${{ github.ref_name }}_win_64bit_setup.exe ./build-recipes/Output/BMicro_${{ github.ref_name }}_win_7_64bit_setup.exe
     - name: Release macOS assets
       if: runner.os == 'macOS'
       uses: softprops/action-gh-release@v1
@@ -61,7 +53,7 @@ jobs:
           ./build-recipes/dist/BMicro_${{ github.ref_name }}_macosx.dmg
           ./build-recipes/dist/BMicro_${{ github.ref_name }}_macosx.pkg
     - name: Release windows assets
-      if: (runner.os == 'windows' && matrix.python-version == '3.9')
+      if: runner.os == 'windows'
       uses: softprops/action-gh-release@v1
       with:
         name: BMicro ${{ github.ref_name }}
@@ -71,14 +63,3 @@ jobs:
             ![](https://img.shields.io/github/downloads/BrillouinMicroscopy/BMicro/${{ github.ref_name }}/total.svg)
         files: |
           ./build-recipes/Output/BMicro_${{ github.ref_name }}_win_64bit_setup.exe
-    - name: Release windows assets
-      if: (runner.os == 'windows' && matrix.python-version == '3.8')
-      uses: softprops/action-gh-release@v1
-      with:
-        name: BMicro ${{ github.ref_name }}
-        draft: true
-        prerelease: false
-        body: |
-            ![](https://img.shields.io/github/downloads/BrillouinMicroscopy/BMicro/${{ github.ref_name }}/total.svg)
-        files: |
-          ./build-recipes/Output/BMicro_${{ github.ref_name }}_win_7_64bit_setup.exe
