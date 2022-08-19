@@ -442,6 +442,9 @@ class CalibrationView(QtWidgets.QWidget):
         self.options_dialog.button_cancel.clicked.connect(
             self.close_options
         )
+        self.options_dialog.temperature.valueChanged.connect(
+            self.temperature_changed
+        )
         self.options_dialog.adjustSize()
 
         self.mplcanvas_options = MplCanvas(self.options_dialog.widget_plot,
@@ -483,6 +486,13 @@ class CalibrationView(QtWidgets.QWidget):
     def close_options(self):
         self.options_dialog.close()
 
+    def temperature_changed(self):
+        temperature = self.sender().value()
+
+        session = Session.get_instance()
+        session.setup.set_temperature(temperature)
+        self.update_options_view()
+
     def update_options_view(self):
         if self.options_dialog is None:
             return
@@ -497,6 +507,9 @@ class CalibrationView(QtWidgets.QWidget):
             1e-9 * session.setup.calibration.shift_methanol)
         self.options_dialog.shift_1.setValue(
             1e-9 * session.setup.calibration.shift_water)
+        self.options_dialog.temperature.setValue(
+            session.setup.temperature - 273.15
+        )
 
         # Get the sorted calibration keys
         calib_keys = session.get_calib_keys(sort_by_time=True)
