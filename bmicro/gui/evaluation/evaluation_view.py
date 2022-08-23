@@ -8,7 +8,7 @@ import warnings
 
 import time
 
-from PyQt6 import QtWidgets, uic
+from PyQt6 import QtWidgets, uic, QtCore
 from PyQt6.QtCore import QObject, QTimer, QThread, pyqtSignal, QCoreApplication
 import multiprocessing as mp
 
@@ -48,9 +48,19 @@ class EvaluationView(QtWidgets.QWidget):
 
         self.mplcanvas = MplCanvas(self.image_widget,
                                    toolbar=('Home', 'Pan', 'Zoom'))
+        self.mplcanvas.get_figure().canvas.mpl_connect(
+            'button_press_event', self.on_click_image)
         self.plot = self.mplcanvas.get_figure().add_subplot(111)
         self.image_map = None
         self.colorbar = None
+
+        self.image_spectrum_dialog = None
+        self.isd_image_canvas = None
+        self.isd_image_plot = None
+        self.isd_image_map = None
+        self.isd_image_colorbar = None
+        self.isd_spectrum_canvas = None
+        self.isd_spectrum_plot = None
 
         self.button_evaluate.released.connect(self.evaluate)
 
@@ -129,6 +139,120 @@ class EvaluationView(QtWidgets.QWidget):
                 self.bounds_table.item(i, 0).setText(bound[0])
                 self.bounds_table.item(i, 1).setText(bound[1])
 
+    def on_click_image(self, event):
+        """
+        Action triggered when user clicks Brillouin map.
+
+        Parameters
+        ----------
+        event: matplotlib event object
+            The mouse click event.
+        """
+        # If the click is outside the axes, skip it
+        if event.inaxes is None:
+            return
+        # If we don't have a session we have not loaded data yet
+        session = Session.get_instance()
+        if session is None:
+            return
+
+        # Get the resolution of the measurement
+        resolution = self.session.get_payload_resolution()
+        if resolution is None:
+            return
+
+        # Get the positions and normalize them
+        positions = list(self.session.get_payload_positions().values())
+        for position in positions:
+            position -= np.nanmean(position)
+
+        # Get the indices of the dimensions to check
+        idx = [idx for idx, dim in enumerate(resolution) if dim > 1]
+
+        # Only works for 2D plots
+        if len(idx) != 2:
+            return
+
+        # Determine the indices of the click in the positions arrays
+        click_pos = (event.xdata, event.ydata)
+        indices = np.zeros(len(resolution), dtype="int")
+        for ind, p_ind in enumerate(idx):
+            dslice = [slice(None) if ind == i else 0
+                      for i, res in enumerate(resolution)]
+            r = abs(positions[ind][tuple(dslice)] - click_pos[p_ind])
+            indices[ind] = int(np.argmin(r))
+
+        # Convert indices to key
+        image_key = self.evaluation_controller\
+            .get_key_from_indices(resolution, *indices)
+
+        # Get the image and spectrum
+        image = session.get_payload_image(image_key, 0)
+        spectra = session.evaluation_model().get_spectra(image_key)
+        spectrum = np.nanmean(spectra, 0)
+
+        # If the modal is not open yet, open it
+        self.open_image_spectrum()
+
+        # Show position and key
+        self.image_spectrum_dialog.image_spectrum_label.setText(
+            "Position "
+            f"x: {positions[0][tuple(indices)]:#0.1f} [µm], "
+            f"y: {positions[1][tuple(indices)]:#0.1f} [µm], "
+            f"z: {positions[2][tuple(indices)]:#0.1f} [µm], "
+            f"image key: {image_key}"
+        )
+
+        # Plot image
+        if isinstance(self.isd_image_map, matplotlib.image.AxesImage):
+            self.isd_image_map.set_data(image.T)
+        else:
+            self.isd_image_map = self.isd_image_plot.imshow(
+                image.T, origin='lower', vmin=100, vmax=300
+            )
+            self.isd_image_colorbar = \
+                self.isd_image_canvas.get_figure().colorbar(self.isd_image_map)
+        self.isd_image_canvas.draw()
+
+        # Plot spectrum
+        self.isd_spectrum_plot.cla()
+        self.isd_spectrum_plot.plot(spectrum)
+        self.isd_spectrum_canvas.draw()
+
+    def open_image_spectrum(self):
+        if self.image_spectrum_dialog is None:
+            ui_file = pkg_resources.resource_filename(
+                'bmicro.gui.evaluation', 'spectrum_view.ui')
+            self.image_spectrum_dialog = QtWidgets.QDialog(
+                self,
+                QtCore.Qt.WindowType.WindowTitleHint |
+                QtCore.Qt.WindowType.WindowCloseButtonHint
+            )
+            uic.loadUi(ui_file, self.image_spectrum_dialog)
+            self.image_spectrum_dialog\
+                .setWindowTitle('Camera image & spectrum')
+            self.image_spectrum_dialog.setWindowModality(
+                QtCore.Qt.WindowModality.NonModal)
+
+            self.image_spectrum_dialog.show()
+
+            self.isd_image_canvas = MplCanvas(
+                self.image_spectrum_dialog.image_widget,
+                toolbar=('Home', 'Pan', 'Zoom'))
+            self.isd_image_plot =\
+                self.isd_image_canvas.get_figure().add_subplot(111)
+            self.isd_image_map = None
+            self.isd_image_colorbar = None
+
+            self.isd_spectrum_canvas = MplCanvas(
+                self.image_spectrum_dialog.spectrum_widget,
+                toolbar=('Home', 'Pan', 'Zoom'))
+            self.isd_spectrum_plot =\
+                self.isd_spectrum_canvas.get_figure().add_subplot(111)
+
+        if self.image_spectrum_dialog.isVisible() is False:
+            self.image_spectrum_dialog.setVisible(True)
+
     def setNrBrillouinPeaks(self, nr_brillouin_peaks):
         session = Session.get_instance()
         evm = session.evaluation_model()
@@ -167,6 +291,10 @@ class EvaluationView(QtWidgets.QWidget):
         self.plot.cla()
 
         self.mplcanvas.draw()
+
+        if self.image_spectrum_dialog is not None\
+                and self.image_spectrum_dialog.isVisible():
+            self.image_spectrum_dialog.close()
 
     def setup_parameter_selection_combobox(self):
 
