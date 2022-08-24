@@ -16,7 +16,8 @@ from bmlab.session import Session
 from bmlab.file import is_source_file
 from bmlab.models.setup import AVAILABLE_SETUPS
 from bmlab.models import EvaluationModel
-from bmlab.controllers import PeakSelectionController, ExportController
+from bmlab.controllers import PeakSelectionController, ExportController,\
+    EvaluationController
 
 from . import data
 from . import extraction
@@ -101,6 +102,8 @@ class BMicro(QtWidgets.QMainWindow):
             },
             'evaluation': {
                 'evaluate': False,
+                'nr_brillouin_peaks': 1,
+                'bounds': None,
             },
             'export': {
                 'export': False,
@@ -573,6 +576,34 @@ class BMicro(QtWidgets.QMainWindow):
             .setChecked(cfg_evaluation['evaluate'])
         self.batch_dialog.checkBox_evaluation\
             .clicked.connect(self.on_evaluation_evaluate)
+        self.batch_dialog.nrBrillouinPeaksGroup\
+            .setEnabled(cfg_evaluation['evaluate'])
+        if cfg_evaluation['nr_brillouin_peaks'] == 1:
+            self.batch_dialog.nrBrillouinPeaks_1.setChecked(True)
+        else:
+            self.batch_dialog.nrBrillouinPeaks_2.setChecked(True)
+        self.batch_dialog.bounds_table\
+            .setEnabled(cfg_evaluation['evaluate'] and
+                        cfg_evaluation['nr_brillouin_peaks'] > 1)
+
+        self.batch_dialog.bounds_table.horizontalHeader().setSectionResizeMode(
+            QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.batch_dialog.bounds_table.verticalHeader().setSectionResizeMode(
+            QtWidgets.QHeaderView.ResizeMode.Stretch)
+        bounds = cfg_evaluation['bounds']
+        if bounds is not None:
+            self.batch_dialog.bounds_table.setColumnCount(2)
+            self.batch_dialog.bounds_table.setColumnCount(len(bounds))
+            for i, bound in enumerate(bounds):
+                self.batch_dialog.bounds_table.item(i, 0).setText(bound[0])
+                self.batch_dialog.bounds_table.item(i, 1).setText(bound[1])
+        self.batch_dialog.bounds_table.cellChanged.connect(
+            self.evaluation_bounds_changed)
+
+        self.batch_dialog.nrBrillouinPeaks_1.toggled.connect(
+            lambda: self.set_nr_brillouin_peaks(1))
+        self.batch_dialog.nrBrillouinPeaks_2.toggled.connect(
+            lambda: self.set_nr_brillouin_peaks(2))
 
         # Export
         cfg_export = self.batch_config['export']
@@ -580,6 +611,20 @@ class BMicro(QtWidgets.QMainWindow):
             .setChecked(cfg_export['export'])
         self.batch_dialog.checkBox_export\
             .clicked.connect(self.on_export_export)
+
+    def set_nr_brillouin_peaks(self, nr_peaks):
+        self.batch_config['evaluation']['nr_brillouin_peaks'] = nr_peaks
+        self.batch_config['evaluation']['bounds'] =\
+            [['min', 'max'] for _ in range(
+                self.batch_config['evaluation']['nr_brillouin_peaks'])]
+
+        self.batch_dialog.bounds_table.setEnabled(
+            self.batch_config['evaluation']['evaluate'] and
+            self.batch_config['evaluation']['nr_brillouin_peaks'] > 1)
+
+    def evaluation_bounds_changed(self, row, column):
+        self.batch_config['evaluation']['bounds'][row][column] =\
+                self.batch_dialog.bounds_table.item(row, column).text()
 
     def add_evaluation_regions(self, region_table, region_list):
         region_list.append((0., 0.))
@@ -705,7 +750,14 @@ class BMicro(QtWidgets.QMainWindow):
         region_table[row] = current_region
 
     def on_evaluation_evaluate(self):
-        self.batch_config['evaluation']['evaluate'] = self.sender().isChecked()
+        self.batch_config['evaluation']['evaluate']\
+            = self.sender().isChecked()
+        self.batch_dialog.nrBrillouinPeaksGroup\
+            .setEnabled(self.batch_config['evaluation']['evaluate'])
+        self.batch_dialog.bounds_table\
+            .setEnabled(
+                self.batch_config['evaluation']['evaluate'] and
+                self.batch_config['evaluation']['nr_brillouin_peaks'] > 1)
 
     def on_export_export(self):
         self.batch_config['export']['export'] = self.sender().isChecked()
@@ -834,6 +886,10 @@ class BMicro(QtWidgets.QMainWindow):
                 if self.aborted(file):
                     return
                 QtCore.QCoreApplication.instance().processEvents()
+                evc = EvaluationController()
+                evc.set_nr_brillouin_peaks(
+                    cfg_evaluation['nr_brillouin_peaks'])
+                evc.set_bounds(cfg_evaluation['bounds'])
                 self.widget_evaluation_view.evaluate(blocking=True)
 
             cfg_export = self.batch_config['export']
