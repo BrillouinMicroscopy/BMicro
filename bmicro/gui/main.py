@@ -229,9 +229,6 @@ class BMicro(QtWidgets.QMainWindow):
         min_box.setEnabled(checked)
         max_box.setEnabled(checked)
 
-        self.export_dialog.button_export.setEnabled(
-            len(self.export_config['brillouin']['parameters']) > 0)
-
     def on_export_minbox(self, value, parameter):
         cax = [value, 'max']
         # We use the existing upper limit if available
