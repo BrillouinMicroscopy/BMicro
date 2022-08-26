@@ -132,12 +132,18 @@ class EvaluationView(QtWidgets.QWidget):
         if evm is None:
             return
         bounds = evm.bounds
-        if bounds is not None:
+        if bounds is None:
+            self.bounds_table.setRowCount(0)
+        else:
             self.bounds_table.setColumnCount(2)
-            self.bounds_table.setColumnCount(len(bounds))
+            self.bounds_table.setRowCount(len(bounds))
             for i, bound in enumerate(bounds):
-                self.bounds_table.item(i, 0).setText(bound[0])
-                self.bounds_table.item(i, 1).setText(bound[1])
+                item = QtWidgets.QTableWidgetItem(str(bound[0]))
+                self.bounds_table.setItem(i, 0, item)
+                item = QtWidgets.QTableWidgetItem(str(bound[1]))
+                self.bounds_table.setItem(i, 1, item)
+
+        self.bounds_table.setEnabled(evm.nr_brillouin_peaks > 1)
 
     def on_click_image(self, event):
         """
@@ -254,13 +260,15 @@ class EvaluationView(QtWidgets.QWidget):
             self.image_spectrum_dialog.setVisible(True)
 
     def setNrBrillouinPeaks(self, nr_brillouin_peaks):
+        if not self.sender().isChecked():
+            return
         session = Session.get_instance()
         evm = session.evaluation_model()
         if evm is None:
             return
         evm.setNrBrillouinPeaks(nr_brillouin_peaks)
         self.combobox_peak_number.setEnabled(nr_brillouin_peaks > 1)
-        self.bounds_table.setEnabled(nr_brillouin_peaks > 1)
+        self.updateBoundsTable()
 
     def boundsChanged(self, row, column):
         session = Session.get_instance()
