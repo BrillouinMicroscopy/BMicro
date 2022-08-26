@@ -183,10 +183,10 @@ class EvaluationView(QtWidgets.QWidget):
         click_pos = (event.xdata, event.ydata)
         indices = np.zeros(len(resolution), dtype="int")
         for ind, p_ind in enumerate(idx):
-            dslice = [slice(None) if ind == i else 0
+            dslice = [slice(None) if p_ind == i else 0
                       for i, res in enumerate(resolution)]
-            r = abs(positions[ind][tuple(dslice)] - click_pos[p_ind])
-            indices[ind] = int(np.argmin(r))
+            r = abs(positions[p_ind][tuple(dslice)] - click_pos[ind])
+            indices[p_ind] = int(np.argmin(r))
 
         # Convert indices to key
         image_key = self.evaluation_controller\
