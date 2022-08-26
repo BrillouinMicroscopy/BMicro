@@ -192,11 +192,6 @@ class EvaluationView(QtWidgets.QWidget):
         image_key = self.evaluation_controller\
             .get_key_from_indices(resolution, *indices)
 
-        # Get the image and spectrum
-        image = session.get_payload_image(image_key, 0)
-        spectra = session.evaluation_model().get_spectra(image_key)
-        spectrum = np.nanmean(spectra, 0)
-
         # If the modal is not open yet, open it
         self.open_image_spectrum()
 
@@ -209,20 +204,28 @@ class EvaluationView(QtWidgets.QWidget):
             f"image key: {image_key}"
         )
 
-        # Plot image
-        if isinstance(self.isd_image_map, matplotlib.image.AxesImage):
-            self.isd_image_map.set_data(image.T)
-        else:
-            self.isd_image_map = self.isd_image_plot.imshow(
-                image.T, origin='lower', vmin=100, vmax=300
-            )
-            self.isd_image_colorbar = \
-                self.isd_image_canvas.get_figure().colorbar(self.isd_image_map)
+        # Get the image plot it
+        image = session.get_payload_image(image_key, 0)
+        if image is not None:
+            if isinstance(self.isd_image_map, matplotlib.image.AxesImage):
+                self.isd_image_map.set_data(image.T)
+            else:
+                self.isd_image_map = self.isd_image_plot.imshow(
+                    image.T, origin='lower', vmin=100, vmax=300
+                )
+                self.isd_image_colorbar = \
+                    self.isd_image_canvas\
+                        .get_figure().colorbar(self.isd_image_map)
         self.isd_image_canvas.draw()
 
-        # Plot spectrum
+        # Get spectrum and plot it
         self.isd_spectrum_plot.cla()
-        self.isd_spectrum_plot.plot(spectrum)
+        spectra = session.evaluation_model().get_spectra(image_key)
+        if spectra is not None:
+            spectrum = np.nanmean(spectra, 0)
+            self.isd_spectrum_plot.plot(spectrum)
+            # Also try to get the fit
+            # fit = self.evaluation_controller.get_fits(image_key)
         self.isd_spectrum_canvas.draw()
 
     def open_image_spectrum(self):
