@@ -13,6 +13,7 @@ from PyQt6.QtCore import QObject, QTimer, QThread, pyqtSignal, QCoreApplication
 import multiprocessing as mp
 
 from bmlab.session import Session
+from bmlab.fits import lorentz
 
 from bmicro.gui.mpl import MplCanvas
 
@@ -222,10 +223,46 @@ class EvaluationView(QtWidgets.QWidget):
         self.isd_spectrum_plot.cla()
         spectra = session.evaluation_model().get_spectra(image_key)
         if spectra is not None:
-            spectrum = np.nanmean(spectra, 0)
-            self.isd_spectrum_plot.plot(spectrum)
+            image_nr = 0
+            spectrum = np.nanmean(spectra, image_nr)
+
             # Also try to get the fit
-            # fit = self.evaluation_controller.get_fits(image_key)
+            brillouin_fits, rayleigh_fits =\
+                self.evaluation_controller.get_fits(image_key)
+            x = range(len(spectrum))
+            # Show the Brillouin peaks
+            # Iterate over the regions
+            for region_nr in range(brillouin_fits[0].shape[1]):
+                # Iterate over the multi-fit peaks
+                for peak_nr in range(brillouin_fits[0].shape[2]):
+                    idx = (image_nr, region_nr, peak_nr)
+                    y = lorentz(
+                        x,
+                        brillouin_fits[0][idx],
+                        brillouin_fits[1][idx],
+                        brillouin_fits[2][idx]
+                    ) + brillouin_fits[3][idx]
+                    if peak_nr > 0:
+                        color = 'tab:orange'
+                    else:
+                        color = 'tab:red'
+                    self.isd_spectrum_plot.plot(y, color=color)
+
+            # Show the Rayleigh peaks
+            # Iterate over the regions
+            for region_nr in range(rayleigh_fits[0].shape[1]):
+                idx = (image_nr, region_nr, 0)
+                y = lorentz(
+                    x,
+                    rayleigh_fits[0][idx],
+                    rayleigh_fits[1][idx],
+                    rayleigh_fits[2][idx]
+                ) + rayleigh_fits[3][idx]
+                self.isd_spectrum_plot.plot(y, color='tab:purple')
+
+            # Show the measured data
+            self.isd_spectrum_plot.plot(spectrum, color='tab:blue')
+
         self.isd_spectrum_canvas.draw()
 
     def open_image_spectrum(self):
