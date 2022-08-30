@@ -272,7 +272,9 @@ class EvaluationView(QtWidgets.QWidget):
             self.image_spectrum_dialog = QtWidgets.QDialog(
                 self,
                 QtCore.Qt.WindowType.WindowTitleHint |
-                QtCore.Qt.WindowType.WindowCloseButtonHint
+                QtCore.Qt.WindowType.WindowCloseButtonHint |
+                QtCore.Qt.WindowType.WindowMaximizeButtonHint |
+                QtCore.Qt.WindowType.WindowMinimizeButtonHint
             )
             uic.loadUi(ui_file, self.image_spectrum_dialog)
             self.image_spectrum_dialog\
