@@ -230,35 +230,48 @@ class EvaluationView(QtWidgets.QWidget):
             brillouin_fits, rayleigh_fits =\
                 self.evaluation_controller.get_fits(image_key)
             x = range(len(spectrum))
-            # Show the Brillouin peaks
-            # Iterate over the regions
-            for region_nr in range(brillouin_fits[0].shape[1]):
-                # Iterate over the multi-fit peaks
-                for peak_nr in range(brillouin_fits[0].shape[2]):
-                    idx = (image_nr, region_nr, peak_nr)
+
+            pm = session.peak_selection_model()
+            if pm is not None:
+                # Show the Brillouin peaks
+                brillouin_regions = pm.get_brillouin_regions()
+                # Iterate over the regions
+                for region_nr in range(brillouin_fits[0].shape[1]):
+                    x = range(
+                        brillouin_regions[region_nr][0],
+                        brillouin_regions[region_nr][1]
+                    )
+                    # Iterate over the multi-fit peaks
+                    for peak_nr in range(brillouin_fits[0].shape[2]):
+                        idx = (image_nr, region_nr, peak_nr)
+                        y = lorentz(
+                            x,
+                            brillouin_fits[0][idx],
+                            brillouin_fits[1][idx],
+                            brillouin_fits[2][idx]
+                        ) + brillouin_fits[3][idx]
+                        if peak_nr > 0:
+                            color = 'tab:orange'
+                        else:
+                            color = 'tab:red'
+                        self.isd_spectrum_plot.plot(x, y, color=color)
+
+                # Show the Rayleigh peaks
+                rayleigh_regions = pm.get_rayleigh_regions()
+                # Iterate over the regions
+                for region_nr in range(rayleigh_fits[0].shape[1]):
+                    x = range(
+                        rayleigh_regions[region_nr][0],
+                        rayleigh_regions[region_nr][1]
+                    )
+                    idx = (image_nr, region_nr, 0)
                     y = lorentz(
                         x,
-                        brillouin_fits[0][idx],
-                        brillouin_fits[1][idx],
-                        brillouin_fits[2][idx]
-                    ) + brillouin_fits[3][idx]
-                    if peak_nr > 0:
-                        color = 'tab:orange'
-                    else:
-                        color = 'tab:red'
-                    self.isd_spectrum_plot.plot(y, color=color)
-
-            # Show the Rayleigh peaks
-            # Iterate over the regions
-            for region_nr in range(rayleigh_fits[0].shape[1]):
-                idx = (image_nr, region_nr, 0)
-                y = lorentz(
-                    x,
-                    rayleigh_fits[0][idx],
-                    rayleigh_fits[1][idx],
-                    rayleigh_fits[2][idx]
-                ) + rayleigh_fits[3][idx]
-                self.isd_spectrum_plot.plot(y, color='tab:purple')
+                        rayleigh_fits[0][idx],
+                        rayleigh_fits[1][idx],
+                        rayleigh_fits[2][idx]
+                    ) + rayleigh_fits[3][idx]
+                    self.isd_spectrum_plot.plot(x, y, color='tab:purple')
 
             # Show the measured data
             self.isd_spectrum_plot.plot(spectrum, color='tab:blue')
