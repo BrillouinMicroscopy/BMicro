@@ -232,14 +232,22 @@ class EvaluationView(QtWidgets.QWidget):
             x = range(len(spectrum))
 
             pm = session.peak_selection_model()
-            if pm is not None:
+            evm = session.evaluation_model()
+            if pm is not None and evm is not None:
+                shift = np.nanmean(
+                    evm.results['rayleigh_shift'][
+                        indices[0], indices[1], indices[2], :, :, :]
+                )
+                if np.isnan(shift):
+                    shift = 0
+
                 # Show the Brillouin peaks
                 brillouin_regions = pm.get_brillouin_regions()
                 # Iterate over the regions
                 for region_nr in range(brillouin_fits[0].shape[1]):
                     x = range(
-                        brillouin_regions[region_nr][0],
-                        brillouin_regions[region_nr][1]
+                        brillouin_regions[region_nr][0] + round(shift),
+                        brillouin_regions[region_nr][1] + round(shift)
                     )
                     # Iterate over the multi-fit peaks
                     for peak_nr in range(brillouin_fits[0].shape[2]):
@@ -261,8 +269,8 @@ class EvaluationView(QtWidgets.QWidget):
                 # Iterate over the regions
                 for region_nr in range(rayleigh_fits[0].shape[1]):
                     x = range(
-                        rayleigh_regions[region_nr][0],
-                        rayleigh_regions[region_nr][1]
+                        rayleigh_regions[region_nr][0] + round(shift),
+                        rayleigh_regions[region_nr][1] + round(shift)
                     )
                     idx = (image_nr, region_nr, 0)
                     y = lorentz(
