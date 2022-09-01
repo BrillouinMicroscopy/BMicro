@@ -175,6 +175,7 @@ class BMicro(QtWidgets.QMainWindow):
 
         session = Session.get_instance()
         try:
+            self.close_file()
             session.set_file(file_name)
         except FileNotFoundError as e:
             msg = QMessageBox()
