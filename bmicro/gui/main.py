@@ -402,7 +402,9 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_dialog = QtWidgets.QDialog(
             self,
             QtCore.Qt.WindowType.WindowTitleHint |
-            QtCore.Qt.WindowType.WindowCloseButtonHint
+            QtCore.Qt.WindowType.WindowCloseButtonHint |
+            QtCore.Qt.WindowType.WindowMaximizeButtonHint |
+            QtCore.Qt.WindowType.WindowMinimizeButtonHint
         )
         uic.loadUi(ui_file, self.batch_dialog)
         self.batch_dialog.setWindowTitle('Batch evaluation')
