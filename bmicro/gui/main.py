@@ -590,13 +590,8 @@ class BMicro(QtWidgets.QMainWindow):
             QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.batch_dialog.bounds_table.verticalHeader().setSectionResizeMode(
             QtWidgets.QHeaderView.ResizeMode.Stretch)
-        bounds = cfg_evaluation['bounds']
-        if bounds is not None:
-            self.batch_dialog.bounds_table.setColumnCount(2)
-            self.batch_dialog.bounds_table.setColumnCount(len(bounds))
-            for i, bound in enumerate(bounds):
-                self.batch_dialog.bounds_table.item(i, 0).setText(bound[0])
-                self.batch_dialog.bounds_table.item(i, 1).setText(bound[1])
+
+        self.update_batch_bounds_table()
         self.batch_dialog.bounds_table.cellChanged.connect(
             self.evaluation_bounds_changed)
 
@@ -612,15 +607,41 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_dialog.checkBox_export\
             .clicked.connect(self.on_export_export)
 
-    def set_nr_brillouin_peaks(self, nr_peaks):
-        self.batch_config['evaluation']['nr_brillouin_peaks'] = nr_peaks
-        self.batch_config['evaluation']['bounds'] =\
-            [['min', 'max'] for _ in range(
-                self.batch_config['evaluation']['nr_brillouin_peaks'])]
+    def update_batch_bounds_table(self):
+        bounds = self.batch_config['evaluation']['bounds']
+        if bounds is None:
+            self.batch_dialog.bounds_table.setRowCount(0)
+        else:
+            self.batch_dialog.bounds_table.setColumnCount(2)
+            self.batch_dialog.bounds_table.setRowCount(len(bounds))
+            for i, bound in enumerate(bounds):
+                item = QtWidgets.QTableWidgetItem(str(bound[0]))
+                self.batch_dialog.bounds_table.setItem(i, 0, item)
+                item = QtWidgets.QTableWidgetItem(str(bound[1]))
+                self.batch_dialog.bounds_table.setItem(i, 1, item)
 
         self.batch_dialog.bounds_table.setEnabled(
             self.batch_config['evaluation']['evaluate'] and
             self.batch_config['evaluation']['nr_brillouin_peaks'] > 1)
+
+    def set_nr_brillouin_peaks(self, nr_peaks):
+        if not self.sender().isChecked():
+            return
+        self.batch_config['evaluation']['nr_brillouin_peaks'] = nr_peaks
+
+        if nr_peaks == 1:
+            bounds = None
+
+        # Initialize the bounds if necessary
+        if nr_peaks > 1 and\
+                (self.batch_config['evaluation']['bounds'] is None or
+                 len(self.batch_config['evaluation']['bounds'])
+                 is not nr_peaks):
+            bounds = [['min', 'max'] for _ in range(nr_peaks)]
+
+        self.batch_config['evaluation']['bounds'] = bounds
+
+        self.update_batch_bounds_table()
 
     def evaluation_bounds_changed(self, row, column):
         self.batch_config['evaluation']['bounds'][row][column] =\
