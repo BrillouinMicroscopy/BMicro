@@ -1,3 +1,24 @@
+## 0.5.0 - 2022-09-02
+
+### Added
+- Allow to account for calibration temperature #212
+- Allow to show image and spectrum #216 #218 #222 #224
+- Show fits in spectrum view #223 #225 #226
+- Implement multi-peak fit batch evaluation #217 #229
+- Export all peaks from multi-peak fits https://github.com/BrillouinMicroscopy/bmlab/pull/146
+- Write scale bar to Brillouin Tiff file https://github.com/BrillouinMicroscopy/bmlab/pull/154 https://github.com/BrillouinMicroscopy/bmlab/pull/155
+
+### Changed
+- Allow to minimaximize the batch evaluation window #228
+- Bump bmlab to 0.5.0 #230
+
+### Fixed
+- Don't disable export button #219
+- Properly handle multi-peak fit bounds in evaluation view #220
+- Don't fail batch evaluation for broken repetitions #221
+- Close current file before opening new file #227
+- Fix exporting fluorescence w/o scale calibration https://github.com/BrillouinMicroscopy/bmlab/pull/145
+
 ## 0.4.0 - 2022-08-17
 
 ### Added
