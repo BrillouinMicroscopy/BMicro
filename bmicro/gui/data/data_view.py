@@ -83,6 +83,9 @@ class DataView(QtWidgets.QWidget):
             self.label_calibration.setText(
                 str(not repetition.calibration.is_empty()))
 
+        if session.setup is not None:
+            self.combobox_setup.setCurrentText(session.setup.name)
+
         self.checkbox_reflect_vertically.setChecked(
             session.orientation.reflection['vertically'])
         self.checkbox_reflect_horizontally.setChecked(
@@ -110,6 +113,7 @@ class DataView(QtWidgets.QWidget):
         self.label_resolution_z.setText('')
         self.label_calibration.setText('')
         self.textedit_comment.setText('')
+        self.combobox_setup.setCurrentText(AVAILABLE_SETUPS[0].name)
         self.radio_rotation_none.setChecked(True)
         self.checkbox_reflect_vertically.setChecked(False)
         self.checkbox_reflect_horizontally.setChecked(False)
