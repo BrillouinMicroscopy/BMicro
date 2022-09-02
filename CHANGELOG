@@ -1,3 +1,9 @@
+## 0.5.1 - 2022-09-02
+
+### Fixed
+- Correctly initialize setup on new file load https://github.com/BrillouinMicroscopy/bmlab/pull/156
+- Show correct setup on file load #232
+
 ## 0.5.0 - 2022-09-02
 
 ### Added
