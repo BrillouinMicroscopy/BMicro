@@ -235,14 +235,18 @@ class BMicro(QtWidgets.QMainWindow):
         # We use the existing upper limit if available
         if parameter in self.export_config['brillouin']:
             cax[1] = self.export_config['brillouin'][parameter]['cax'][1]
-        self.export_config['brillouin'][parameter]['cax'] = tuple(cax)
+            self.export_config['brillouin'][parameter]['cax'] = tuple(cax)
+        else:
+            self.export_config['brillouin'][parameter] = {'cax': tuple(cax)}
 
     def on_export_maxbox(self, value, parameter):
         cax = ['min', value]
         # We use the existing lower limit if available
         if parameter in self.export_config['brillouin']:
             cax[0] = self.export_config['brillouin'][parameter]['cax'][0]
-        self.export_config['brillouin'][parameter]['cax'] = tuple(cax)
+            self.export_config['brillouin'][parameter]['cax'] = tuple(cax)
+        else:
+            self.export_config['brillouin'][parameter] = {'cax': tuple(cax)}
 
     def init_export_dialog(self, parent_widget):
         v_layout = QVBoxLayout()
