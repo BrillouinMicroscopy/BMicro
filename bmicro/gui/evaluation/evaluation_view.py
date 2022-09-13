@@ -131,6 +131,8 @@ class EvaluationView(QtWidgets.QWidget):
         session = Session.get_instance()
         evm = session.evaluation_model()
         if evm is None:
+            self.bounds_table.setRowCount(0)
+            self.bounds_table.setEnabled(False)
             return
         bounds = evm.bounds
         if bounds is None:
@@ -361,6 +363,10 @@ class EvaluationView(QtWidgets.QWidget):
         self.evaluation_progress.setValue(0)
         self.clear_plots()
         self.plot.cla()
+        self.updateBoundsTable()
+        self.nrBrillouinPeaks_1.setChecked(True)
+        self.combobox_parameter.clear()
+        self.combobox_peak_number.setEnabled(False)
 
         self.mplcanvas.draw()
 
