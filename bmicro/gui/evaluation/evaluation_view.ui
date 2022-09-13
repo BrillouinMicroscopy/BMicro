@@ -106,16 +106,6 @@
             <property name="enabled">
              <bool>false</bool>
             </property>
-            <row>
-             <property name="text">
-              <string>w0_1</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>w0_2</string>
-             </property>
-            </row>
             <column>
              <property name="text">
               <string>Lower</string>
@@ -126,26 +116,6 @@
               <string>Upper</string>
              </property>
             </column>
-            <item row="0" column="0">
-             <property name="text">
-              <string>min</string>
-             </property>
-            </item>
-            <item row="0" column="1">
-             <property name="text">
-              <string>max</string>
-             </property>
-            </item>
-            <item row="1" column="0">
-             <property name="text">
-              <string>min</string>
-             </property>
-            </item>
-            <item row="1" column="1">
-             <property name="text">
-              <string>max</string>
-             </property>
-            </item>
            </widget>
           </item>
          </layout>
