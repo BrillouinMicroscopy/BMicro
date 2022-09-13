@@ -222,32 +222,34 @@ class EvaluationView(QtWidgets.QWidget):
         # Get spectrum and plot it
         self.isd_spectrum_plot.cla()
         spectra = session.evaluation_model().get_spectra(image_key)
-        if spectra is not None:
+        cm = session.calibration_model()
+        payload_time = session.get_payload_time(image_key)
+        frequencies = cm.get_frequencies_by_time(payload_time)
+
+        if spectra is not None and frequencies is not None:
             image_nr = 0
             spectrum = np.nanmean(spectra, image_nr)
 
             # Also try to get the fit
             brillouin_fits, rayleigh_fits =\
                 self.evaluation_controller.get_fits(image_key)
-            x = range(len(spectrum))
+
+            # Show the measured data
+            self.isd_spectrum_plot.plot(1e-9 * frequencies,
+                                        spectrum, color='tab:blue')
+            self.isd_spectrum_plot.set_xlabel('$f$ [GHz]')
 
             pm = session.peak_selection_model()
             evm = session.evaluation_model()
             if pm is not None and evm is not None:
-                shift = np.nanmean(
-                    evm.results['rayleigh_shift'][
-                        indices[0], indices[1], indices[2], :, :, :]
-                )
-                if np.isnan(shift):
-                    shift = 0
-
                 # Show the Brillouin peaks
                 brillouin_regions = pm.get_brillouin_regions()
                 # Iterate over the regions
                 for region_nr in range(brillouin_fits[0].shape[1]):
-                    x = range(
-                        brillouin_regions[region_nr][0] + round(shift),
-                        brillouin_regions[region_nr][1] + round(shift)
+                    x = np.linspace(
+                        brillouin_regions[region_nr][0],
+                        brillouin_regions[region_nr][1],
+                        200
                     )
                     # Iterate over the multi-fit peaks
                     for peak_nr in range(brillouin_fits[0].shape[2]):
@@ -262,15 +264,16 @@ class EvaluationView(QtWidgets.QWidget):
                             color = 'tab:orange'
                         else:
                             color = 'tab:red'
-                        self.isd_spectrum_plot.plot(x, y, color=color)
+                        self.isd_spectrum_plot.plot(1e-9 * x, y, color=color)
 
                 # Show the Rayleigh peaks
                 rayleigh_regions = pm.get_rayleigh_regions()
                 # Iterate over the regions
                 for region_nr in range(rayleigh_fits[0].shape[1]):
-                    x = range(
-                        rayleigh_regions[region_nr][0] + round(shift),
-                        rayleigh_regions[region_nr][1] + round(shift)
+                    x = np.linspace(
+                        rayleigh_regions[region_nr][0],
+                        rayleigh_regions[region_nr][1],
+                        200
                     )
                     idx = (image_nr, region_nr, 0)
                     y = lorentz(
@@ -279,10 +282,8 @@ class EvaluationView(QtWidgets.QWidget):
                         rayleigh_fits[1][idx],
                         rayleigh_fits[2][idx]
                     ) + rayleigh_fits[3][idx]
-                    self.isd_spectrum_plot.plot(x, y, color='tab:purple')
-
-            # Show the measured data
-            self.isd_spectrum_plot.plot(spectrum, color='tab:blue')
+                    self.isd_spectrum_plot.plot(1e-9 * x,
+                                                y, color='tab:purple')
 
         self.isd_spectrum_canvas.draw()
 

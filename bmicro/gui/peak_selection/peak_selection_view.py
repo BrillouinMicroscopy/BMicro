@@ -105,21 +105,19 @@ class PeakSelectionView(QtWidgets.QWidget):
     def on_select_data_region(self, xmin, xmax):
         if not self.plot.lines or not self.plot.lines[0]:
             return
-        # Since we might operate on a frequency axis,
-        # we need the indices instead of the values.
-        xdata = self.plot.lines[0].get_xdata()
-        indmin, indmax = np.searchsorted(xdata, (xmin, xmax))
-
         if self.mode == MODE_DEFAULT:
             return
         session = Session.get_instance()
 
+        # We need the region in Hz
+        region = (1e9*xmin, 1e9*xmax)
+
         pm = session.peak_selection_model()
         if pm:
             if self.mode == MODE_SELECT_BRILLOUIN:
-                pm.add_brillouin_region((indmin, indmax))
+                pm.add_brillouin_region(region)
             elif self.mode == MODE_SELECT_RAYLEIGH:
-                pm.add_rayleigh_region((indmin, indmax))
+                pm.add_rayleigh_region(region)
 
         self.refresh_plot()
 
@@ -158,10 +156,6 @@ class PeakSelectionView(QtWidgets.QWidget):
                     self.plot.set_xlabel('$f$ [GHz]')
                     self.plot.set_xlim(1e-9*np.min(frequencies),
                                        1e-9*np.max(frequencies))
-                else:
-                    self.plot.plot(spectrum)
-                    self.plot.set_xlabel('$f$ [pix]')
-                    self.plot.set_xlim(0, len(spectrum))
                 self.plot.set_ylim(bottom=0)
 
                 regions = pm.get_brillouin_regions()
@@ -202,17 +196,17 @@ class PeakSelectionView(QtWidgets.QWidget):
                         frequencies=None):
         table.setRowCount(len(regions))
         for rowIdx, region in enumerate(regions):
-            mask = np.arange(int(region[0]), int(region[1]))
             if frequencies is not None:
+                ind_l = np.nanargmin(abs(frequencies - region[0]))
+                ind_r = np.nanargmin(abs(frequencies - region[1]))
+                mask = slice(ind_l, ind_r)
                 self.plot.plot(1e-9*frequencies[mask], spectrum[mask], color)
-            else:
-                self.plot.plot(mask, spectrum[mask], color)
             # Add regions to table
             # Block signals, so the itemChanged signal is not
             # emitted during table creation
             table.blockSignals(True)
             for columnIdx, value in enumerate(region):
-                item = QtWidgets.QTableWidgetItem(str(value))
+                item = QtWidgets.QTableWidgetItem(str(1e-9*value))
                 table.setItem(rowIdx, columnIdx, item)
             table.blockSignals(False)
 
@@ -228,13 +222,13 @@ class PeakSelectionView(QtWidgets.QWidget):
             if type == MODE_SELECT_BRILLOUIN:
                 regions = pm.get_brillouin_regions()
                 current_region = np.asarray(regions[row])
-                current_region[column] = value
+                current_region[column] = 1e9*value
                 current_region = tuple(current_region)
                 pm.set_brillouin_region(row, current_region)
             elif type == MODE_SELECT_RAYLEIGH:
                 regions = pm.get_rayleigh_regions()
                 current_region = np.asarray(regions[row])
-                current_region[column] = value
+                current_region[column] = 1e9*value
                 current_region = tuple(current_region)
                 pm.set_rayleigh_region(row, current_region)
             self.refresh_plot()
