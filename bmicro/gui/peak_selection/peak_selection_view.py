@@ -128,10 +128,10 @@ class PeakSelectionView(QtWidgets.QWidget):
 
         try:
             image_key = '0'
-            spectrum, times, _ = evc.extract_spectra(
+            spectra, times, _ = evc.extract_spectra(
                 image_key
             )
-            if spectrum is None:
+            if spectra is None:
                 return
 
             cm = session.calibration_model()
@@ -142,20 +142,20 @@ class PeakSelectionView(QtWidgets.QWidget):
             if not pm:
                 return
 
-            if len(spectrum) > 0:
+            if len(spectra) > 0:
                 with warnings.catch_warnings():
                     warnings.filterwarnings(
                         action='ignore',
                         message='Mean of empty slice'
                     )
-                    spectrum = np.nanmean(spectrum, 0)
+                    spectrum = np.nanmean(spectra, axis=0, keepdims=True)
                 time = times[0]
                 frequencies = cm.get_frequencies_by_time(time)
                 if frequencies is not None:
-                    self.plot.plot(1e-9*frequencies, spectrum)
+                    self.plot.plot(1e-9*frequencies[0], spectrum[0])
                     self.plot.set_xlabel('$f$ [GHz]')
-                    self.plot.set_xlim(1e-9*np.min(frequencies),
-                                       1e-9*np.max(frequencies))
+                    self.plot.set_xlim(1e-9*np.nanmin(frequencies),
+                                       1e-9*np.nanmax(frequencies))
                 self.plot.set_ylim(bottom=0)
 
                 regions = pm.get_brillouin_regions()
@@ -197,10 +197,11 @@ class PeakSelectionView(QtWidgets.QWidget):
         table.setRowCount(len(regions))
         for rowIdx, region in enumerate(regions):
             if frequencies is not None:
-                ind_l = np.nanargmin(abs(frequencies - region[0]))
-                ind_r = np.nanargmin(abs(frequencies - region[1]))
+                ind_l = np.nanargmin(abs(frequencies[0] - region[0]))
+                ind_r = np.nanargmin(abs(frequencies[0] - region[1]))
                 mask = slice(ind_l, ind_r)
-                self.plot.plot(1e-9*frequencies[mask], spectrum[mask], color)
+                self.plot.plot(
+                    1e-9*frequencies[0][mask], spectrum[0][mask], color)
             # Add regions to table
             # Block signals, so the itemChanged signal is not
             # emitted during table creation
