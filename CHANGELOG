@@ -1,3 +1,17 @@
+## 0.6.0 - 2022-09-16
+
+### Added
+- Implement exporting 3D data https://github.com/BrillouinMicroscopy/bmlab/pull/162
+
+### Changed
+- Fit Brillouin spectrum on frequency axis https://github.com/BrillouinMicroscopy/bmlab/pull/158
+- Bump bmlab to 0.6.1 #240
+
+### Fixed
+- Fix setting axis limits for 1D data #238
+- Fix setting caxis in export dialog #235
+- Fix parameter label in csv files https://github.com/BrillouinMicroscopy/bmlab/pull/163
+
 ## 0.5.1 - 2022-09-02
 
 ### Fixed
