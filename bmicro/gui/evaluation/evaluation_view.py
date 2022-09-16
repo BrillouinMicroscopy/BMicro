@@ -237,7 +237,7 @@ class EvaluationView(QtWidgets.QWidget):
                 self.evaluation_controller.get_fits(image_key)
 
             # Show the measured data
-            self.isd_spectrum_plot.plot(1e-9 * frequencies,
+            self.isd_spectrum_plot.plot(1e-9 * frequencies[0],
                                         spectrum, color='tab:blue')
             self.isd_spectrum_plot.set_xlabel('$f$ [GHz]')
 
