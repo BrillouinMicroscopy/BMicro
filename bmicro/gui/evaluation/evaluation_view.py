@@ -9,7 +9,6 @@ import warnings
 # import time
 
 from PyQt6 import QtWidgets, uic, QtCore
-# from PyQt6.QtCore import QObject, QTimer, QThread, pyqtSignal, QCoreApplication
 from PyQt6.QtCore import QObject, QTimer, pyqtSignal
 import multiprocessing as mp
 
