@@ -6,10 +6,11 @@ from matplotlib.colors import Normalize
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import warnings
 
-import time
+# import time
 
 from PyQt6 import QtWidgets, uic, QtCore
-from PyQt6.QtCore import QObject, QTimer, QThread, pyqtSignal, QCoreApplication
+# from PyQt6.QtCore import QObject, QTimer, QThread, pyqtSignal, QCoreApplication
+from PyQt6.QtCore import QObject, QTimer, pyqtSignal
 import multiprocessing as mp
 
 from bmlab.session import Session
