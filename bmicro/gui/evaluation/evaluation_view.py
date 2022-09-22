@@ -430,26 +430,28 @@ class EvaluationView(QtWidgets.QWidget):
         image_keys = self.session.get_image_keys()
         self.max_count = mp.Value('i', len(image_keys), lock=True)
 
-        dnkw = {
-            "count": self.count,
-            "max_count": self.max_count,
-            "abort": self.evaluation_abort,
-        }
+        self.evaluation_controller.evaluate()
 
-        self.thread = QThread()
-        self.worker = Worker(fkw=dnkw)
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.run)
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.worker.finished.connect(self.refresh_ui)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.start()
-
-        if blocking:
-            while self.evaluation_running:
-                QCoreApplication.instance().processEvents()
-                time.sleep(0.1)
+        # dnkw = {
+        #     "count": self.count,
+        #     "max_count": self.max_count,
+        #     "abort": self.evaluation_abort,
+        # }
+        #
+        # self.thread = QThread()
+        # self.worker = Worker(fkw=dnkw)
+        # self.worker.moveToThread(self.thread)
+        # self.thread.started.connect(self.worker.run)
+        # self.worker.finished.connect(self.thread.quit)
+        # self.worker.finished.connect(self.worker.deleteLater)
+        # self.worker.finished.connect(self.refresh_ui)
+        # self.thread.finished.connect(self.thread.deleteLater)
+        # self.thread.start()
+        #
+        # if blocking:
+        #     while self.evaluation_running:
+        #         QCoreApplication.instance().processEvents()
+        #         time.sleep(0.1)
 
     def refresh_ui(self):
         # If evaluation is aborted by user,
