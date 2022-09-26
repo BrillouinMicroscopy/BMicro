@@ -584,8 +584,10 @@ class BMicro(QtWidgets.QMainWindow):
             .setEnabled(cfg_evaluation['evaluate'])
         if cfg_evaluation['nr_brillouin_peaks'] == 1:
             self.batch_dialog.nrBrillouinPeaks_1.setChecked(True)
-        else:
+        elif cfg_evaluation['nr_brillouin_peaks'] == 2:
             self.batch_dialog.nrBrillouinPeaks_2.setChecked(True)
+        elif cfg_evaluation['nr_brillouin_peaks'] == 4:
+            self.batch_dialog.nrBrillouinPeaks_4.setChecked(True)
         self.batch_dialog.bounds_table\
             .setEnabled(cfg_evaluation['evaluate'] and
                         cfg_evaluation['nr_brillouin_peaks'] > 1)
@@ -603,6 +605,8 @@ class BMicro(QtWidgets.QMainWindow):
             lambda: self.set_nr_brillouin_peaks(1))
         self.batch_dialog.nrBrillouinPeaks_2.toggled.connect(
             lambda: self.set_nr_brillouin_peaks(2))
+        self.batch_dialog.nrBrillouinPeaks_4.toggled.connect(
+            lambda: self.set_nr_brillouin_peaks(4))
 
         # Export
         cfg_export = self.batch_config['export']

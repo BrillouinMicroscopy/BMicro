@@ -109,6 +109,8 @@ class EvaluationView(QtWidgets.QWidget):
             lambda: self.setNrBrillouinPeaks(1))
         self.nrBrillouinPeaks_2.toggled.connect(
             lambda: self.setNrBrillouinPeaks(2))
+        self.nrBrillouinPeaks_4.toggled.connect(
+            lambda: self.setNrBrillouinPeaks(4))
 
     def update_ui(self):
         session = Session.get_instance()
@@ -119,8 +121,11 @@ class EvaluationView(QtWidgets.QWidget):
         if evm.nr_brillouin_peaks == 1:
             self.nrBrillouinPeaks_1.setChecked(True)
             self.bounds_table.setEnabled(False)
-        else:
+        elif evm.nr_brillouin_peaks == 2:
             self.nrBrillouinPeaks_2.setChecked(True)
+            self.bounds_table.setEnabled(True)
+        elif evm.nr_brillouin_peaks == 4:
+            self.nrBrillouinPeaks_4.setChecked(True)
             self.bounds_table.setEnabled(True)
 
         self.updateBoundsTable()
@@ -346,6 +351,32 @@ class EvaluationView(QtWidgets.QWidget):
             return
         evm.setNrBrillouinPeaks(nr_brillouin_peaks)
         self.combobox_peak_number.setEnabled(nr_brillouin_peaks > 1)
+        self.combobox_peak_number.blockSignals(True)
+        self.combobox_peak_number.clear()
+        peak_number_labels = []
+        if nr_brillouin_peaks == 1:
+            peak_number_labels = ['Single-Peak-Fit']
+        elif nr_brillouin_peaks == 2:
+            peak_number_labels = [
+                'Single-Peak-Fit',
+                'Two-Peak-Fit - Peak 1',
+                'Two-Peak-Fit - Peak 2',
+                'Two-Peak-Fit - Mean',
+                'Two-Peak-Fit - Weighted Mean'
+            ]
+        elif nr_brillouin_peaks == 4:
+            peak_number_labels = [
+                'Single-Peak-Fit',
+                'Four-Peak-Fit - Peak 1',
+                'Four-Peak-Fit - Peak 2',
+                'Four-Peak-Fit - Peak 3',
+                'Four-Peak-Fit - Peak 4',
+                'Four-Peak-Fit - Mean',
+                'Four-Peak-Fit - Weighted Mean'
+            ]
+        self.combobox_peak_number.addItems(peak_number_labels)
+        self.combobox_peak_number.blockSignals(False)
+
         self.updateBoundsTable()
 
     def boundsChanged(self, row, column):
@@ -379,6 +410,10 @@ class EvaluationView(QtWidgets.QWidget):
         self.nrBrillouinPeaks_1.setChecked(True)
         self.combobox_parameter.clear()
         self.combobox_peak_number.setEnabled(False)
+        self.combobox_peak_number.blockSignals(True)
+        self.combobox_peak_number.clear()
+        self.combobox_peak_number.addItems(['Single-Peak-Fit'])
+        self.combobox_peak_number.blockSignals(False)
 
         self.mplcanvas.draw()
 

@@ -71,6 +71,16 @@
             </attribute>
            </widget>
           </item>
+          <item>
+           <widget class="QRadioButton" name="nrBrillouinPeaks_4">
+            <property name="text">
+             <string>Four Peaks</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
+            </attribute>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -214,6 +224,36 @@
             <item>
              <property name="text">
               <string>Two-Peak-Fit - Weighted Mean</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Four-Peak-Fit - Peak 1</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Four-Peak-Fit - Peak 2</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Four-Peak-Fit - Peak 3</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Four-Peak-Fit - Peak 4</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Four-Peak-Fit - Mean</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Four-Peak-Fit - Weighted Mean</string>
              </property>
             </item>
            </widget>

@@ -786,6 +786,16 @@
                         </property>
                        </widget>
                       </item>
+                      <item>
+                       <widget class="QRadioButton" name="nrBrillouinPeaks_4">
+                        <property name="text">
+                         <string>Four Peaks</string>
+                        </property>
+                        <property name="checked">
+                         <bool>false</bool>
+                        </property>
+                       </widget>
+                      </item>
                      </layout>
                     </widget>
                    </item>
