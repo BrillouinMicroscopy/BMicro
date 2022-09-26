@@ -253,20 +253,32 @@ class EvaluationView(QtWidgets.QWidget):
                         brillouin_regions[region_nr][1],
                         200
                     )
-                    # Iterate over the multi-fit peaks
+                    # First entry is always a single-peak fit,
+                    # the following entries belong to a multi-peak fit
                     for peak_nr in range(brillouin_fits[0].shape[2]):
                         idx = (image_nr, region_nr, peak_nr)
-                        y = lorentz(
+                        current_fit = lorentz(
                             x,
                             brillouin_fits[0][idx],
                             brillouin_fits[1][idx],
                             brillouin_fits[2][idx]
-                        ) + brillouin_fits[3][idx]
-                        if peak_nr > 0:
-                            color = 'tab:orange'
+                        )
+                        if peak_nr < 2:
+                            y = current_fit
                         else:
+                            y += current_fit
+                        if peak_nr == 0:
                             color = 'tab:red'
-                        self.isd_spectrum_plot.plot(1e-9 * x, y, color=color)
+                        else:
+                            color = 'tab:orange'
+                        # We plot the fit for the first and last entry
+                        if peak_nr == 0 or\
+                                peak_nr == (brillouin_fits[0].shape[2] - 1):
+                            self.isd_spectrum_plot.plot(
+                                1e-9 * x,
+                                y + brillouin_fits[3][idx],
+                                color=color
+                            )
 
                 # Show the Rayleigh peaks
                 rayleigh_regions = pm.get_rayleigh_regions()
