@@ -669,9 +669,9 @@ class EvaluationView(QtWidgets.QWidget):
                 self.colorbar.ax.set_title(cb_label)
 
             self.mplcanvas.draw()
-        except Exception:
+        except Exception as e:
             self.reset_ui()
-            pass
+            raise e
 
     def get_plot_limits(self, data):
         if self.autoscale.isChecked():
