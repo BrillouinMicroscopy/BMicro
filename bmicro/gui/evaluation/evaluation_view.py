@@ -663,7 +663,10 @@ class EvaluationView(QtWidgets.QWidget):
                 self.plot.set_zlabel(labels[2])
 
                 self.colorbar =\
-                    self.mplcanvas.get_figure().colorbar(scalar_map)
+                    self.mplcanvas.get_figure().colorbar(
+                        scalar_map,
+                        ax=self.plot
+                    )
                 cb_label = parameters[parameter_key]['symbol'] +\
                     ' [' + parameters[parameter_key]['unit'] + ']'
                 self.colorbar.ax.set_title(cb_label)
