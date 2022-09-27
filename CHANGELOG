@@ -1,3 +1,12 @@
+## 0.6.2 - 2022-09-27
+
+### Added
+- Add console logging for dev packages #242
+
+### Fixed
+- Show multi-peak fit in spectrum preview as one #245
+- Fix 3D plotting with matplotlib 3.6 #246
+
 ## 0.6.1 - 2022-09-16
 
 ### Fixed
