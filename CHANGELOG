@@ -1,3 +1,9 @@
+## 0.7.0 - 2022-09-28
+
+### Added
+- Implement 4-peak fitting #244 https://github.com/BrillouinMicroscopy/bmlab/pull/167
+- Enable spectrum preview for 1D data #247
+
 ## 0.6.2 - 2022-09-27
 
 ### Added
