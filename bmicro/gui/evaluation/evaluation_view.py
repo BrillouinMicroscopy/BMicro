@@ -183,8 +183,8 @@ class EvaluationView(QtWidgets.QWidget):
         # Get the indices of the dimensions to check
         idx = [idx for idx, dim in enumerate(resolution) if dim > 1]
 
-        # Only works for 2D plots
-        if len(idx) != 2:
+        # Only works for 1D and 2D plots
+        if len(idx) < 1 or len(idx) > 2:
             return
 
         # Determine the indices of the click in the positions arrays
