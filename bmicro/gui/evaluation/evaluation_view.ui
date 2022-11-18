@@ -118,12 +118,22 @@
             </property>
             <column>
              <property name="text">
-              <string>Lower</string>
+              <string>w0 lower</string>
              </property>
             </column>
             <column>
              <property name="text">
-              <string>Upper</string>
+              <string>w0 upper</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>FWHM lower</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>FWHM upper</string>
              </property>
             </column>
            </widget>

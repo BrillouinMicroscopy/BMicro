@@ -167,7 +167,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>0</y>
+              <y>-569</y>
               <width>381</width>
               <height>1400</height>
              </rect>
@@ -940,12 +940,22 @@
                         </row>
                         <column>
                          <property name="text">
-                          <string>Lower</string>
+                          <string>w0 lower</string>
                          </property>
                         </column>
                         <column>
                          <property name="text">
-                          <string>Upper</string>
+                          <string>w0 upper</string>
+                         </property>
+                        </column>
+                        <column>
+                         <property name="text">
+                          <string>FWHM lower</string>
+                         </property>
+                        </column>
+                        <column>
+                         <property name="text">
+                          <string>FWHM upper</string>
                          </property>
                         </column>
                         <item row="0" column="0">
