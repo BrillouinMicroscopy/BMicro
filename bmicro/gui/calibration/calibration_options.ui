@@ -145,7 +145,7 @@
          <item>
           <widget class="QLabel" name="label_temperature">
            <property name="text">
-            <string>Calibration temperature [°C]</string>
+            <string>Calibration temperature [°C]:</string>
            </property>
           </widget>
          </item>
