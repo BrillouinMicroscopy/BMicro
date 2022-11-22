@@ -501,6 +501,18 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_dialog.checkBox_calibrate\
             .clicked.connect(self.on_calibration_calibrate)
 
+        self.batch_dialog.temperature.valueChanged.connect(
+            self.temperature_changed
+        )
+        self.batch_dialog.shift_0.valueChanged.connect(
+            self.shift_methanol_changed
+        )
+        self.batch_dialog.shift_1.valueChanged.connect(
+            self.shift_water_changed
+        )
+
+        self.update_batch_calibration_frequencies()
+
         # Peak selection
         cfg_peak_selection = self.batch_config['peak-selection']
         self.batch_dialog.checkBox_peak_selection\
@@ -615,6 +627,59 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_dialog.checkBox_export\
             .clicked.connect(self.on_export_export)
 
+    def temperature_changed(self):
+        temperature = self.sender().value()
+
+        self.batch_config['setup']['setup'].set_temperature(temperature)
+        self.update_batch_calibration_frequencies()
+
+    def shift_methanol_changed(self):
+        shift = self.sender().value()
+
+        self.batch_config['setup']['setup']\
+            .calibration.set_shift_methanol(1e9 * shift)
+
+    def shift_water_changed(self):
+        shift = self.sender().value()
+
+        self.batch_config['setup']['setup']\
+            .calibration.set_shift_water(1e9 * shift)
+
+    def update_batch_calibration_frequencies(self):
+        cfg_setup = self.batch_config['setup']
+        if not cfg_setup['set']:
+            self.batch_dialog.shift_0.setEnabled(False)
+            self.batch_dialog.label_shift_0.setEnabled(False)
+            self.batch_dialog.shift_1.setEnabled(False)
+            self.batch_dialog.label_shift_1.setEnabled(False)
+            self.batch_dialog.temperature.setEnabled(False)
+            self.batch_dialog.label_temperature.setEnabled(False)
+        else:
+            # Set current calibration values
+            if cfg_setup['setup'].calibration.shift_methanol is not None:
+                self.batch_dialog.label_shift_0.setEnabled(True)
+                self.batch_dialog.shift_0.setEnabled(True)
+                self.batch_dialog.shift_0.setValue(
+                    1e-9 * cfg_setup['setup'].calibration.shift_methanol)
+            else:
+                self.batch_dialog.shift_0.setEnabled(False)
+                self.batch_dialog.label_shift_0.setEnabled(False)
+
+            if cfg_setup['setup'].calibration.shift_water is not None:
+                self.batch_dialog.label_shift_1.setEnabled(True)
+                self.batch_dialog.shift_1.setEnabled(True)
+                self.batch_dialog.shift_1.setValue(
+                    1e-9 * cfg_setup['setup'].calibration.shift_water)
+            else:
+                self.batch_dialog.shift_1.setEnabled(False)
+                self.batch_dialog.label_shift_1.setEnabled(False)
+
+            self.batch_dialog.temperature.setEnabled(True)
+            self.batch_dialog.label_temperature.setEnabled(True)
+            self.batch_dialog.temperature.setValue(
+                cfg_setup['setup'].temperature - 273.15
+            )
+
     def update_batch_bounds_table(self):
         bounds = self.batch_config['evaluation']['bounds']
         if bounds is None:
@@ -713,6 +778,8 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_dialog.combobox_setup\
             .setEnabled(self.batch_config['setup']['set'])
 
+        self.update_batch_calibration_frequencies()
+
     def on_orientation_set(self):
         self.batch_config['orientation']['set'] = self.sender().isChecked()
         self.batch_dialog.groupBox_rotation\
@@ -803,6 +870,8 @@ class BMicro(QtWidgets.QMainWindow):
                 break
         self.batch_config['setup']['setup'] = setup
 
+        self.update_batch_calibration_frequencies()
+
     def start_batch_evaluation(self):
         self.batch_evaluation_running = not self.batch_evaluation_running
         if self.batch_evaluation_running:
@@ -865,7 +934,7 @@ class BMicro(QtWidgets.QMainWindow):
                     horizontally=cfg_orientation['reflection']['horizontally']
                 )
 
-            # Exctraction
+            # Extraction
             cfg_extraction = self.batch_config['extraction']
             if cfg_extraction['extract']:
                 self.tabWidget.setCurrentIndex(1)
