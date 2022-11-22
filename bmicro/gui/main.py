@@ -103,7 +103,8 @@ class BMicro(QtWidgets.QMainWindow):
             'evaluation': {
                 'evaluate': False,
                 'nr_brillouin_peaks': 1,
-                'bounds': None,
+                'bounds_w0': None,
+                'bounds_fwhm': None,
             },
             'export': {
                 'export': False,
@@ -681,17 +682,23 @@ class BMicro(QtWidgets.QMainWindow):
             )
 
     def update_batch_bounds_table(self):
-        bounds = self.batch_config['evaluation']['bounds']
-        if bounds is None:
+        bounds_w0 = self.batch_config['evaluation']['bounds_w0']
+        bounds_fwhm = self.batch_config['evaluation']['bounds_fwhm']
+        if bounds_w0 is None or bounds_fwhm is None:
             self.batch_dialog.bounds_table.setRowCount(0)
         else:
-            self.batch_dialog.bounds_table.setColumnCount(2)
-            self.batch_dialog.bounds_table.setRowCount(len(bounds))
-            for i, bound in enumerate(bounds):
+            self.batch_dialog.bounds_table.setColumnCount(4)
+            self.batch_dialog.bounds_table.setRowCount(len(bounds_w0))
+            for i, bound in enumerate(bounds_w0):
                 item = QtWidgets.QTableWidgetItem(str(bound[0]))
                 self.batch_dialog.bounds_table.setItem(i, 0, item)
                 item = QtWidgets.QTableWidgetItem(str(bound[1]))
                 self.batch_dialog.bounds_table.setItem(i, 1, item)
+            for i, bound in enumerate(bounds_fwhm):
+                item = QtWidgets.QTableWidgetItem(str(bound[0]))
+                self.batch_dialog.bounds_table.setItem(i, 2, item)
+                item = QtWidgets.QTableWidgetItem(str(bound[1]))
+                self.batch_dialog.bounds_table.setItem(i, 3, item)
 
         self.batch_dialog.bounds_table.setEnabled(
             self.batch_config['evaluation']['evaluate'] and
@@ -703,22 +710,33 @@ class BMicro(QtWidgets.QMainWindow):
         self.batch_config['evaluation']['nr_brillouin_peaks'] = nr_peaks
 
         if nr_peaks == 1:
-            bounds = None
+            bounds_w0 = None
+            bounds_fwhm = None
 
         # Initialize the bounds if necessary
         if nr_peaks > 1 and\
-                (self.batch_config['evaluation']['bounds'] is None or
-                 len(self.batch_config['evaluation']['bounds'])
+                (self.batch_config['evaluation']['bounds_w0'] is None or
+                 len(self.batch_config['evaluation']['bounds_w0'])
                  is not nr_peaks):
-            bounds = [['min', 'max'] for _ in range(nr_peaks)]
+            bounds_w0 = [['min', 'max'] for _ in range(nr_peaks)]
+        if nr_peaks > 1 and\
+                (self.batch_config['evaluation']['bounds_fwhm'] is None or
+                 len(self.batch_config['evaluation']['bounds_fwhm'])
+                 is not nr_peaks):
+            bounds_fwhm = [['0', 'inf'] for _ in range(nr_peaks)]
 
-        self.batch_config['evaluation']['bounds'] = bounds
+        self.batch_config['evaluation']['bounds_w0'] = bounds_w0
+        self.batch_config['evaluation']['bounds_fwhm'] = bounds_fwhm
 
         self.update_batch_bounds_table()
 
     def evaluation_bounds_changed(self, row, column):
-        self.batch_config['evaluation']['bounds'][row][column] =\
-                self.batch_dialog.bounds_table.item(row, column).text()
+        if column < 2:
+            self.batch_config['evaluation']['bounds_w0'][row][column] =\
+                    self.batch_dialog.bounds_table.item(row, column).text()
+        elif column < 4:
+            self.batch_config['evaluation']['bounds_fwhm'][row][column - 2] =\
+                    self.batch_dialog.bounds_table.item(row, column).text()
 
     def add_evaluation_regions(self, region_table, region_list):
         region_list.append((0., 0.))
@@ -987,7 +1005,8 @@ class BMicro(QtWidgets.QMainWindow):
                 evc = EvaluationController()
                 evc.set_nr_brillouin_peaks(
                     cfg_evaluation['nr_brillouin_peaks'])
-                evc.set_bounds(cfg_evaluation['bounds'])
+                evc.set_bounds(cfg_evaluation['bounds_w0'])
+                evc.set_bounds_fwhm(cfg_evaluation['bounds_fwhm'])
                 self.widget_evaluation_view.evaluate(blocking=True)
 
             cfg_export = self.batch_config['export']

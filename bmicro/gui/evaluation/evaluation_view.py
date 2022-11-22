@@ -139,17 +139,23 @@ class EvaluationView(QtWidgets.QWidget):
             self.bounds_table.setRowCount(0)
             self.bounds_table.setEnabled(False)
             return
-        bounds = evm.bounds
-        if bounds is None:
+        bounds_w0 = evm.bounds_w0
+        bounds_fwhm = evm.bounds_fwhm
+        if bounds_w0 is None or bounds_fwhm is None:
             self.bounds_table.setRowCount(0)
         else:
-            self.bounds_table.setColumnCount(2)
-            self.bounds_table.setRowCount(len(bounds))
-            for i, bound in enumerate(bounds):
+            self.bounds_table.setColumnCount(4)
+            self.bounds_table.setRowCount(len(bounds_w0))
+            for i, bound in enumerate(bounds_w0):
                 item = QtWidgets.QTableWidgetItem(str(bound[0]))
                 self.bounds_table.setItem(i, 0, item)
                 item = QtWidgets.QTableWidgetItem(str(bound[1]))
                 self.bounds_table.setItem(i, 1, item)
+            for i, bound in enumerate(bounds_fwhm):
+                item = QtWidgets.QTableWidgetItem(str(bound[0]))
+                self.bounds_table.setItem(i, 2, item)
+                item = QtWidgets.QTableWidgetItem(str(bound[1]))
+                self.bounds_table.setItem(i, 3, item)
 
         self.bounds_table.setEnabled(evm.nr_brillouin_peaks > 1)
 
@@ -385,9 +391,13 @@ class EvaluationView(QtWidgets.QWidget):
         if evm is None:
             return
 
-        if evm.bounds is not None:
-            evm.bounds[row][column] =\
-                self.bounds_table.item(row, column).text()
+        if evm.bounds_w0 is not None:
+            if column < 2:
+                evm.bounds_w0[row][column] =\
+                    self.bounds_table.item(row, column).text()
+            elif column < 4:
+                evm.bounds_fwhm[row][column - 2] =\
+                    self.bounds_table.item(row, column).text()
 
     def clear_plots(self):
         if isinstance(self.colorbar, matplotlib.colorbar.Colorbar):
