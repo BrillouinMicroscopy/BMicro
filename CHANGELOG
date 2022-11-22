@@ -1,3 +1,12 @@
+## 0.8.0 - 2022-11-22
+
+### Added
+- Implement GUI to restrict peak width #251
+- Make options available in batch calibration #252
+
+### Changed
+- Update to Qt version 6.3.2 #249
+
 ## 0.7.0 - 2022-09-28
 
 ### Added
