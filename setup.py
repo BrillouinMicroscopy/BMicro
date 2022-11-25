@@ -48,7 +48,7 @@ setup(
                       "scikit-image",
                       "scipy<=1.9.0"
                       ],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     keywords=["Brillouin Microscopy"],
     classifiers=['Operating System :: OS Independent',
                  'Programming Language :: Python :: 3',
