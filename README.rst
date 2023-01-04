@@ -34,7 +34,7 @@ Please read our `information for developers
 .. |BMicro| image:: https://raw.github.com/BrillouinMicroscopy/BMicro/main/docs/logo/bmicro.png
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/bmicro.svg
    :target: https://pypi.python.org/pypi/bmicro
-.. |Build Status Unix| image:: https://img.shields.io/github/actions/workflow/status/BrillouinMicroscopy/bmicro/check.yml
+.. |Build Status Unix| image:: https://img.shields.io/github/actions/workflow/status/BrillouinMicroscopy/bmicro/check_main_github.yml
    :target: https://github.com/BrillouinMicroscopy/BMicro/actions?query=workflow%3AChecks
 .. |Coverage Status| image:: https://img.shields.io/codecov/c/github/BrillouinMicroscopy/BMicro/main.svg
    :target: https://codecov.io/gh/BrillouinMicroscopy/BMicro
