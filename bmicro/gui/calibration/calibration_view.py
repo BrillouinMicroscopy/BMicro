@@ -490,6 +490,9 @@ class CalibrationView(QtWidgets.QWidget):
         temperature = self.sender().value()
 
         session = Session.get_instance()
+        # Don't do anything if the same temperature is set
+        if temperature == session.setup.temperature - 273.15:
+            return
         session.setup.set_temperature(temperature)
         self.update_options_view()
 
@@ -507,9 +510,11 @@ class CalibrationView(QtWidgets.QWidget):
             1e-9 * session.setup.calibration.shift_methanol)
         self.options_dialog.shift_1.setValue(
             1e-9 * session.setup.calibration.shift_water)
+        self.options_dialog.temperature.blockSignals(True)
         self.options_dialog.temperature.setValue(
             session.setup.temperature - 273.15
         )
+        self.options_dialog.temperature.blockSignals(False)
 
         # Get the sorted calibration keys
         calib_keys = session.get_calib_keys(sort_by_time=True)
