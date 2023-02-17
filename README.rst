@@ -40,3 +40,11 @@ Please read our `information for developers
    :target: https://codecov.io/gh/BrillouinMicroscopy/BMicro
 .. |Docs Status| image:: https://readthedocs.org/projects/bmicro/badge/?version=latest
    :target: https://readthedocs.org/projects/bmicro/builds/
+   
+   
+How to cite
+-----------
+
+If you use BMicro in a scientific publication, please cite it with:
+
+> Raimund Schlüßler and others (2023), BMicro version X.X.X: Python program for the evaluation of Brillouin microscopy data sets [Software]. Available at https://github.com/BrillouinMicroscopy/BMicro.
