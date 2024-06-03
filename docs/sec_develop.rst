@@ -115,7 +115,7 @@ Continuous integration
 ======================
 The following things are automated:
 
-- pytest and flake8 on Linux, macOS, and Windows via GitHub Actions:
+- pytest and flake8 --exclude _version.py .n Linux, macOS, and Windows via GitHub Actions:
   https://github.com/BrillouinMicroscopy/BMicro/actions?query=workflow%3AChecks
 
   You should always check that all checks pass before you merge a pull request
