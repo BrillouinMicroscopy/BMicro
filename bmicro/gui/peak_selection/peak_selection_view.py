@@ -1,4 +1,4 @@
-import pkg_resources
+from importlib import resources
 import logging
 
 from PyQt6 import QtWidgets, uic
@@ -27,9 +27,10 @@ class PeakSelectionView(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super(PeakSelectionView, self).__init__(*args, **kwargs)
 
-        ui_file = pkg_resources.resource_filename(
-            'bmicro.gui.peak_selection', 'peak_selection_view.ui')
-        uic.loadUi(ui_file, self)
+        ref = (resources.files('bmicro.gui.peak_selection') /
+               'peak_selection_view.ui')
+        with resources.as_file(ref) as ui_file:
+            uic.loadUi(ui_file, self)
 
         self.mplcanvas = MplCanvas(self.image_widget,
                                    toolbar=('Home', 'Pan', 'Zoom'))

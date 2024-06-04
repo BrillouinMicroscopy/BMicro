@@ -1,4 +1,4 @@
-import pkg_resources
+from importlib import resources
 import logging
 
 from PyQt6 import QtWidgets, QtCore, uic
@@ -31,9 +31,9 @@ class CalibrationView(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super(CalibrationView, self).__init__(*args, **kwargs)
 
-        ui_file = pkg_resources.resource_filename(
-            'bmicro.gui.calibration', 'calibration_view.ui')
-        uic.loadUi(ui_file, self)
+        ref = resources.files('bmicro.gui.calibration') / 'calibration_view.ui'
+        with resources.as_file(ref) as ui_file:
+            uic.loadUi(ui_file, self)
 
         self.mplcanvas = MplCanvas(self.image_widget,
                                    toolbar=('Home', 'Pan', 'Zoom'))
@@ -422,14 +422,15 @@ class CalibrationView(QtWidgets.QWidget):
         self.refresh_plot()
 
     def show_options(self):
-        ui_file = pkg_resources.resource_filename(
-            'bmicro.gui.calibration', 'calibration_options.ui')
         self.options_dialog = QtWidgets.QDialog(
             self,
             QtCore.Qt.WindowType.WindowTitleHint |
             QtCore.Qt.WindowType.WindowCloseButtonHint
         )
-        uic.loadUi(ui_file, self.options_dialog)
+        ref = (resources.files('bmicro.gui.calibration') /
+               'calibration_options.ui')
+        with resources.as_file(ref) as ui_file:
+            uic.loadUi(ui_file, self.options_dialog)
         self.options_dialog.setWindowTitle('Calibration options')
         self.options_dialog.setWindowModality(
             QtCore.Qt.WindowModality.ApplicationModal)

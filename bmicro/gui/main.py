@@ -1,5 +1,5 @@
 import pathlib
-import pkg_resources
+from importlib import resources
 import hashlib
 import signal
 import sys
@@ -64,11 +64,14 @@ class BMicro(QtWidgets.QMainWindow):
 
         """ Initializes BMicro."""
         super(BMicro, self).__init__(*args, **kwargs)
-        ui_file = pkg_resources.resource_filename('bmicro.gui', 'main.ui')
-        uic.loadUi(ui_file, self)
+        ref = resources.files('bmicro.gui') / 'main.ui'
+        with resources.as_file(ref) as ui_file:
+            uic.loadUi(ui_file, self)
         QtCore.QCoreApplication.setApplicationName('BMicro')
 
-        self.imdir = pkg_resources.resource_filename("bmicro", "img")
+        ref = resources.files('bmicro') / 'img'
+        with resources.as_file(ref) as imdir:
+            self.imdir = imdir
 
         self.tabWidget.currentChanged.connect(self.update_ui)
 
@@ -200,14 +203,14 @@ class BMicro(QtWidgets.QMainWindow):
         self.reset_ui()
 
     def on_action_export_file(self):
-        ui_file = pkg_resources.resource_filename(
-            'bmicro.gui', 'export_configuration.ui')
         self.export_dialog = QtWidgets.QDialog(
             self,
             QtCore.Qt.WindowType.WindowTitleHint |
             QtCore.Qt.WindowType.WindowCloseButtonHint
         )
-        uic.loadUi(ui_file, self.export_dialog)
+        ref = resources.files('bmicro.gui') / 'export_configuration.ui'
+        with resources.as_file(ref) as ui_file:
+            uic.loadUi(ui_file, self.export_dialog)
         self.export_dialog.setWindowTitle('Export configuration')
         self.export_dialog.setWindowModality(
             QtCore.Qt.WindowModality.ApplicationModal)
@@ -402,8 +405,6 @@ class BMicro(QtWidgets.QMainWindow):
                                     f"BMicro {bmicroversion}", about_text)
 
     def on_action_batch_evaluation(self):
-        ui_file = pkg_resources.resource_filename(
-            'bmicro.gui', 'batch_evaluation.ui')
         self.batch_dialog = QtWidgets.QDialog(
             self,
             QtCore.Qt.WindowType.WindowTitleHint |
@@ -411,7 +412,9 @@ class BMicro(QtWidgets.QMainWindow):
             QtCore.Qt.WindowType.WindowMaximizeButtonHint |
             QtCore.Qt.WindowType.WindowMinimizeButtonHint
         )
-        uic.loadUi(ui_file, self.batch_dialog)
+        ref = resources.files('bmicro.gui') / 'batch_evaluation.ui'
+        with resources.as_file(ref) as ui_file:
+            uic.loadUi(ui_file, self.batch_dialog)
         self.batch_dialog.setWindowTitle('Batch evaluation')
         self.batch_dialog.setWindowModality(
             QtCore.Qt.WindowModality.ApplicationModal)
