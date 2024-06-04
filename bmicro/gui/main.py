@@ -8,7 +8,7 @@ import traceback
 import numpy as np
 
 from PyQt6 import QtWidgets, uic, QtCore, QtGui
-from PyQt6.QtWidgets import QFileDialog, QMessageBox,\
+from PyQt6.QtWidgets import QFileDialog, QMessageBox, \
     QVBoxLayout, QWidget, QCheckBox, QHBoxLayout, QLabel, QLineEdit
 from PyQt6.QtCore import QSize
 
@@ -16,7 +16,7 @@ from bmlab.session import Session
 from bmlab.file import is_source_file
 from bmlab.models.setup import AVAILABLE_SETUPS
 from bmlab.models import EvaluationModel
-from bmlab.controllers import PeakSelectionController, ExportController,\
+from bmlab.controllers import PeakSelectionController, ExportController, \
     EvaluationController
 
 from . import data

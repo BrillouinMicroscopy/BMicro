@@ -630,9 +630,9 @@ class EvaluationView(QtWidgets.QWidget):
                 # horizontal axis
                 image_map = data[tuple(dslice)]
                 image_map = np.rot90(image_map)
-                extent = np.nanmin(positions[idx[0]][tuple(dslice)]),\
-                    np.nanmax(positions[idx[0]][tuple(dslice)]),\
-                    np.nanmin(positions[idx[1]][tuple(dslice)]),\
+                extent = np.nanmin(positions[idx[0]][tuple(dslice)]), \
+                    np.nanmax(positions[idx[0]][tuple(dslice)]), \
+                    np.nanmin(positions[idx[1]][tuple(dslice)]), \
                     np.nanmax(positions[idx[1]][tuple(dslice)])
                 if isinstance(self.image_map, matplotlib.image.AxesImage):
                     self.image_map.set_data(image_map)
