@@ -36,7 +36,7 @@ setup(
     license="GPL v3",
     description=description,
     long_description=open('README.rst').read() if exists('README.rst') else '',
-    install_requires=["bmlab>=0.7.0",
+    install_requires=["bmlab>=0.9.1",
                       "h5py>=2.10.0",
                       "matplotlib",
                       "numpy>=1.17.0",
