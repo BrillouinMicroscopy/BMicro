@@ -1,6 +1,6 @@
 def main():
     import os
-    import pkg_resources
+    from importlib import resources
     import sys
     import logging
 
@@ -13,9 +13,10 @@ def main():
     """
     app = QtWidgets.QApplication(sys.argv)
     # set window icon
-    imdir = pkg_resources.resource_filename("bmicro", "img")
-    icon_path = os.path.join(imdir, "icon.png")
-    app.setWindowIcon(QtGui.QIcon(icon_path))
+    ref = resources.files('bmicro') / 'img'
+    with resources.as_file(ref) as imdir:
+        icon_path = os.path.join(imdir, "icon.png")
+        app.setWindowIcon(QtGui.QIcon(icon_path))
 
     window = BMicro()
     window.show()

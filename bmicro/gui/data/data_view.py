@@ -1,4 +1,4 @@
-import pkg_resources
+from importlib import resources
 import logging
 
 from PyQt6 import uic, QtWidgets
@@ -24,9 +24,9 @@ class DataView(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super(DataView, self).__init__(*args, **kwargs)
 
-        ui_file = pkg_resources.resource_filename(
-            'bmicro.gui.data', 'data_view.ui')
-        uic.loadUi(ui_file, self)
+        ref = resources.files('bmicro.gui.data') / 'data_view.ui'
+        with resources.as_file(ref) as ui_file:
+            uic.loadUi(ui_file, self)
 
         self.mplcanvas = MplCanvas(self.image_preview_widget)
         self.preview = self.mplcanvas.get_figure().add_subplot(111)

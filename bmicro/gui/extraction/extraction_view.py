@@ -1,4 +1,4 @@
-import pkg_resources
+from importlib import resources
 import logging
 
 from PyQt6 import QtWidgets, QtCore, uic
@@ -28,9 +28,9 @@ class ExtractionView(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super(ExtractionView, self).__init__(*args, **kwargs)
 
-        ui_file = pkg_resources.resource_filename(
-            'bmicro.gui.extraction', 'extraction_view.ui')
-        uic.loadUi(ui_file, self)
+        ref = resources.files('bmicro.gui.extraction') / 'extraction_view.ui'
+        with resources.as_file(ref) as ui_file:
+            uic.loadUi(ui_file, self)
 
         self.mode = MODE_DEFAULT
         self.current_frame = 0

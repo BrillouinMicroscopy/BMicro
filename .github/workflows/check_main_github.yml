@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
         os: [macos-latest, ubuntu-latest, windows-latest]
         exclude:
           # 3.10 on macOS with shapely 1.8.0 is broken, but shapely >1.8.0 breaks the macOS DMG packages
@@ -35,7 +35,7 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0 libegl1-mesa
+        sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0 libegl1-mesa libxcb-cursor0
         # start xvfb in the background
         sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
     - name: Install dependencies for Mac and Linux
@@ -85,7 +85,7 @@ jobs:
       run: |
         bash ./macos_build_app.sh BMicro $(python -m bmicro --version)
     - name: Upload build artifacts
-      if: (runner.os == 'macOS' && matrix.python-version == '3.9')
+      if: (runner.os == 'macOS' && matrix.python-version == '3.12')
       uses: actions/upload-artifact@v3
       with:
         name: BMicro_macosx
@@ -102,7 +102,7 @@ jobs:
         python win_make_iss.py
         iscc /Q win_bmicro.iss
     - name: Upload build artifacts
-      if: (runner.os == 'windows' && matrix.python-version == '3.9')
+      if: (runner.os == 'windows' && matrix.python-version == '3.12')
       uses: actions/upload-artifact@v3
       with:
         name: BMicro

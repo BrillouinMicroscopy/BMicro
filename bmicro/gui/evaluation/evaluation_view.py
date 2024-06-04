@@ -1,4 +1,4 @@
-import pkg_resources
+from importlib import resources
 import logging
 import numpy as np
 import matplotlib
@@ -43,9 +43,9 @@ class EvaluationView(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super(EvaluationView, self).__init__(*args, **kwargs)
 
-        ui_file = pkg_resources.resource_filename(
-            'bmicro.gui.evaluation', 'evaluation_view.ui')
-        uic.loadUi(ui_file, self)
+        ref = resources.files('bmicro.gui.evaluation') / 'evaluation_view.ui'
+        with resources.as_file(ref) as ui_file:
+            uic.loadUi(ui_file, self)
 
         self.mplcanvas = MplCanvas(self.image_widget,
                                    toolbar=('Home', 'Pan', 'Zoom'))
@@ -314,8 +314,6 @@ class EvaluationView(QtWidgets.QWidget):
 
     def open_image_spectrum(self):
         if self.image_spectrum_dialog is None:
-            ui_file = pkg_resources.resource_filename(
-                'bmicro.gui.evaluation', 'spectrum_view.ui')
             self.image_spectrum_dialog = QtWidgets.QDialog(
                 self,
                 QtCore.Qt.WindowType.WindowTitleHint |
@@ -323,7 +321,9 @@ class EvaluationView(QtWidgets.QWidget):
                 QtCore.Qt.WindowType.WindowMaximizeButtonHint |
                 QtCore.Qt.WindowType.WindowMinimizeButtonHint
             )
-            uic.loadUi(ui_file, self.image_spectrum_dialog)
+            ref = resources.files('bmicro.gui.evaluation') / 'spectrum_view.ui'
+            with resources.as_file(ref) as ui_file:
+                uic.loadUi(ui_file, self.image_spectrum_dialog)
             self.image_spectrum_dialog\
                 .setWindowTitle('Camera image & spectrum')
             self.image_spectrum_dialog.setWindowModality(
@@ -630,9 +630,9 @@ class EvaluationView(QtWidgets.QWidget):
                 # horizontal axis
                 image_map = data[tuple(dslice)]
                 image_map = np.rot90(image_map)
-                extent = np.nanmin(positions[idx[0]][tuple(dslice)]),\
-                    np.nanmax(positions[idx[0]][tuple(dslice)]),\
-                    np.nanmin(positions[idx[1]][tuple(dslice)]),\
+                extent = np.nanmin(positions[idx[0]][tuple(dslice)]), \
+                    np.nanmax(positions[idx[0]][tuple(dslice)]), \
+                    np.nanmin(positions[idx[1]][tuple(dslice)]), \
                     np.nanmax(positions[idx[1]][tuple(dslice)])
                 if isinstance(self.image_map, matplotlib.image.AxesImage):
                     self.image_map.set_data(image_map)
