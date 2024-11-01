@@ -42,7 +42,7 @@ jobs:
         iscc /Q win_bmicro.iss
     - name: Release macOS assets
       if: runner.os == 'macOS'
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         name: BMicro ${{ github.ref_name }}
         draft: true
@@ -54,7 +54,7 @@ jobs:
           ./build-recipes/dist/BMicro_${{ github.ref_name }}_macosx.pkg
     - name: Release windows assets
       if: runner.os == 'windows'
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         name: BMicro ${{ github.ref_name }}
         draft: true
