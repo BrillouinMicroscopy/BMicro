@@ -1,3 +1,15 @@
+## 0.10.0 - 2024-11-01
+
+### Added
+- Support for RGB bright-field images #269
+- Add dependabot for action workflows 64a50d722d62032f36c4bbc87d17c07db7081a55
+
+### Changed
+- Update to bmlab 0.10.0 #269
+- Add support for Python 3.13
+- Drop support for Python 3.9
+- Updated actions dependencies
+
 ## 0.9.0 - 2024-06-04
 
 ### Changed
