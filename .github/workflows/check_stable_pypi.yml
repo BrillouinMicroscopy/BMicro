@@ -70,7 +70,7 @@ jobs:
         bash ./macos_build_app.sh BMicro $(python -m bmicro --version)
     - name: Upload build artifacts
       if: (runner.os == 'macOS' && matrix.python-version == '3.12')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: BMicro_macosx
         path: |
@@ -87,7 +87,7 @@ jobs:
         iscc /Q win_bmicro.iss
     - name: Upload build artifacts
       if: (runner.os == 'windows' && matrix.python-version == '3.12')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: BMicro
         path: |
