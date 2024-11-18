@@ -61,7 +61,7 @@ jobs:
       run: |
         flake8 --exclude _version.py .
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
 
     - name: Create app and check if it runs (macOS)
       if: runner.os == 'macOS'
