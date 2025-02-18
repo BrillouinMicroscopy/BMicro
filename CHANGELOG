@@ -1,3 +1,11 @@
+## 0.10.1 - 2025-02-18
+
+### Changed
+- Update to bmlab 0.10.1 #271
+
+### Fixed
+- fix(export): don't break if BM and FL images don't overlap #271
+
 ## 0.10.0 - 2024-11-01
 
 ### Added
