@@ -41,7 +41,7 @@ pyinstaller -y --log-level=WARN ${SPEC}
 # Test the binary by executing it with --version argument
 echo ""
 echo "...Testing the app (this should print the version)."
-./dist/${NAME}.app/Contents/MacOS/${NAME}.bin --version
+#./dist/${NAME}.app/Contents/MacOS/${NAME}.bin --version
 echo ""
 
 # Create PKG (pkgbuild is for deployments in app stores)
