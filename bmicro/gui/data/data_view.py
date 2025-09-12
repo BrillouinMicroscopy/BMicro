@@ -1,11 +1,12 @@
 from importlib import resources
 import logging
 
-from PyQt6 import uic, QtWidgets
+from PyQt6 import uic, QtWidgets, QtCore
 import matplotlib
 
 from bmlab.models.setup import AVAILABLE_SETUPS
 from bmlab.session import Session
+from bmlab.controllers import PeakSelectionController, EvaluationController
 
 from bmicro.gui.mpl import MplCanvas
 
@@ -28,6 +29,8 @@ class DataView(QtWidgets.QWidget):
         with resources.as_file(ref) as ui_file:
             uic.loadUi(ui_file, self)
 
+        self.parent = args[0]
+
         self.mplcanvas = MplCanvas(self.image_preview_widget)
         self.preview = self.mplcanvas.get_figure().add_subplot(111)
         self.preview.axis('off')
@@ -47,6 +50,8 @@ class DataView(QtWidgets.QWidget):
         self.combobox_setup.addItems([s.name for s in AVAILABLE_SETUPS])
         self.combobox_setup.currentIndexChanged.connect(
             self.on_select_setup)
+
+        self.auto_evaluation.clicked.connect(self.on_auto_evaluation)
 
         # Initialize current setup to first entry
         Session.get_instance().set_setup(AVAILABLE_SETUPS[0])
@@ -118,6 +123,57 @@ class DataView(QtWidgets.QWidget):
         self.checkbox_reflect_vertically.setChecked(False)
         self.checkbox_reflect_horizontally.setChecked(False)
         self.update_preview()
+
+    def on_auto_evaluation(self):
+        session = Session.get_instance()
+        if session.file is None:
+            return
+
+        rep_keys = session.file.repetition_keys()
+
+        for rep_key in rep_keys:
+            # Load repetition
+            session.set_current_repetition(rep_key)
+            QtCore.QCoreApplication.instance().processEvents()
+
+            # Setup
+            session.set_setup(AVAILABLE_SETUPS[0])
+
+            # Orientation
+            session.set_rotation(0)
+            session.set_reflection(
+                vertically=False,
+                horizontally=True
+            )
+            self.update_ui()
+
+            # Extraction
+            self.parent.tabWidget.setCurrentIndex(1)
+            QtCore.QCoreApplication.instance().processEvents()
+            self.parent.widget_extraction_view.find_points_all()
+
+            # Calibration
+            self.parent.tabWidget.setCurrentIndex(2)
+            QtCore.QCoreApplication.instance().processEvents()
+            self.parent.widget_calibration_view.calibrate_all()
+
+            # PeakSelection
+            self.parent.tabWidget.setCurrentIndex(3)
+            QtCore.QCoreApplication.instance().processEvents()
+            psc = PeakSelectionController()
+            psc.add_brillouin_region_frequency((4.0e9, 6.0e9))
+            psc.add_brillouin_region_frequency((9.0e9, 11.0e9))
+            psc.add_rayleigh_region_frequency((-2.0e9, 2.0e9))
+            psc.add_rayleigh_region_frequency((13.0e9, 17.0e9))
+            self.parent.widget_peak_selection_view.update_ui()
+            QtCore.QCoreApplication.instance().processEvents()
+
+            # Evaluation
+            self.parent.tabWidget.setCurrentIndex(4)
+            QtCore.QCoreApplication.instance().processEvents()
+            evc = EvaluationController()
+            evc.set_nr_brillouin_peaks(1)
+            self.parent.widget_evaluation_view.evaluate()
 
     def on_rotation_clicked(self):
         """
