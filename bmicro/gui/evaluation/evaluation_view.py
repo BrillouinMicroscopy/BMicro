@@ -461,6 +461,9 @@ class EvaluationView(QtWidgets.QWidget):
         self.refresh_plot()
 
     def evaluate(self, blocking=False):
+        # Check that a file is open
+        if self.session.file is None:
+            return
         # If the evaluation is already running, we abort it and reset
         #  the button label
         if self.evaluation_running:
