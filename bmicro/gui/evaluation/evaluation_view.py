@@ -734,8 +734,8 @@ class EvaluationView(QtWidgets.QWidget):
 
             if self.ignore_outliers.isChecked():
                 # Ignore outliers with 1.5 IQR rule
-                q1 = np.percentile(data, 25)
-                q3 = np.percentile(data, 75)
+                q1 = np.nanpercentile(data, 25)
+                q3 = np.nanpercentile(data, 75)
                 iqr = q3 - q1
                 # Chose largest minimum and smallest maximum
                 value_min = max(q1 - 1.5 * iqr, value_min)
