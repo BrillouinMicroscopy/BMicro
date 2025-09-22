@@ -77,6 +77,8 @@ class EvaluationView(QtWidgets.QWidget):
 
         self.autoscale.clicked.connect(
             self.on_scale_changed)
+        self.ignore_outliers.clicked.connect(
+            self.on_scale_changed)
         self.value_min.valueChanged.connect(
             self.on_scale_changed)
         self.value_max.valueChanged.connect(
@@ -458,6 +460,7 @@ class EvaluationView(QtWidgets.QWidget):
         autoscale = self.autoscale.isChecked()
         self.value_min.setDisabled(autoscale)
         self.value_max.setDisabled(autoscale)
+        self.ignore_outliers.setDisabled(not autoscale)
         self.refresh_plot()
 
     def evaluate(self, blocking=False):
@@ -728,6 +731,16 @@ class EvaluationView(QtWidgets.QWidget):
         if self.autoscale.isChecked():
             value_min = np.nanmin(data)
             value_max = np.nanmax(data)
+
+            if self.ignore_outliers.isChecked():
+                # Ignore outliers with 1.5 IQR rule
+                q1 = np.percentile(data, 25)
+                q3 = np.percentile(data, 75)
+                iqr = q3 - q1
+                # Chose largest minimum and smallest maximum
+                value_min = max(q1 - 1.5 * iqr, value_min)
+                value_max = min(q3 + 1.5 * iqr, value_max)
+
             self.value_min.blockSignals(True)
             self.value_min.setValue(value_min)
             self.value_min.blockSignals(False)
