@@ -46,7 +46,7 @@ setup(
                       "pytest-qt",
                       "pytest_mock",
                       "scikit-image",
-                      "scipy==1.14.1"
+                      "scipy"
                       ],
     python_requires=">=3.10",
     keywords=["Brillouin Microscopy"],
