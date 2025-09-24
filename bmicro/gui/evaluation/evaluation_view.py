@@ -729,17 +729,17 @@ class EvaluationView(QtWidgets.QWidget):
 
     def get_plot_limits(self, data):
         if self.autoscale.isChecked():
-            value_min = np.nanmin(data)
-            value_max = np.nanmax(data)
 
             if self.ignore_outliers.isChecked():
                 # Ignore outliers with 1.5 IQR rule
                 q1 = np.nanpercentile(data, 25)
                 q3 = np.nanpercentile(data, 75)
                 iqr = q3 - q1
-                # Chose largest minimum and smallest maximum
-                value_min = max(q1 - 1.5 * iqr, value_min)
-                value_max = min(q3 + 1.5 * iqr, value_max)
+                data[data < (q1 - 1.5 * iqr)] = np.nan
+                data[data > (q3 + 1.5 * iqr)] = np.nan
+
+            value_min = np.nanmin(data)
+            value_max = np.nanmax(data)
 
             self.value_min.blockSignals(True)
             self.value_min.setValue(value_min)
