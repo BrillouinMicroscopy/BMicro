@@ -14,7 +14,7 @@ authors = [
 ]
 description = 'GUI for Brillouin evaluation'
 name = 'bmicro'
-year = "2022"
+year = "2026"
 
 
 sys.path.insert(0, realpath(dirname(__file__))+"/"+name)
@@ -36,7 +36,7 @@ setup(
     license="GPL v3",
     description=description,
     long_description=open('README.rst').read() if exists('README.rst') else '',
-    install_requires=["bmlab>=0.11.0a0",
+    install_requires=["bmlab>=0.12.0",
                       "h5py>=2.10.0",
                       "matplotlib",
                       "numpy>=1.17.0",
