@@ -738,8 +738,13 @@ class EvaluationView(QtWidgets.QWidget):
                 data[data < (q1 - 1.5 * iqr)] = np.nan
                 data[data > (q3 + 1.5 * iqr)] = np.nan
 
-            value_min = np.nanmin(data)
-            value_max = np.nanmax(data)
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    action='ignore',
+                    message='All-NaN slice encountered'
+                )
+                value_min = np.nanmin(data)
+                value_max = np.nanmax(data)
 
             self.value_min.blockSignals(True)
             self.value_min.setValue(value_min)
