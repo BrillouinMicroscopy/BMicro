@@ -1,3 +1,10 @@
+## 0.12.2 - 2026-03-30
+
+### Fixed
+- fix: better handle aborted scans
+- fix: correctly auto evaluate all repetitions #294
+- fix: silence all-nan warnings #295
+
 ## 0.12.1 - 2026-03-04
 
 ### Fixed
